@@ -1,5 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react'
 import { getProfile } from '~/server/profile'
+import { createCheckoutSession, createPortalSession } from '~/server/billing'
+import { addCustomDomain, removeCustomDomain, checkDomainStatus } from '~/server/domains'
 
 export const Route = createFileRoute('/_dashboard/dashboard/settings')({
   loader: () => getProfile(),
@@ -35,17 +38,116 @@ function SettingsPage() {
           </div>
         </div>
 
-        {/* Billing - placeholder for Phase 4 */}
+        {/* Billing */}
         <div className="bg-dark-card border border-white/10 rounded-lg p-6">
           <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Billing</h2>
-          <p className="text-text-secondary text-sm">Billing and subscription management coming soon.</p>
+          {profile?.tier === 'pro' ? (
+            <div>
+              <p className="text-sm text-text-secondary mb-4">You're on the <span className="text-accent font-bold">Pro</span> plan.</p>
+              <button
+                onClick={async () => {
+                  const result = await createPortalSession()
+                  if ('url' in result && result.url) window.location.href = result.url
+                }}
+                className="bg-white/10 hover:bg-white/20 text-white text-sm font-bold uppercase tracking-widest px-6 py-2 rounded-lg transition-colors"
+              >
+                Manage Subscription
+              </button>
+            </div>
+          ) : (
+            <div>
+              <p className="text-sm text-text-secondary mb-4">You're on the <span className="font-bold">Free</span> plan. Upgrade for custom domains, remove branding, and more.</p>
+              <button
+                onClick={async () => {
+                  const result = await createCheckoutSession()
+                  if ('url' in result && result.url) window.location.href = result.url
+                }}
+                className="bg-accent hover:bg-accent/80 text-white text-sm font-bold uppercase tracking-widest px-6 py-2 rounded-lg transition-colors"
+              >
+                Upgrade to Pro
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* Custom Domain - placeholder for Phase 4 */}
-        <div className="bg-dark-card border border-white/10 rounded-lg p-6">
-          <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Custom Domain</h2>
-          <p className="text-text-secondary text-sm">Custom domain configuration available on the Pro plan.</p>
+        {/* Custom Domain */}
+        <CustomDomainSection profile={profile} />
+      </div>
+    </div>
+  )
+}
+
+function CustomDomainSection({ profile }: { profile: any }) {
+  const [domain, setDomain] = useState(profile?.custom_domain || '')
+  const [status, setStatus] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  const handleAdd = async () => {
+    setLoading(true)
+    const result = await addCustomDomain({ data: { domain } })
+    setLoading(false)
+    if ('error' in result) {
+      setStatus(result.error as string)
+    } else {
+      setStatus('Domain added. Configure your DNS: CNAME → cname.vercel-dns.com')
+    }
+  }
+
+  const handleRemove = async () => {
+    setLoading(true)
+    await removeCustomDomain()
+    setLoading(false)
+    setDomain('')
+    setStatus('Domain removed.')
+  }
+
+  const handleCheck = async () => {
+    const result = await checkDomainStatus({ data: { domain } })
+    setStatus(result.configured ? 'Domain is verified and active.' : 'Domain not yet verified. Check your DNS settings.')
+  }
+
+  if (profile?.tier !== 'pro') {
+    return (
+      <div className="bg-dark-card border border-white/10 rounded-lg p-6">
+        <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Custom Domain</h2>
+        <p className="text-text-secondary text-sm">Upgrade to Pro to use a custom domain.</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-dark-card border border-white/10 rounded-lg p-6">
+      <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Custom Domain</h2>
+      {profile?.custom_domain ? (
+        <div className="space-y-3">
+          <p className="text-sm">Current domain: <span className="font-mono text-accent">{profile.custom_domain}</span></p>
+          <div className="flex gap-2">
+            <button onClick={handleCheck} className="text-xs text-text-secondary hover:text-white transition-colors">Check status</button>
+            <button onClick={handleRemove} disabled={loading} className="text-xs text-red-400 hover:text-red-300 transition-colors">Remove</button>
+          </div>
         </div>
+      ) : (
+        <div className="space-y-3">
+          <input
+            type="text"
+            value={domain}
+            onChange={(e) => setDomain(e.target.value)}
+            placeholder="yourdomain.com"
+            className="w-full bg-dark-bg border border-white/10 rounded-lg px-4 py-2 text-white text-sm focus:border-accent focus:outline-none"
+          />
+          <button
+            onClick={handleAdd}
+            disabled={!domain || loading}
+            className="bg-accent hover:bg-accent/80 disabled:opacity-30 text-white text-sm font-bold uppercase tracking-widest px-6 py-2 rounded-lg transition-colors"
+          >
+            {loading ? 'Adding...' : 'Add Domain'}
+          </button>
+        </div>
+      )}
+      {status && <p className="text-xs text-text-secondary mt-3">{status}</p>}
+      <div className="mt-4 text-xs text-text-secondary">
+        <p className="font-bold mb-1">DNS Configuration:</p>
+        <p>Add a CNAME record pointing your domain to <code className="text-accent">cname.vercel-dns.com</code></p>
       </div>
     </div>
   )
