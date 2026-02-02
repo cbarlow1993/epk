@@ -15,8 +15,10 @@ import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardDashboardRouteImport } from './routes/_dashboard/dashboard'
+import { Route as DashboardDashboardTechnicalRouteImport } from './routes/_dashboard/dashboard.technical'
 import { Route as DashboardDashboardMusicRouteImport } from './routes/_dashboard/dashboard.music'
 import { Route as DashboardDashboardEventsRouteImport } from './routes/_dashboard/dashboard.events'
+import { Route as DashboardDashboardContactRouteImport } from './routes/_dashboard/dashboard.contact'
 import { Route as DashboardDashboardBioRouteImport } from './routes/_dashboard/dashboard.bio'
 
 const SignupRoute = SignupRouteImport.update({
@@ -48,6 +50,12 @@ const DashboardDashboardRoute = DashboardDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardDashboardTechnicalRoute =
+  DashboardDashboardTechnicalRouteImport.update({
+    id: '/technical',
+    path: '/technical',
+    getParentRoute: () => DashboardDashboardRoute,
+  } as any)
 const DashboardDashboardMusicRoute = DashboardDashboardMusicRouteImport.update({
   id: '/music',
   path: '/music',
@@ -57,6 +65,12 @@ const DashboardDashboardEventsRoute =
   DashboardDashboardEventsRouteImport.update({
     id: '/events',
     path: '/events',
+    getParentRoute: () => DashboardDashboardRoute,
+  } as any)
+const DashboardDashboardContactRoute =
+  DashboardDashboardContactRouteImport.update({
+    id: '/contact',
+    path: '/contact',
     getParentRoute: () => DashboardDashboardRoute,
   } as any)
 const DashboardDashboardBioRoute = DashboardDashboardBioRouteImport.update({
@@ -72,8 +86,10 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/dashboard': typeof DashboardDashboardRouteWithChildren
   '/dashboard/bio': typeof DashboardDashboardBioRoute
+  '/dashboard/contact': typeof DashboardDashboardContactRoute
   '/dashboard/events': typeof DashboardDashboardEventsRoute
   '/dashboard/music': typeof DashboardDashboardMusicRoute
+  '/dashboard/technical': typeof DashboardDashboardTechnicalRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -82,8 +98,10 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/dashboard': typeof DashboardDashboardRouteWithChildren
   '/dashboard/bio': typeof DashboardDashboardBioRoute
+  '/dashboard/contact': typeof DashboardDashboardContactRoute
   '/dashboard/events': typeof DashboardDashboardEventsRoute
   '/dashboard/music': typeof DashboardDashboardMusicRoute
+  '/dashboard/technical': typeof DashboardDashboardTechnicalRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -94,8 +112,10 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/_dashboard/dashboard': typeof DashboardDashboardRouteWithChildren
   '/_dashboard/dashboard/bio': typeof DashboardDashboardBioRoute
+  '/_dashboard/dashboard/contact': typeof DashboardDashboardContactRoute
   '/_dashboard/dashboard/events': typeof DashboardDashboardEventsRoute
   '/_dashboard/dashboard/music': typeof DashboardDashboardMusicRoute
+  '/_dashboard/dashboard/technical': typeof DashboardDashboardTechnicalRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -106,8 +126,10 @@ export interface FileRouteTypes {
     | '/signup'
     | '/dashboard'
     | '/dashboard/bio'
+    | '/dashboard/contact'
     | '/dashboard/events'
     | '/dashboard/music'
+    | '/dashboard/technical'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -116,8 +138,10 @@ export interface FileRouteTypes {
     | '/signup'
     | '/dashboard'
     | '/dashboard/bio'
+    | '/dashboard/contact'
     | '/dashboard/events'
     | '/dashboard/music'
+    | '/dashboard/technical'
   id:
     | '__root__'
     | '/'
@@ -127,8 +151,10 @@ export interface FileRouteTypes {
     | '/signup'
     | '/_dashboard/dashboard'
     | '/_dashboard/dashboard/bio'
+    | '/_dashboard/dashboard/contact'
     | '/_dashboard/dashboard/events'
     | '/_dashboard/dashboard/music'
+    | '/_dashboard/dashboard/technical'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -183,6 +209,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/dashboard/technical': {
+      id: '/_dashboard/dashboard/technical'
+      path: '/technical'
+      fullPath: '/dashboard/technical'
+      preLoaderRoute: typeof DashboardDashboardTechnicalRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
     '/_dashboard/dashboard/music': {
       id: '/_dashboard/dashboard/music'
       path: '/music'
@@ -197,6 +230,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardEventsRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
+    '/_dashboard/dashboard/contact': {
+      id: '/_dashboard/dashboard/contact'
+      path: '/contact'
+      fullPath: '/dashboard/contact'
+      preLoaderRoute: typeof DashboardDashboardContactRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
     '/_dashboard/dashboard/bio': {
       id: '/_dashboard/dashboard/bio'
       path: '/bio'
@@ -209,14 +249,18 @@ declare module '@tanstack/react-router' {
 
 interface DashboardDashboardRouteChildren {
   DashboardDashboardBioRoute: typeof DashboardDashboardBioRoute
+  DashboardDashboardContactRoute: typeof DashboardDashboardContactRoute
   DashboardDashboardEventsRoute: typeof DashboardDashboardEventsRoute
   DashboardDashboardMusicRoute: typeof DashboardDashboardMusicRoute
+  DashboardDashboardTechnicalRoute: typeof DashboardDashboardTechnicalRoute
 }
 
 const DashboardDashboardRouteChildren: DashboardDashboardRouteChildren = {
   DashboardDashboardBioRoute: DashboardDashboardBioRoute,
+  DashboardDashboardContactRoute: DashboardDashboardContactRoute,
   DashboardDashboardEventsRoute: DashboardDashboardEventsRoute,
   DashboardDashboardMusicRoute: DashboardDashboardMusicRoute,
+  DashboardDashboardTechnicalRoute: DashboardDashboardTechnicalRoute,
 }
 
 const DashboardDashboardRouteWithChildren =
