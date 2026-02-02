@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
     if (profile) {
       // Internal rewrite to the slug route
       url.pathname = `/${profile.slug}`
-      event.node.req.url = url.pathname + url.search
+      event.node!.req.url = url.pathname + url.search
     }
   }
 })
