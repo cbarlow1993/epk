@@ -9,3 +9,7 @@
   --color-text-secondary: #a0a0b0;
   --font-display: 'Inter', sans-serif;
 }
+
+html {
+  scroll-behavior: smooth;
+}
