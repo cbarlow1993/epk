@@ -1,6 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useCallback } from 'react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { getProfile, updateProfile } from '~/server/profile'
+import { profileUpdateSchema, type ProfileUpdate } from '~/schemas/profile'
+import { FormTextarea } from '~/components/forms'
 
 export const Route = createFileRoute('/_dashboard/dashboard/bio')({
   loader: () => getProfile(),
@@ -9,56 +13,69 @@ export const Route = createFileRoute('/_dashboard/dashboard/bio')({
 
 function BioEditor() {
   const initialProfile = Route.useLoaderData()
-  const [bioLeft, setBioLeft] = useState(initialProfile?.bio_left || '')
-  const [bioRight, setBioRight] = useState(initialProfile?.bio_right || '')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [error, setError] = useState('')
 
-  const [timer, setTimer] = useState<ReturnType<typeof setTimeout> | null>(null)
-  const autoSave = useCallback((field: string, value: string) => {
-    if (timer) clearTimeout(timer)
-    const t = setTimeout(async () => {
-      setSaving(true)
-      setSaved(false)
-      await updateProfile({ data: { [field]: value } })
-      setSaving(false)
-      setSaved(true)
-      setTimeout(() => setSaved(false), 2000)
-    }, 800)
-    setTimer(t)
-  }, [timer])
+  const { register, handleSubmit, formState: { errors, isDirty } } = useForm<Pick<ProfileUpdate, 'bio_left' | 'bio_right'>>({
+    resolver: zodResolver(profileUpdateSchema.pick({ bio_left: true, bio_right: true }).partial()),
+    defaultValues: {
+      bio_left: initialProfile?.bio_left || '',
+      bio_right: initialProfile?.bio_right || '',
+    },
+  })
+
+  const onSave = handleSubmit(async (data) => {
+    setSaving(true)
+    setSaved(false)
+    setError('')
+    try {
+      const result = await updateProfile({ data })
+      if (result && 'error' in result) {
+        setError(result.error as string)
+      } else {
+        setSaved(true)
+        setTimeout(() => setSaved(false), 3000)
+      }
+    } catch {
+      setError('Failed to save. Please try again.')
+    }
+    setSaving(false)
+  })
 
   return (
-    <div>
+    <form onSubmit={onSave}>
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-black uppercase tracking-wider">Bio</h1>
-        <span className="text-xs text-text-secondary">
-          {saving ? 'Saving...' : saved ? 'Saved' : ''}
-        </span>
+        <div className="flex items-center gap-3">
+          {saved && <span className="text-xs text-green-400">Saved</span>}
+          {error && <span className="text-xs text-red-400">{error}</span>}
+          <button
+            type="submit"
+            disabled={saving || (!isDirty && !saved)}
+            className="px-5 py-2 rounded-lg text-sm font-bold uppercase tracking-wider bg-accent text-black hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {saving ? 'Saving...' : 'Save'}
+          </button>
+        </div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm uppercase tracking-widest font-bold mb-2">Left Column</label>
-          <textarea
-            value={bioLeft}
-            onChange={(e) => { setBioLeft(e.target.value); autoSave('bio_left', e.target.value) }}
-            rows={15}
-            className="w-full bg-dark-card border border-white/10 rounded-lg px-4 py-3 text-white placeholder-text-secondary/50 focus:border-accent focus:outline-none transition-colors resize-none text-sm leading-relaxed"
-            placeholder="First half of your bio..."
-          />
-        </div>
-        <div>
-          <label className="block text-sm uppercase tracking-widest font-bold mb-2">Right Column</label>
-          <textarea
-            value={bioRight}
-            onChange={(e) => { setBioRight(e.target.value); autoSave('bio_right', e.target.value) }}
-            rows={15}
-            className="w-full bg-dark-card border border-white/10 rounded-lg px-4 py-3 text-white placeholder-text-secondary/50 focus:border-accent focus:outline-none transition-colors resize-none text-sm leading-relaxed"
-            placeholder="Second half of your bio..."
-          />
-        </div>
+        <FormTextarea
+          label="Left Column"
+          registration={register('bio_left')}
+          error={errors.bio_left}
+          rows={15}
+          placeholder="First half of your bio..."
+        />
+        <FormTextarea
+          label="Right Column"
+          registration={register('bio_right')}
+          error={errors.bio_right}
+          rows={15}
+          placeholder="Second half of your bio..."
+        />
       </div>
-    </div>
+    </form>
   )
 }

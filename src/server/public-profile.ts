@@ -1,19 +1,23 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getSupabaseAdmin } from '~/utils/supabase'
+import { getSupabaseServerClient } from '~/utils/supabase'
 
 export const getPublicProfile = createServerFn({ method: 'GET' })
   .inputValidator((slug: string) => slug)
   .handler(async ({ data: slug }) => {
-    const supabase = getSupabaseAdmin()
+    const supabase = getSupabaseServerClient()
 
-    const { data: profile } = await supabase
+    const { data: fullProfile } = await supabase
       .from('profiles')
       .select('*')
       .eq('slug', slug)
       .eq('published', true)
       .single()
 
-    if (!profile) return null
+    if (!fullProfile) return null
+
+    // Strip sensitive fields before returning to client
+    const { id, stripe_customer_id, custom_css, ...profile } = fullProfile
+    const profileId = id
 
     const [
       { data: socialLinks },
@@ -23,12 +27,12 @@ export const getPublicProfile = createServerFn({ method: 'GET' })
       { data: bookingContact },
       { data: pressAssets },
     ] = await Promise.all([
-      supabase.from('social_links').select('*').eq('profile_id', profile.id).order('sort_order'),
-      supabase.from('mixes').select('*').eq('profile_id', profile.id).order('sort_order'),
-      supabase.from('events').select('*').eq('profile_id', profile.id).order('sort_order'),
-      supabase.from('technical_rider').select('*').eq('profile_id', profile.id).single(),
-      supabase.from('booking_contact').select('*').eq('profile_id', profile.id).single(),
-      supabase.from('press_assets').select('*').eq('profile_id', profile.id).order('sort_order'),
+      supabase.from('social_links').select('*').eq('profile_id', profileId).order('sort_order'),
+      supabase.from('mixes').select('*').eq('profile_id', profileId).order('sort_order'),
+      supabase.from('events').select('*').eq('profile_id', profileId).order('sort_order'),
+      supabase.from('technical_rider').select('*').eq('profile_id', profileId).single(),
+      supabase.from('booking_contact').select('*').eq('profile_id', profileId).single(),
+      supabase.from('press_assets').select('*').eq('profile_id', profileId).order('sort_order'),
     ])
 
     return {

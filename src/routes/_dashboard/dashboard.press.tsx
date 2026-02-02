@@ -1,26 +1,37 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState, useRef } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { getPressAssets, upsertPressAsset, deletePressAsset } from '~/server/press-assets'
+import { ASSET_TYPES, type PressAssetUpsert } from '~/schemas/press-asset'
 import { uploadFileFromInput } from '~/utils/upload'
+import { z } from 'zod'
 
 export const Route = createFileRoute('/_dashboard/dashboard/press')({
   loader: () => getPressAssets(),
   component: PressEditor,
 })
 
-const ASSET_TYPES = [
-  { value: 'photo', label: 'Photo' },
-  { value: 'video', label: 'Video' },
-  { value: 'logo', label: 'Logo' },
-]
+const ASSET_TYPE_OPTIONS = ASSET_TYPES.map((t) => ({
+  value: t,
+  label: t.charAt(0).toUpperCase() + t.slice(1),
+}))
 
 function PressEditor() {
   const initialAssets = Route.useLoaderData()
   const [assets, setAssets] = useState(initialAssets || [])
-  const [title, setTitle] = useState('')
-  const [type, setType] = useState('photo')
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const pressFormSchema = z.object({
+    title: z.string().max(200).optional(),
+    type: z.enum(ASSET_TYPES),
+  })
+
+  const { register, getValues, reset } = useForm<{ title?: string; type: PressAssetUpsert['type'] }>({
+    resolver: zodResolver(pressFormSchema),
+    defaultValues: { title: '', type: 'photo' },
+  })
 
   const handleUpload = async () => {
     const file = fileInputRef.current?.files?.[0]
@@ -33,14 +44,15 @@ function PressEditor() {
       return
     }
 
-    const assetTitle = title.trim() || file.name
+    const formValues = getValues()
+    const assetTitle = formValues.title?.trim() || file.name
+    const typeVal = formValues.type
     const result = await upsertPressAsset({
-      data: { title: assetTitle, file_url: fileUrl, type, sort_order: assets.length },
+      data: { title: assetTitle, file_url: fileUrl, type: typeVal || 'photo', sort_order: assets.length },
     })
     if ('asset' in result && result.asset) {
       setAssets([...assets, result.asset])
-      setTitle('')
-      setType('photo')
+      reset()
       if (fileInputRef.current) fileInputRef.current.value = ''
     }
     setUploading(false)
@@ -67,19 +79,12 @@ function PressEditor() {
           <input
             type="text"
             placeholder="Title (optional, defaults to filename)"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            {...register('title')}
             className={inputClass}
           />
-          <select
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-            className={inputClass}
-          >
-            {ASSET_TYPES.map((t) => (
-              <option key={t.value} value={t.value}>
-                {t.label}
-              </option>
+          <select {...register('type')} className={inputClass}>
+            {ASSET_TYPE_OPTIONS.map((t) => (
+              <option key={t.value} value={t.value}>{t.label}</option>
             ))}
           </select>
           <input
@@ -90,6 +95,7 @@ function PressEditor() {
           />
         </div>
         <button
+          type="button"
           onClick={handleUpload}
           disabled={uploading}
           className={`${btnClass} bg-accent text-black hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed`}

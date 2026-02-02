@@ -1,46 +1,41 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { getSocialLinks, upsertSocialLink, deleteSocialLink, reorderSocialLinks } from '~/server/social-links'
+import { socialLinkUpsertSchema, SOCIAL_PLATFORMS, type SocialLinkUpsert } from '~/schemas/social-link'
 
 export const Route = createFileRoute('/_dashboard/dashboard/socials')({
   loader: () => getSocialLinks(),
   component: SocialsEditor,
 })
 
-const PLATFORMS = [
-  { value: 'instagram', label: 'Instagram' },
-  { value: 'soundcloud', label: 'SoundCloud' },
-  { value: 'tiktok', label: 'TikTok' },
-  { value: 'twitter', label: 'Twitter' },
-  { value: 'youtube', label: 'YouTube' },
-  { value: 'spotify', label: 'Spotify' },
-  { value: 'facebook', label: 'Facebook' },
-  { value: 'mixcloud', label: 'Mixcloud' },
-  { value: 'other', label: 'Other' },
-]
+const PLATFORM_OPTIONS = SOCIAL_PLATFORMS.map((p) => ({
+  value: p,
+  label: p.charAt(0).toUpperCase() + p.slice(1),
+}))
 
 function SocialsEditor() {
   const initialLinks = Route.useLoaderData()
   const [links, setLinks] = useState(initialLinks || [])
-  const [platform, setPlatform] = useState('instagram')
-  const [url, setUrl] = useState('')
-  const [handle, setHandle] = useState('')
+
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<SocialLinkUpsert>({
+    resolver: zodResolver(socialLinkUpsertSchema.omit({ id: true, sort_order: true })),
+    defaultValues: { platform: 'instagram', url: '', handle: '' },
+  })
   const [adding, setAdding] = useState(false)
 
-  const handleAdd = async () => {
-    if (!url.trim()) return
+  const onAdd = handleSubmit(async (data) => {
     setAdding(true)
     const result = await upsertSocialLink({
-      data: { platform, url, handle, sort_order: links.length },
+      data: { ...data, sort_order: links.length },
     })
     if ('link' in result && result.link) {
       setLinks([...links, result.link])
-      setPlatform('instagram')
-      setUrl('')
-      setHandle('')
+      reset()
     }
     setAdding(false)
-  }
+  })
 
   const handleDelete = async (id: string) => {
     await deleteSocialLink({ data: id })
@@ -59,12 +54,14 @@ function SocialsEditor() {
   }
 
   const getPlatformLabel = (value: string) => {
-    const p = PLATFORMS.find((p) => p.value === value)
+    const p = PLATFORM_OPTIONS.find((p) => p.value === value)
     return p ? p.label : value
   }
 
   const inputClass =
     'w-full bg-dark-card border border-white/10 rounded-lg px-4 py-3 text-white placeholder-text-secondary/50 focus:border-accent focus:outline-none transition-colors text-sm'
+  const inputErrorClass =
+    'w-full bg-dark-card border border-red-500 rounded-lg px-4 py-3 text-white placeholder-text-secondary/50 focus:border-accent focus:outline-none transition-colors text-sm'
   const btnClass =
     'px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-colors'
 
@@ -73,43 +70,43 @@ function SocialsEditor() {
       <h1 className="text-2xl font-black uppercase tracking-wider mb-8">Social Links</h1>
 
       {/* Add Form */}
-      <div className="bg-dark-card border border-white/10 rounded-xl p-6 mb-8">
+      <form onSubmit={onAdd} className="bg-dark-card border border-white/10 rounded-xl p-6 mb-8">
         <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Add Social Link</h2>
-        <div className="grid md:grid-cols-3 gap-4 mb-4">
-          <select
-            value={platform}
-            onChange={(e) => setPlatform(e.target.value)}
-            className={inputClass}
-          >
-            {PLATFORMS.map((p) => (
-              <option key={p.value} value={p.value}>
-                {p.label}
-              </option>
-            ))}
-          </select>
-          <input
-            type="url"
-            placeholder="URL (e.g. https://instagram.com/...)"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            className={inputClass}
-          />
-          <input
-            type="text"
-            placeholder="@username"
-            value={handle}
-            onChange={(e) => setHandle(e.target.value)}
-            className={inputClass}
-          />
+        <div className="grid md:grid-cols-3 gap-4 mb-2">
+          <div>
+            <select {...register('platform')} className={inputClass}>
+              {PLATFORM_OPTIONS.map((p) => (
+                <option key={p.value} value={p.value}>{p.label}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <input
+              type="url"
+              placeholder="URL (e.g. https://instagram.com/...)"
+              {...register('url')}
+              className={errors.url ? inputErrorClass : inputClass}
+            />
+            {errors.url && <p className="text-xs text-red-400 mt-1">{errors.url.message}</p>}
+          </div>
+          <div>
+            <input
+              type="text"
+              placeholder="@username"
+              {...register('handle')}
+              className={errors.handle ? inputErrorClass : inputClass}
+            />
+            {errors.handle && <p className="text-xs text-red-400 mt-1">{errors.handle.message}</p>}
+          </div>
         </div>
         <button
-          onClick={handleAdd}
-          disabled={adding || !url.trim()}
-          className={`${btnClass} bg-accent text-black hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed`}
+          type="submit"
+          disabled={adding}
+          className={`${btnClass} bg-accent text-black hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed mt-2`}
         >
           {adding ? 'Adding...' : 'Add'}
         </button>
-      </div>
+      </form>
 
       {/* Links List */}
       {links.length === 0 ? (

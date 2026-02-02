@@ -1,10 +1,9 @@
 import { createServerFn } from '@tanstack/react-start'
 import { getSupabaseServerClient } from '~/utils/supabase'
-import { getRequest } from '@tanstack/react-start/server'
+import { eventUpsertSchema, eventReorderSchema } from '~/schemas/event'
 
 export const getEvents = createServerFn({ method: 'GET' }).handler(async () => {
-  const request = getRequest()
-  const { supabase } = getSupabaseServerClient(request)
+  const supabase = getSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return []
   const { data } = await supabase.from('events').select('*').eq('profile_id', user.id).order('sort_order')
@@ -12,10 +11,9 @@ export const getEvents = createServerFn({ method: 'GET' }).handler(async () => {
 })
 
 export const upsertEvent = createServerFn({ method: 'POST' })
-  .inputValidator((data: { id?: string; name: string; image_url?: string; link_url?: string; sort_order?: number }) => data)
+  .inputValidator((data: unknown) => eventUpsertSchema.parse(data))
   .handler(async ({ data }) => {
-    const request = getRequest()
-    const { supabase } = getSupabaseServerClient(request)
+    const supabase = getSupabaseServerClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { error: 'Not authenticated' }
     if (data.id) {
@@ -35,8 +33,7 @@ export const upsertEvent = createServerFn({ method: 'POST' })
 export const deleteEvent = createServerFn({ method: 'POST' })
   .inputValidator((id: string) => id)
   .handler(async ({ data: id }) => {
-    const request = getRequest()
-    const { supabase } = getSupabaseServerClient(request)
+    const supabase = getSupabaseServerClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { error: 'Not authenticated' }
     const { error } = await supabase.from('events').delete().eq('id', id).eq('profile_id', user.id)
@@ -45,10 +42,9 @@ export const deleteEvent = createServerFn({ method: 'POST' })
   })
 
 export const reorderEvents = createServerFn({ method: 'POST' })
-  .inputValidator((data: { ids: string[] }) => data)
+  .inputValidator((data: unknown) => eventReorderSchema.parse(data))
   .handler(async ({ data }) => {
-    const request = getRequest()
-    const { supabase } = getSupabaseServerClient(request)
+    const supabase = getSupabaseServerClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { error: 'Not authenticated' }
     for (let i = 0; i < data.ids.length; i++) {

@@ -11,9 +11,10 @@ const MAIN_DOMAINS = [
 export default defineEventHandler(async (event) => {
   const url = getRequestURL(event)
   const hostname = url.hostname
+  const host = url.host // includes port
 
-  // Skip for main domains
-  if (MAIN_DOMAINS.some((d) => hostname.includes(d))) {
+  // Skip for main domains — exact match on hostname or host (with port)
+  if (MAIN_DOMAINS.some((d) => hostname === d || host === d)) {
     return
   }
 

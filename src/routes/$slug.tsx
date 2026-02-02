@@ -1,4 +1,4 @@
-import { createFileRoute, useSearch } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { getPublicProfile } from '~/server/public-profile'
 import { Nav } from '~/components/Nav'
 import { FadeIn } from '~/components/FadeIn'
@@ -38,6 +38,8 @@ export const Route = createFileRoute('/$slug')({
 
 function PublicEPK() {
   const data = Route.useLoaderData()
+  const search = Route.useSearch()
+
   if (!data) return (
     <div className="min-h-screen bg-dark-bg flex items-center justify-center">
       <p className="text-text-secondary">Page not found.</p>
@@ -46,7 +48,6 @@ function PublicEPK() {
 
   const { profile, socialLinks, mixes, events, technicalRider, bookingContact, pressAssets } = data
 
-  const search = Route.useSearch()
   const accent = search.accent || profile.accent_color || '#3b82f6'
   const bg = search.bg || profile.bg_color || '#0a0a0f'
   const font = search.font || profile.font_family || 'Inter'
@@ -75,7 +76,7 @@ function PublicEPK() {
           <div className="absolute inset-0 bg-gradient-to-t from-dark-bg/90 via-transparent to-dark-bg/60" />
           <div className="relative z-10 text-center">
             <h1 className="text-6xl md:text-8xl font-black tracking-tight mb-2">
-              {profile.display_name.toUpperCase()}
+              {(profile.display_name || 'DJ').toUpperCase()}
             </h1>
             {profile.tagline && (
               <p className="text-lg md:text-xl tracking-[0.3em] text-text-secondary uppercase mb-8">
@@ -134,7 +135,7 @@ function PublicEPK() {
                 ).map(([category, categoryMixes]: [string, any[]]) => (
                   <div key={category} className="mb-10">
                     <h3 className="text-lg font-bold uppercase tracking-wider text-accent mb-6 capitalize">
-                      {category.replace('-', ' ')}
+                      {category.replace(/-/g, ' ')}
                     </h3>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {categoryMixes.map((mix: any) => (
@@ -222,17 +223,14 @@ function PublicEPK() {
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {pressAssets.map((asset: any) => (
                     <a
-                      key={asset.id}
-                      href={asset.url}
+                      key={asset.title}
+                      href={asset.file_url}
                       download
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-dark-card border border-white/5 rounded-lg p-4 hover:border-accent/30 transition-colors group"
                     >
-                      {asset.thumbnail_url && (
-                        <img src={asset.thumbnail_url} alt={asset.label} className="w-full h-32 object-cover rounded mb-3" loading="lazy" />
-                      )}
-                      <p className="font-bold text-sm mb-1">{asset.label}</p>
+                      <p className="font-bold text-sm mb-1">{asset.title}</p>
                       <p className="text-xs text-text-secondary group-hover:text-accent transition-colors">Download</p>
                     </a>
                   ))}

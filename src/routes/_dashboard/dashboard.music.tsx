@@ -1,45 +1,43 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { getMixes, upsertMix, deleteMix, reorderMixes } from '~/server/mixes'
+import { mixUpsertSchema, MIX_CATEGORIES, type MixUpsert } from '~/schemas/mix'
 
 export const Route = createFileRoute('/_dashboard/dashboard/music')({
   loader: () => getMixes(),
   component: MusicEditor,
 })
 
-const CATEGORIES = [
-  { value: 'commercial', label: 'Commercial' },
-  { value: 'melodic', label: 'Melodic' },
-  { value: 'progressive', label: 'Progressive' },
-  { value: 'tech-house', label: 'Tech House' },
-  { value: 'deep-house', label: 'Deep House' },
-  { value: 'other', label: 'Other' },
-]
+const CATEGORY_OPTIONS = MIX_CATEGORIES.map((c) => ({
+  value: c,
+  label: c.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()),
+}))
 
 function MusicEditor() {
   const initialMixes = Route.useLoaderData()
   const [mixes, setMixes] = useState(initialMixes || [])
-  const [title, setTitle] = useState('')
-  const [url, setUrl] = useState('')
-  const [category, setCategory] = useState('commercial')
   const [adding, setAdding] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editTitle, setEditTitle] = useState('')
   const [editUrl, setEditUrl] = useState('')
   const [editCategory, setEditCategory] = useState('')
 
-  const handleAdd = async () => {
-    if (!title.trim() || !url.trim()) return
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<MixUpsert>({
+    resolver: zodResolver(mixUpsertSchema.omit({ id: true, sort_order: true, thumbnail_url: true })),
+    defaultValues: { title: '', url: '', category: 'commercial' },
+  })
+
+  const onAdd = handleSubmit(async (data) => {
     setAdding(true)
-    const result = await upsertMix({ data: { title, url, category, sort_order: mixes.length } })
+    const result = await upsertMix({ data: { ...data, sort_order: mixes.length } })
     if ('mix' in result && result.mix) {
       setMixes([...mixes, result.mix])
-      setTitle('')
-      setUrl('')
-      setCategory('commercial')
+      reset()
     }
     setAdding(false)
-  }
+  })
 
   const handleDelete = async (id: string) => {
     await deleteMix({ data: id })
@@ -54,7 +52,7 @@ function MusicEditor() {
   }
 
   const handleSaveEdit = async (id: string) => {
-    const result = await upsertMix({ data: { id, title: editTitle, url: editUrl, category: editCategory } })
+    const result = await upsertMix({ data: { id, title: editTitle, url: editUrl, category: editCategory as any } })
     if ('mix' in result && result.mix) {
       setMixes(mixes.map((m: any) => (m.id === id ? result.mix : m)))
     }
@@ -74,6 +72,8 @@ function MusicEditor() {
 
   const inputClass =
     'w-full bg-dark-card border border-white/10 rounded-lg px-4 py-3 text-white placeholder-text-secondary/50 focus:border-accent focus:outline-none transition-colors text-sm'
+  const inputErrorClass =
+    'w-full bg-dark-card border border-red-500 rounded-lg px-4 py-3 text-white placeholder-text-secondary/50 focus:border-accent focus:outline-none transition-colors text-sm'
   const btnClass =
     'px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-colors'
 
@@ -82,43 +82,44 @@ function MusicEditor() {
       <h1 className="text-2xl font-black uppercase tracking-wider mb-8">Music / Mixes</h1>
 
       {/* Add Form */}
-      <div className="bg-dark-card border border-white/10 rounded-xl p-6 mb-8">
+      <form onSubmit={onAdd} className="bg-dark-card border border-white/10 rounded-xl p-6 mb-8">
         <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Add Mix</h2>
-        <div className="grid md:grid-cols-3 gap-4 mb-4">
-          <input
-            type="text"
-            placeholder="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className={inputClass}
-          />
-          <input
-            type="url"
-            placeholder="URL (SoundCloud, Mixcloud, etc.)"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            className={inputClass}
-          />
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className={inputClass}
-          >
-            {CATEGORIES.map((c) => (
-              <option key={c.value} value={c.value}>
-                {c.label}
-              </option>
-            ))}
-          </select>
+        <div className="grid md:grid-cols-3 gap-4 mb-2">
+          <div>
+            <input
+              type="text"
+              placeholder="Title"
+              {...register('title')}
+              className={errors.title ? inputErrorClass : inputClass}
+            />
+            {errors.title && <p className="text-xs text-red-400 mt-1">{errors.title.message}</p>}
+          </div>
+          <div>
+            <input
+              type="url"
+              placeholder="URL (SoundCloud, Mixcloud, etc.)"
+              {...register('url')}
+              className={errors.url ? inputErrorClass : inputClass}
+            />
+            {errors.url && <p className="text-xs text-red-400 mt-1">{errors.url.message}</p>}
+          </div>
+          <div>
+            <select {...register('category')} className={inputClass}>
+              {CATEGORY_OPTIONS.map((c) => (
+                <option key={c.value} value={c.value}>{c.label}</option>
+              ))}
+            </select>
+            {errors.category && <p className="text-xs text-red-400 mt-1">{errors.category.message}</p>}
+          </div>
         </div>
         <button
-          onClick={handleAdd}
-          disabled={adding || !title.trim() || !url.trim()}
-          className={`${btnClass} bg-accent text-black hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed`}
+          type="submit"
+          disabled={adding}
+          className={`${btnClass} bg-accent text-black hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed mt-2`}
         >
           {adding ? 'Adding...' : 'Add Mix'}
         </button>
-      </div>
+      </form>
 
       {/* Mix List */}
       {mixes.length === 0 ? (
@@ -171,10 +172,8 @@ function MusicEditor() {
                       onChange={(e) => setEditCategory(e.target.value)}
                       className={inputClass}
                     >
-                      {CATEGORIES.map((c) => (
-                        <option key={c.value} value={c.value}>
-                          {c.label}
-                        </option>
+                      {CATEGORY_OPTIONS.map((c) => (
+                        <option key={c.value} value={c.value}>{c.label}</option>
                       ))}
                     </select>
                   </div>

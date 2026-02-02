@@ -1,13 +1,12 @@
 import { createServerFn } from '@tanstack/react-start'
 import { getSupabaseServerClient } from '~/utils/supabase'
-import { getRequest } from '@tanstack/react-start/server'
 import Stripe from 'stripe'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+const BASE_URL = process.env.APP_BASE_URL || 'http://localhost:3000'
 
 export const createCheckoutSession = createServerFn({ method: 'POST' }).handler(async () => {
-  const request = getRequest()
-  const { supabase } = getSupabaseServerClient(request)
+  const supabase = getSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -28,8 +27,8 @@ export const createCheckoutSession = createServerFn({ method: 'POST' }).handler(
     customer: customerId,
     mode: 'subscription',
     line_items: [{ price: process.env.STRIPE_PRO_PRICE_ID!, quantity: 1 }],
-    success_url: `${request.headers.get('origin')}/dashboard/settings?upgraded=true`,
-    cancel_url: `${request.headers.get('origin')}/dashboard/settings`,
+    success_url: `${BASE_URL}/dashboard/settings?upgraded=true`,
+    cancel_url: `${BASE_URL}/dashboard/settings`,
     metadata: { supabase_user_id: user.id },
   })
 
@@ -37,8 +36,7 @@ export const createCheckoutSession = createServerFn({ method: 'POST' }).handler(
 })
 
 export const createPortalSession = createServerFn({ method: 'POST' }).handler(async () => {
-  const request = getRequest()
-  const { supabase } = getSupabaseServerClient(request)
+  const supabase = getSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -47,7 +45,7 @@ export const createPortalSession = createServerFn({ method: 'POST' }).handler(as
 
   const session = await stripe.billingPortal.sessions.create({
     customer: profile.stripe_customer_id,
-    return_url: `${request.headers.get('origin')}/dashboard/settings`,
+    return_url: `${BASE_URL}/dashboard/settings`,
   })
 
   return { url: session.url }

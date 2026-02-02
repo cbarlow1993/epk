@@ -34,9 +34,23 @@ export default defineEventHandler(async (event) => {
       }
       break
     }
+    case 'customer.subscription.updated': {
+      const subscription = stripeEvent.data.object as Stripe.Subscription
+      const customerId = subscription.customer as string
+      const isActive = ['active', 'trialing'].includes(subscription.status)
+      await supabase.from('profiles').update({ tier: isActive ? 'pro' : 'free' }).eq('stripe_customer_id', customerId)
+      break
+    }
     case 'customer.subscription.deleted': {
       const subscription = stripeEvent.data.object as Stripe.Subscription
       const customerId = subscription.customer as string
+      await supabase.from('profiles').update({ tier: 'free' }).eq('stripe_customer_id', customerId)
+      break
+    }
+    case 'invoice.payment_failed': {
+      const invoice = stripeEvent.data.object as Stripe.Invoice
+      const customerId = invoice.customer as string
+      // Optionally downgrade or flag account
       await supabase.from('profiles').update({ tier: 'free' }).eq('stripe_customer_id', customerId)
       break
     }

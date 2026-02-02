@@ -1,10 +1,8 @@
 import { createServerFn } from '@tanstack/react-start'
 import { getSupabaseServerClient } from '~/utils/supabase'
-import { getRequest } from '@tanstack/react-start/server'
 
 export const getCurrentUser = createServerFn({ method: 'GET' }).handler(async () => {
-  const request = getRequest()
-  const { supabase } = getSupabaseServerClient(request)
+  const supabase = getSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) return null
@@ -21,8 +19,7 @@ export const getCurrentUser = createServerFn({ method: 'GET' }).handler(async ()
 export const loginWithEmail = createServerFn({ method: 'POST' })
   .inputValidator((data: { email: string; password: string }) => data)
   .handler(async ({ data }) => {
-    const request = getRequest()
-    const { supabase, headers } = getSupabaseServerClient(request)
+    const supabase = getSupabaseServerClient()
 
     const { data: authData, error } = await supabase.auth.signInWithPassword({
       email: data.email,
@@ -30,17 +27,16 @@ export const loginWithEmail = createServerFn({ method: 'POST' })
     })
 
     if (error) {
-      return { error: error.message, headers: Object.fromEntries(headers.entries()) }
+      return { error: error.message }
     }
 
-    return { user: authData.user, headers: Object.fromEntries(headers.entries()) }
+    return { user: authData.user }
   })
 
 export const signupWithEmail = createServerFn({ method: 'POST' })
   .inputValidator((data: { email: string; password: string; displayName: string }) => data)
   .handler(async ({ data }) => {
-    const request = getRequest()
-    const { supabase, headers } = getSupabaseServerClient(request)
+    const supabase = getSupabaseServerClient()
 
     const { data: authData, error } = await supabase.auth.signUp({
       email: data.email,
@@ -51,15 +47,14 @@ export const signupWithEmail = createServerFn({ method: 'POST' })
     })
 
     if (error) {
-      return { error: error.message, headers: Object.fromEntries(headers.entries()) }
+      return { error: error.message }
     }
 
-    return { user: authData.user, headers: Object.fromEntries(headers.entries()) }
+    return { user: authData.user }
   })
 
 export const logout = createServerFn({ method: 'POST' }).handler(async () => {
-  const request = getRequest()
-  const { supabase, headers } = getSupabaseServerClient(request)
+  const supabase = getSupabaseServerClient()
   await supabase.auth.signOut()
-  return { headers: Object.fromEntries(headers.entries()) }
+  return { success: true }
 })

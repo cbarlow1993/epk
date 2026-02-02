@@ -1,17 +1,45 @@
 import { createServerFn } from '@tanstack/react-start'
 import { getSupabaseServerClient } from '~/utils/supabase'
-import { getRequest } from '@tanstack/react-start/server'
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+const ALLOWED_CONTENT_TYPES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'application/pdf',
+  'audio/mpeg',
+  'audio/wav',
+])
+const ALLOWED_FOLDERS = new Set(['images', 'press', 'audio'])
 
 export const uploadFile = createServerFn({ method: 'POST' })
   .inputValidator((data: { base64: string; fileName: string; contentType: string; folder: string }) => data)
   .handler(async ({ data }) => {
-    const request = getRequest()
-    const { supabase } = getSupabaseServerClient(request)
+    const supabase = getSupabaseServerClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { error: 'Not authenticated' }
 
+    // Validate content type
+    if (!ALLOWED_CONTENT_TYPES.has(data.contentType)) {
+      return { error: 'File type not allowed' }
+    }
+
+    // Validate folder to prevent path traversal
+    if (!ALLOWED_FOLDERS.has(data.folder)) {
+      return { error: 'Invalid upload folder' }
+    }
+
     const buffer = Buffer.from(data.base64, 'base64')
-    const path = `${user.id}/${data.folder}/${Date.now()}-${data.fileName}`
+
+    // Validate file size
+    if (buffer.byteLength > MAX_FILE_SIZE) {
+      return { error: 'File exceeds 10MB limit' }
+    }
+
+    // Sanitize filename — strip path separators and use timestamp prefix
+    const safeName = data.fileName.replace(/[^a-zA-Z0-9._-]/g, '_')
+    const path = `${user.id}/${data.folder}/${Date.now()}-${safeName}`
 
     const { error } = await supabase.storage
       .from('uploads')

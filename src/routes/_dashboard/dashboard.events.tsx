@@ -1,6 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState, useRef } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { getEvents, upsertEvent, deleteEvent, reorderEvents } from '~/server/events'
+import { eventUpsertSchema, type EventUpsert } from '~/schemas/event'
 import { uploadFileFromInput } from '~/utils/upload'
 
 export const Route = createFileRoute('/_dashboard/dashboard/events')({
@@ -11,14 +14,16 @@ export const Route = createFileRoute('/_dashboard/dashboard/events')({
 function EventsEditor() {
   const initialEvents = Route.useLoaderData()
   const [events, setEvents] = useState(initialEvents || [])
-  const [name, setName] = useState('')
-  const [linkUrl, setLinkUrl] = useState('')
   const [adding, setAdding] = useState(false)
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleAdd = async () => {
-    if (!name.trim()) return
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<EventUpsert>({
+    resolver: zodResolver(eventUpsertSchema.omit({ id: true, sort_order: true, image_url: true })),
+    defaultValues: { name: '', link_url: '' },
+  })
+
+  const onAdd = handleSubmit(async (data) => {
     setAdding(true)
 
     let imageUrl: string | undefined
@@ -31,16 +36,15 @@ function EventsEditor() {
     }
 
     const result = await upsertEvent({
-      data: { name, image_url: imageUrl, link_url: linkUrl || undefined, sort_order: events.length },
+      data: { name: data.name, image_url: imageUrl, link_url: data.link_url || undefined, sort_order: events.length },
     })
     if ('event' in result && result.event) {
       setEvents([...events, result.event])
-      setName('')
-      setLinkUrl('')
+      reset()
       if (fileInputRef.current) fileInputRef.current.value = ''
     }
     setAdding(false)
-  }
+  })
 
   const handleDelete = async (id: string) => {
     await deleteEvent({ data: id })
@@ -60,6 +64,8 @@ function EventsEditor() {
 
   const inputClass =
     'w-full bg-dark-card border border-white/10 rounded-lg px-4 py-3 text-white placeholder-text-secondary/50 focus:border-accent focus:outline-none transition-colors text-sm'
+  const inputErrorClass =
+    'w-full bg-dark-card border border-red-500 rounded-lg px-4 py-3 text-white placeholder-text-secondary/50 focus:border-accent focus:outline-none transition-colors text-sm'
   const btnClass =
     'px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-colors'
 
@@ -68,23 +74,27 @@ function EventsEditor() {
       <h1 className="text-2xl font-black uppercase tracking-wider mb-8">Events / Brands</h1>
 
       {/* Add Form */}
-      <div className="bg-dark-card border border-white/10 rounded-xl p-6 mb-8">
+      <form onSubmit={onAdd} className="bg-dark-card border border-white/10 rounded-xl p-6 mb-8">
         <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Add Event</h2>
-        <div className="grid md:grid-cols-3 gap-4 mb-4">
-          <input
-            type="text"
-            placeholder="Event / Brand Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className={inputClass}
-          />
-          <input
-            type="url"
-            placeholder="Link URL (optional)"
-            value={linkUrl}
-            onChange={(e) => setLinkUrl(e.target.value)}
-            className={inputClass}
-          />
+        <div className="grid md:grid-cols-3 gap-4 mb-2">
+          <div>
+            <input
+              type="text"
+              placeholder="Event / Brand Name"
+              {...register('name')}
+              className={errors.name ? inputErrorClass : inputClass}
+            />
+            {errors.name && <p className="text-xs text-red-400 mt-1">{errors.name.message}</p>}
+          </div>
+          <div>
+            <input
+              type="url"
+              placeholder="Link URL (optional)"
+              {...register('link_url')}
+              className={errors.link_url ? inputErrorClass : inputClass}
+            />
+            {errors.link_url && <p className="text-xs text-red-400 mt-1">{errors.link_url.message}</p>}
+          </div>
           <input
             type="file"
             accept="image/*"
@@ -93,13 +103,13 @@ function EventsEditor() {
           />
         </div>
         <button
-          onClick={handleAdd}
-          disabled={adding || uploading || !name.trim()}
-          className={`${btnClass} bg-accent text-black hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed`}
+          type="submit"
+          disabled={adding || uploading}
+          className={`${btnClass} bg-accent text-black hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed mt-2`}
         >
           {uploading ? 'Uploading...' : adding ? 'Adding...' : 'Add Event'}
         </button>
-      </div>
+      </form>
 
       {/* Events Grid */}
       {events.length === 0 ? (

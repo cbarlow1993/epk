@@ -15,6 +15,7 @@ import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardDashboardRouteImport } from './routes/_dashboard/dashboard'
+import { Route as DashboardDashboardIndexRouteImport } from './routes/_dashboard/dashboard.index'
 import { Route as DashboardDashboardThemeRouteImport } from './routes/_dashboard/dashboard.theme'
 import { Route as DashboardDashboardTechnicalRouteImport } from './routes/_dashboard/dashboard.technical'
 import { Route as DashboardDashboardSocialsRouteImport } from './routes/_dashboard/dashboard.socials'
@@ -53,6 +54,11 @@ const DashboardDashboardRoute = DashboardDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardDashboardIndexRoute = DashboardDashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardDashboardRoute,
 } as any)
 const DashboardDashboardThemeRoute = DashboardDashboardThemeRouteImport.update({
   id: '/theme',
@@ -120,13 +126,13 @@ export interface FileRoutesByFullPath {
   '/dashboard/socials': typeof DashboardDashboardSocialsRoute
   '/dashboard/technical': typeof DashboardDashboardTechnicalRoute
   '/dashboard/theme': typeof DashboardDashboardThemeRoute
+  '/dashboard/': typeof DashboardDashboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$slug': typeof SlugRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
-  '/dashboard': typeof DashboardDashboardRouteWithChildren
   '/dashboard/bio': typeof DashboardDashboardBioRoute
   '/dashboard/contact': typeof DashboardDashboardContactRoute
   '/dashboard/events': typeof DashboardDashboardEventsRoute
@@ -136,6 +142,7 @@ export interface FileRoutesByTo {
   '/dashboard/socials': typeof DashboardDashboardSocialsRoute
   '/dashboard/technical': typeof DashboardDashboardTechnicalRoute
   '/dashboard/theme': typeof DashboardDashboardThemeRoute
+  '/dashboard': typeof DashboardDashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -154,6 +161,7 @@ export interface FileRoutesById {
   '/_dashboard/dashboard/socials': typeof DashboardDashboardSocialsRoute
   '/_dashboard/dashboard/technical': typeof DashboardDashboardTechnicalRoute
   '/_dashboard/dashboard/theme': typeof DashboardDashboardThemeRoute
+  '/_dashboard/dashboard/': typeof DashboardDashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -172,13 +180,13 @@ export interface FileRouteTypes {
     | '/dashboard/socials'
     | '/dashboard/technical'
     | '/dashboard/theme'
+    | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/$slug'
     | '/login'
     | '/signup'
-    | '/dashboard'
     | '/dashboard/bio'
     | '/dashboard/contact'
     | '/dashboard/events'
@@ -188,6 +196,7 @@ export interface FileRouteTypes {
     | '/dashboard/socials'
     | '/dashboard/technical'
     | '/dashboard/theme'
+    | '/dashboard'
   id:
     | '__root__'
     | '/'
@@ -205,6 +214,7 @@ export interface FileRouteTypes {
     | '/_dashboard/dashboard/socials'
     | '/_dashboard/dashboard/technical'
     | '/_dashboard/dashboard/theme'
+    | '/_dashboard/dashboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -258,6 +268,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardDashboardRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/dashboard/': {
+      id: '/_dashboard/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardDashboardIndexRouteImport
+      parentRoute: typeof DashboardDashboardRoute
     }
     '/_dashboard/dashboard/theme': {
       id: '/_dashboard/dashboard/theme'
@@ -335,6 +352,7 @@ interface DashboardDashboardRouteChildren {
   DashboardDashboardSocialsRoute: typeof DashboardDashboardSocialsRoute
   DashboardDashboardTechnicalRoute: typeof DashboardDashboardTechnicalRoute
   DashboardDashboardThemeRoute: typeof DashboardDashboardThemeRoute
+  DashboardDashboardIndexRoute: typeof DashboardDashboardIndexRoute
 }
 
 const DashboardDashboardRouteChildren: DashboardDashboardRouteChildren = {
@@ -347,6 +365,7 @@ const DashboardDashboardRouteChildren: DashboardDashboardRouteChildren = {
   DashboardDashboardSocialsRoute: DashboardDashboardSocialsRoute,
   DashboardDashboardTechnicalRoute: DashboardDashboardTechnicalRoute,
   DashboardDashboardThemeRoute: DashboardDashboardThemeRoute,
+  DashboardDashboardIndexRoute: DashboardDashboardIndexRoute,
 }
 
 const DashboardDashboardRouteWithChildren =

@@ -1,6 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
 import { getSupabaseServerClient } from '~/utils/supabase'
-import { getRequest } from '@tanstack/react-start/server'
 
 const VERCEL_TOKEN = process.env.VERCEL_TOKEN
 const VERCEL_PROJECT_ID = process.env.VERCEL_PROJECT_ID
@@ -9,8 +8,7 @@ const VERCEL_TEAM_ID = process.env.VERCEL_TEAM_ID
 export const addCustomDomain = createServerFn({ method: 'POST' })
   .inputValidator((data: { domain: string }) => data)
   .handler(async ({ data }) => {
-    const request = getRequest()
-    const { supabase } = getSupabaseServerClient(request)
+    const supabase = getSupabaseServerClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { error: 'Not authenticated' }
 
@@ -37,8 +35,7 @@ export const addCustomDomain = createServerFn({ method: 'POST' })
   })
 
 export const removeCustomDomain = createServerFn({ method: 'POST' }).handler(async () => {
-  const request = getRequest()
-  const { supabase } = getSupabaseServerClient(request)
+  const supabase = getSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -46,10 +43,14 @@ export const removeCustomDomain = createServerFn({ method: 'POST' }).handler(asy
   if (!profile?.custom_domain) return { error: 'No custom domain configured' }
 
   const teamParam = VERCEL_TEAM_ID ? `?teamId=${VERCEL_TEAM_ID}` : ''
-  await fetch(`https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/domains/${profile.custom_domain}${teamParam}`, {
+  const res = await fetch(`https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/domains/${profile.custom_domain}${teamParam}`, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${VERCEL_TOKEN}` },
   })
+
+  if (!res.ok) {
+    return { error: 'Failed to remove domain from hosting provider' }
+  }
 
   await supabase.from('profiles').update({ custom_domain: null }).eq('id', user.id)
   return { success: true }
@@ -58,6 +59,10 @@ export const removeCustomDomain = createServerFn({ method: 'POST' }).handler(asy
 export const checkDomainStatus = createServerFn({ method: 'POST' })
   .inputValidator((data: { domain: string }) => data)
   .handler(async ({ data }) => {
+    const supabase = getSupabaseServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { error: 'Not authenticated' }
+
     const teamParam = VERCEL_TEAM_ID ? `?teamId=${VERCEL_TEAM_ID}` : ''
     const res = await fetch(`https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/domains/${data.domain}${teamParam}`, {
       headers: { Authorization: `Bearer ${VERCEL_TOKEN}` },

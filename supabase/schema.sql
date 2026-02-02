@@ -58,7 +58,7 @@ CREATE TABLE events (
 -- Technical rider
 CREATE TABLE technical_rider (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  profile_id UUID NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
   preferred_setup TEXT DEFAULT '',
   alternative_setup TEXT DEFAULT '',
   created_at TIMESTAMPTZ DEFAULT now(),
@@ -68,7 +68,7 @@ CREATE TABLE technical_rider (
 -- Booking contact
 CREATE TABLE booking_contact (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  profile_id UUID NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
   manager_name TEXT DEFAULT '',
   email TEXT DEFAULT '',
   phone TEXT DEFAULT '',
@@ -127,14 +127,46 @@ BEGIN
   END LOOP;
 END $$;
 
+-- Reserved slugs that cannot be used by profiles
+-- (add more as needed)
+CREATE TABLE reserved_slugs (
+  slug TEXT PRIMARY KEY
+);
+INSERT INTO reserved_slugs (slug) VALUES
+  ('dashboard'), ('login'), ('signup'), ('admin'), ('api'), ('settings'),
+  ('profile'), ('billing'), ('help'), ('support'), ('about'), ('pricing');
+
 -- Auto-create profile on user signup via trigger
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
+DECLARE
+  base_slug TEXT;
+  new_slug TEXT;
+  suffix INT := 0;
 BEGIN
+  base_slug := LOWER(REGEXP_REPLACE(
+    COALESCE(NEW.raw_user_meta_data->>'display_name', split_part(NEW.email, '@', 1)),
+    '[^a-z0-9]+', '-', 'g'
+  ));
+  -- Strip leading/trailing hyphens
+  base_slug := TRIM(BOTH '-' FROM base_slug);
+  IF base_slug = '' THEN
+    base_slug := 'user';
+  END IF;
+
+  new_slug := base_slug;
+  -- Find a unique slug that isn't reserved
+  LOOP
+    EXIT WHEN NOT EXISTS (SELECT 1 FROM profiles WHERE slug = new_slug)
+              AND NOT EXISTS (SELECT 1 FROM reserved_slugs WHERE slug = new_slug);
+    suffix := suffix + 1;
+    new_slug := base_slug || '-' || suffix;
+  END LOOP;
+
   INSERT INTO profiles (id, slug, display_name)
   VALUES (
     NEW.id,
-    LOWER(REPLACE(COALESCE(NEW.raw_user_meta_data->>'display_name', split_part(NEW.email, '@', 1)), ' ', '-')),
+    new_slug,
     COALESCE(NEW.raw_user_meta_data->>'display_name', split_part(NEW.email, '@', 1))
   );
   -- Also create empty technical_rider and booking_contact rows

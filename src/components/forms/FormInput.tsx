@@ -1,0 +1,27 @@
+import type { UseFormRegisterReturn, FieldError } from 'react-hook-form'
+
+interface FormInputProps {
+  label: string
+  registration: UseFormRegisterReturn
+  error?: FieldError
+  type?: string
+  placeholder?: string
+  className?: string
+}
+
+export function FormInput({ label, registration, error, type = 'text', placeholder, className }: FormInputProps) {
+  return (
+    <div className={className}>
+      <label className="block text-sm uppercase tracking-widest font-bold mb-2">{label}</label>
+      <input
+        type={type}
+        placeholder={placeholder}
+        {...registration}
+        className={`w-full bg-dark-card border rounded-lg px-4 py-3 text-white placeholder-text-secondary/50 focus:border-accent focus:outline-none transition-colors text-sm ${
+          error ? 'border-red-500' : 'border-white/10'
+        }`}
+      />
+      {error && <p className="text-xs text-red-400 mt-1">{error.message}</p>}
+    </div>
+  )
+}

@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { signupWithEmail } from '~/server/auth'
 
@@ -12,22 +12,26 @@ function SignupPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
 
-    const result = await signupWithEmail({ data: { email, password, displayName } })
+    try {
+      const result = await signupWithEmail({ data: { email, password, displayName } })
 
-    if ('error' in result && result.error) {
-      setError(result.error)
+      if (result && 'error' in result && result.error) {
+        setError(result.error)
+        setLoading(false)
+        return
+      }
+
+      window.location.href = '/dashboard'
+    } catch {
+      setError('An unexpected error occurred')
       setLoading(false)
-      return
     }
-
-    navigate({ to: '/dashboard' })
   }
 
   return (
