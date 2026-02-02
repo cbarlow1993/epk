@@ -15,6 +15,7 @@ import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardDashboardRouteImport } from './routes/_dashboard/dashboard'
+import { Route as DashboardDashboardMusicRouteImport } from './routes/_dashboard/dashboard.music'
 import { Route as DashboardDashboardBioRouteImport } from './routes/_dashboard/dashboard.bio'
 
 const SignupRoute = SignupRouteImport.update({
@@ -46,6 +47,11 @@ const DashboardDashboardRoute = DashboardDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardDashboardMusicRoute = DashboardDashboardMusicRouteImport.update({
+  id: '/music',
+  path: '/music',
+  getParentRoute: () => DashboardDashboardRoute,
+} as any)
 const DashboardDashboardBioRoute = DashboardDashboardBioRouteImport.update({
   id: '/bio',
   path: '/bio',
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/dashboard': typeof DashboardDashboardRouteWithChildren
   '/dashboard/bio': typeof DashboardDashboardBioRoute
+  '/dashboard/music': typeof DashboardDashboardMusicRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/dashboard': typeof DashboardDashboardRouteWithChildren
   '/dashboard/bio': typeof DashboardDashboardBioRoute
+  '/dashboard/music': typeof DashboardDashboardMusicRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/_dashboard/dashboard': typeof DashboardDashboardRouteWithChildren
   '/_dashboard/dashboard/bio': typeof DashboardDashboardBioRoute
+  '/_dashboard/dashboard/music': typeof DashboardDashboardMusicRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -87,8 +96,16 @@ export interface FileRouteTypes {
     | '/signup'
     | '/dashboard'
     | '/dashboard/bio'
+    | '/dashboard/music'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$slug' | '/login' | '/signup' | '/dashboard' | '/dashboard/bio'
+  to:
+    | '/'
+    | '/$slug'
+    | '/login'
+    | '/signup'
+    | '/dashboard'
+    | '/dashboard/bio'
+    | '/dashboard/music'
   id:
     | '__root__'
     | '/'
@@ -98,6 +115,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/_dashboard/dashboard'
     | '/_dashboard/dashboard/bio'
+    | '/_dashboard/dashboard/music'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -152,6 +170,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/dashboard/music': {
+      id: '/_dashboard/dashboard/music'
+      path: '/music'
+      fullPath: '/dashboard/music'
+      preLoaderRoute: typeof DashboardDashboardMusicRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
     '/_dashboard/dashboard/bio': {
       id: '/_dashboard/dashboard/bio'
       path: '/bio'
@@ -164,10 +189,12 @@ declare module '@tanstack/react-router' {
 
 interface DashboardDashboardRouteChildren {
   DashboardDashboardBioRoute: typeof DashboardDashboardBioRoute
+  DashboardDashboardMusicRoute: typeof DashboardDashboardMusicRoute
 }
 
 const DashboardDashboardRouteChildren: DashboardDashboardRouteChildren = {
   DashboardDashboardBioRoute: DashboardDashboardBioRoute,
+  DashboardDashboardMusicRoute: DashboardDashboardMusicRoute,
 }
 
 const DashboardDashboardRouteWithChildren =
