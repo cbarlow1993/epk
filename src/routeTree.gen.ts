@@ -18,6 +18,7 @@ import { Route as DashboardDashboardRouteImport } from './routes/_dashboard/dash
 import { Route as DashboardDashboardThemeRouteImport } from './routes/_dashboard/dashboard.theme'
 import { Route as DashboardDashboardTechnicalRouteImport } from './routes/_dashboard/dashboard.technical'
 import { Route as DashboardDashboardSocialsRouteImport } from './routes/_dashboard/dashboard.socials'
+import { Route as DashboardDashboardSettingsRouteImport } from './routes/_dashboard/dashboard.settings'
 import { Route as DashboardDashboardPressRouteImport } from './routes/_dashboard/dashboard.press'
 import { Route as DashboardDashboardMusicRouteImport } from './routes/_dashboard/dashboard.music'
 import { Route as DashboardDashboardEventsRouteImport } from './routes/_dashboard/dashboard.events'
@@ -70,6 +71,12 @@ const DashboardDashboardSocialsRoute =
     path: '/socials',
     getParentRoute: () => DashboardDashboardRoute,
   } as any)
+const DashboardDashboardSettingsRoute =
+  DashboardDashboardSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => DashboardDashboardRoute,
+  } as any)
 const DashboardDashboardPressRoute = DashboardDashboardPressRouteImport.update({
   id: '/press',
   path: '/press',
@@ -109,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/events': typeof DashboardDashboardEventsRoute
   '/dashboard/music': typeof DashboardDashboardMusicRoute
   '/dashboard/press': typeof DashboardDashboardPressRoute
+  '/dashboard/settings': typeof DashboardDashboardSettingsRoute
   '/dashboard/socials': typeof DashboardDashboardSocialsRoute
   '/dashboard/technical': typeof DashboardDashboardTechnicalRoute
   '/dashboard/theme': typeof DashboardDashboardThemeRoute
@@ -124,6 +132,7 @@ export interface FileRoutesByTo {
   '/dashboard/events': typeof DashboardDashboardEventsRoute
   '/dashboard/music': typeof DashboardDashboardMusicRoute
   '/dashboard/press': typeof DashboardDashboardPressRoute
+  '/dashboard/settings': typeof DashboardDashboardSettingsRoute
   '/dashboard/socials': typeof DashboardDashboardSocialsRoute
   '/dashboard/technical': typeof DashboardDashboardTechnicalRoute
   '/dashboard/theme': typeof DashboardDashboardThemeRoute
@@ -141,6 +150,7 @@ export interface FileRoutesById {
   '/_dashboard/dashboard/events': typeof DashboardDashboardEventsRoute
   '/_dashboard/dashboard/music': typeof DashboardDashboardMusicRoute
   '/_dashboard/dashboard/press': typeof DashboardDashboardPressRoute
+  '/_dashboard/dashboard/settings': typeof DashboardDashboardSettingsRoute
   '/_dashboard/dashboard/socials': typeof DashboardDashboardSocialsRoute
   '/_dashboard/dashboard/technical': typeof DashboardDashboardTechnicalRoute
   '/_dashboard/dashboard/theme': typeof DashboardDashboardThemeRoute
@@ -158,6 +168,7 @@ export interface FileRouteTypes {
     | '/dashboard/events'
     | '/dashboard/music'
     | '/dashboard/press'
+    | '/dashboard/settings'
     | '/dashboard/socials'
     | '/dashboard/technical'
     | '/dashboard/theme'
@@ -173,6 +184,7 @@ export interface FileRouteTypes {
     | '/dashboard/events'
     | '/dashboard/music'
     | '/dashboard/press'
+    | '/dashboard/settings'
     | '/dashboard/socials'
     | '/dashboard/technical'
     | '/dashboard/theme'
@@ -189,6 +201,7 @@ export interface FileRouteTypes {
     | '/_dashboard/dashboard/events'
     | '/_dashboard/dashboard/music'
     | '/_dashboard/dashboard/press'
+    | '/_dashboard/dashboard/settings'
     | '/_dashboard/dashboard/socials'
     | '/_dashboard/dashboard/technical'
     | '/_dashboard/dashboard/theme'
@@ -267,6 +280,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardSocialsRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
+    '/_dashboard/dashboard/settings': {
+      id: '/_dashboard/dashboard/settings'
+      path: '/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof DashboardDashboardSettingsRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
     '/_dashboard/dashboard/press': {
       id: '/_dashboard/dashboard/press'
       path: '/press'
@@ -311,6 +331,7 @@ interface DashboardDashboardRouteChildren {
   DashboardDashboardEventsRoute: typeof DashboardDashboardEventsRoute
   DashboardDashboardMusicRoute: typeof DashboardDashboardMusicRoute
   DashboardDashboardPressRoute: typeof DashboardDashboardPressRoute
+  DashboardDashboardSettingsRoute: typeof DashboardDashboardSettingsRoute
   DashboardDashboardSocialsRoute: typeof DashboardDashboardSocialsRoute
   DashboardDashboardTechnicalRoute: typeof DashboardDashboardTechnicalRoute
   DashboardDashboardThemeRoute: typeof DashboardDashboardThemeRoute
@@ -322,6 +343,7 @@ const DashboardDashboardRouteChildren: DashboardDashboardRouteChildren = {
   DashboardDashboardEventsRoute: DashboardDashboardEventsRoute,
   DashboardDashboardMusicRoute: DashboardDashboardMusicRoute,
   DashboardDashboardPressRoute: DashboardDashboardPressRoute,
+  DashboardDashboardSettingsRoute: DashboardDashboardSettingsRoute,
   DashboardDashboardSocialsRoute: DashboardDashboardSocialsRoute,
   DashboardDashboardTechnicalRoute: DashboardDashboardTechnicalRoute,
   DashboardDashboardThemeRoute: DashboardDashboardThemeRoute,
