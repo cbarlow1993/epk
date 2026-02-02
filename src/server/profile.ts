@@ -21,6 +21,9 @@ export const updateProfile = createServerFn({ method: 'POST' })
     profile_image_url?: string
     hero_image_url?: string
     published?: boolean
+    accent_color?: string
+    bg_color?: string
+    font_family?: string
   }) => data)
   .handler(async ({ data }) => {
     const request = getRequest()
