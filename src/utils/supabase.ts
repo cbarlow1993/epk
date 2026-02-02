@@ -32,11 +32,11 @@ export function getSupabaseServerClient(request: Request) {
   return { supabase, headers }
 }
 
-// Simple admin client for server-only operations (no cookies needed)
+// Admin client for server-only operations that bypass RLS (no cookies needed)
 export function getSupabaseAdmin() {
   return createClient(
     import.meta.env.VITE_SUPABASE_URL,
-    import.meta.env.VITE_SUPABASE_ANON_KEY,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
   )
 }
 
