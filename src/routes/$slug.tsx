@@ -1,19 +1,30 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { getPublicProfile } from '~/server/public-profile'
 import { Nav } from '~/components/Nav'
-import { Footer } from '~/components/Footer'
 import { FadeIn } from '~/components/FadeIn'
 
 export const Route = createFileRoute('/$slug')({
+  validateSearch: (search: Record<string, unknown>) => ({
+    preview: search.preview === 'true',
+    accent: (search.accent as string) || undefined,
+    bg: (search.bg as string) || undefined,
+    font: (search.font as string) || undefined,
+  }),
   loader: ({ params }) => getPublicProfile({ data: params.slug }),
   head: ({ loaderData }) => {
     const name = loaderData?.profile?.display_name || 'DJ'
+    const font = loaderData?.profile?.font_family || 'Inter'
+    const fontParam = font.replace(/ /g, '+')
     return {
       meta: [
         { title: `${name} | DJ - Official Press Kit` },
         { name: 'description', content: `Official Electronic Press Kit for ${name}.` },
         { name: 'og:title', content: `${name} | DJ - Official Press Kit` },
         { name: 'og:type', content: 'website' },
+      ],
+      links: [
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'stylesheet', href: `https://fonts.googleapis.com/css2?family=${fontParam}:wght@400;700;900&display=swap` },
       ],
     }
   },
@@ -35,8 +46,23 @@ function PublicEPK() {
 
   const { profile, socialLinks, mixes, events, technicalRider, bookingContact, pressAssets } = data
 
+  const search = Route.useSearch()
+  const accent = search.accent || profile.accent_color || '#3b82f6'
+  const bg = search.bg || profile.bg_color || '#0a0a0f'
+  const font = search.font || profile.font_family || 'Inter'
+
   return (
-    <>
+    <div
+      style={{
+        '--color-accent': accent,
+        '--color-accent-glow': accent,
+        '--color-dark-bg': bg,
+        '--font-display': `'${font}', sans-serif`,
+        backgroundColor: bg,
+        fontFamily: `'${font}', sans-serif`,
+      } as React.CSSProperties}
+      className="min-h-screen text-white"
+    >
       <Nav />
       <main>
         {/* Hero */}
@@ -233,7 +259,15 @@ function PublicEPK() {
           </FadeIn>
         )}
       </main>
-      <Footer />
-    </>
+
+      {/* Branded footer for free tier */}
+      {profile.tier === 'free' && (
+        <footer className="py-6 text-center border-t border-white/5">
+          <p className="text-xs text-text-secondary">
+            Built with <a href="/" className="text-accent hover:underline">DJ EPK</a>
+          </p>
+        </footer>
+      )}
+    </div>
   )
 }
