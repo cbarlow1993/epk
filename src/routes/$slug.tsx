@@ -33,7 +33,7 @@ function PublicEPK() {
     </div>
   )
 
-  const { profile, socialLinks, mixes, events, technicalRider, bookingContact } = data
+  const { profile, socialLinks, mixes, events, technicalRider, bookingContact, pressAssets } = data
 
   return (
     <>
@@ -56,6 +56,22 @@ function PublicEPK() {
                 {profile.tagline}
               </p>
             )}
+            {socialLinks.length > 0 && (
+              <div className="flex items-center justify-center gap-4 mt-4">
+                {socialLinks.map((link: any) => (
+                  <a
+                    key={link.id}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={link.platform}
+                    className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-sm font-bold uppercase hover:border-accent hover:text-accent transition-colors"
+                  >
+                    {link.platform.charAt(0)}
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
@@ -70,6 +86,41 @@ function PublicEPK() {
                   {profile.bio_left && <div className="whitespace-pre-line">{profile.bio_left}</div>}
                   {profile.bio_right && <div className="whitespace-pre-line">{profile.bio_right}</div>}
                 </div>
+              </div>
+            </section>
+          </FadeIn>
+        )}
+
+        {/* Mixes */}
+        {mixes.length > 0 && (
+          <FadeIn>
+            <section id="music" className="py-20 px-4">
+              <div className="max-w-6xl mx-auto">
+                <div className="w-20 h-1 bg-accent mb-8 shadow-[0_0_10px_var(--color-accent-glow)]" />
+                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-wider mb-12">Listen</h2>
+                {Object.entries(
+                  mixes.reduce((acc: Record<string, typeof mixes>, mix: any) => {
+                    const cat = mix.category || 'other'
+                    if (!acc[cat]) acc[cat] = []
+                    acc[cat].push(mix)
+                    return acc
+                  }, {})
+                ).map(([category, categoryMixes]: [string, any[]]) => (
+                  <div key={category} className="mb-10">
+                    <h3 className="text-lg font-bold uppercase tracking-wider text-accent mb-6 capitalize">
+                      {category.replace('-', ' ')}
+                    </h3>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {categoryMixes.map((mix: any) => (
+                        <a key={mix.id} href={mix.url} target="_blank" rel="noopener noreferrer"
+                          className="bg-dark-card border border-white/5 rounded-lg p-4 hover:border-accent/30 transition-colors">
+                          <p className="font-bold text-sm mb-1">{mix.title}</p>
+                          <p className="text-xs text-text-secondary truncate">{mix.url}</p>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             </section>
           </FadeIn>
@@ -129,6 +180,36 @@ function PublicEPK() {
                       <div className="text-text-secondary text-sm leading-relaxed whitespace-pre-line">{technicalRider.alternative_setup}</div>
                     </div>
                   )}
+                </div>
+              </div>
+            </section>
+          </FadeIn>
+        )}
+
+        {/* Press Assets */}
+        {pressAssets && pressAssets.length > 0 && (
+          <FadeIn>
+            <section id="press" className="py-20 px-4">
+              <div className="max-w-6xl mx-auto">
+                <div className="w-20 h-1 bg-accent mb-8 shadow-[0_0_10px_var(--color-accent-glow)]" />
+                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-wider mb-12">Press Assets</h2>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {pressAssets.map((asset: any) => (
+                    <a
+                      key={asset.id}
+                      href={asset.url}
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-dark-card border border-white/5 rounded-lg p-4 hover:border-accent/30 transition-colors group"
+                    >
+                      {asset.thumbnail_url && (
+                        <img src={asset.thumbnail_url} alt={asset.label} className="w-full h-32 object-cover rounded mb-3" loading="lazy" />
+                      )}
+                      <p className="font-bold text-sm mb-1">{asset.label}</p>
+                      <p className="text-xs text-text-secondary group-hover:text-accent transition-colors">Download</p>
+                    </a>
+                  ))}
                 </div>
               </div>
             </section>

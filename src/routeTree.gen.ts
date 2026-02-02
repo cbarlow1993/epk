@@ -16,6 +16,8 @@ import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardDashboardRouteImport } from './routes/_dashboard/dashboard'
 import { Route as DashboardDashboardTechnicalRouteImport } from './routes/_dashboard/dashboard.technical'
+import { Route as DashboardDashboardSocialsRouteImport } from './routes/_dashboard/dashboard.socials'
+import { Route as DashboardDashboardPressRouteImport } from './routes/_dashboard/dashboard.press'
 import { Route as DashboardDashboardMusicRouteImport } from './routes/_dashboard/dashboard.music'
 import { Route as DashboardDashboardEventsRouteImport } from './routes/_dashboard/dashboard.events'
 import { Route as DashboardDashboardContactRouteImport } from './routes/_dashboard/dashboard.contact'
@@ -56,6 +58,17 @@ const DashboardDashboardTechnicalRoute =
     path: '/technical',
     getParentRoute: () => DashboardDashboardRoute,
   } as any)
+const DashboardDashboardSocialsRoute =
+  DashboardDashboardSocialsRouteImport.update({
+    id: '/socials',
+    path: '/socials',
+    getParentRoute: () => DashboardDashboardRoute,
+  } as any)
+const DashboardDashboardPressRoute = DashboardDashboardPressRouteImport.update({
+  id: '/press',
+  path: '/press',
+  getParentRoute: () => DashboardDashboardRoute,
+} as any)
 const DashboardDashboardMusicRoute = DashboardDashboardMusicRouteImport.update({
   id: '/music',
   path: '/music',
@@ -89,6 +102,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/contact': typeof DashboardDashboardContactRoute
   '/dashboard/events': typeof DashboardDashboardEventsRoute
   '/dashboard/music': typeof DashboardDashboardMusicRoute
+  '/dashboard/press': typeof DashboardDashboardPressRoute
+  '/dashboard/socials': typeof DashboardDashboardSocialsRoute
   '/dashboard/technical': typeof DashboardDashboardTechnicalRoute
 }
 export interface FileRoutesByTo {
@@ -101,6 +116,8 @@ export interface FileRoutesByTo {
   '/dashboard/contact': typeof DashboardDashboardContactRoute
   '/dashboard/events': typeof DashboardDashboardEventsRoute
   '/dashboard/music': typeof DashboardDashboardMusicRoute
+  '/dashboard/press': typeof DashboardDashboardPressRoute
+  '/dashboard/socials': typeof DashboardDashboardSocialsRoute
   '/dashboard/technical': typeof DashboardDashboardTechnicalRoute
 }
 export interface FileRoutesById {
@@ -115,6 +132,8 @@ export interface FileRoutesById {
   '/_dashboard/dashboard/contact': typeof DashboardDashboardContactRoute
   '/_dashboard/dashboard/events': typeof DashboardDashboardEventsRoute
   '/_dashboard/dashboard/music': typeof DashboardDashboardMusicRoute
+  '/_dashboard/dashboard/press': typeof DashboardDashboardPressRoute
+  '/_dashboard/dashboard/socials': typeof DashboardDashboardSocialsRoute
   '/_dashboard/dashboard/technical': typeof DashboardDashboardTechnicalRoute
 }
 export interface FileRouteTypes {
@@ -129,6 +148,8 @@ export interface FileRouteTypes {
     | '/dashboard/contact'
     | '/dashboard/events'
     | '/dashboard/music'
+    | '/dashboard/press'
+    | '/dashboard/socials'
     | '/dashboard/technical'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -141,6 +162,8 @@ export interface FileRouteTypes {
     | '/dashboard/contact'
     | '/dashboard/events'
     | '/dashboard/music'
+    | '/dashboard/press'
+    | '/dashboard/socials'
     | '/dashboard/technical'
   id:
     | '__root__'
@@ -154,6 +177,8 @@ export interface FileRouteTypes {
     | '/_dashboard/dashboard/contact'
     | '/_dashboard/dashboard/events'
     | '/_dashboard/dashboard/music'
+    | '/_dashboard/dashboard/press'
+    | '/_dashboard/dashboard/socials'
     | '/_dashboard/dashboard/technical'
   fileRoutesById: FileRoutesById
 }
@@ -216,6 +241,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardTechnicalRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
+    '/_dashboard/dashboard/socials': {
+      id: '/_dashboard/dashboard/socials'
+      path: '/socials'
+      fullPath: '/dashboard/socials'
+      preLoaderRoute: typeof DashboardDashboardSocialsRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
+    '/_dashboard/dashboard/press': {
+      id: '/_dashboard/dashboard/press'
+      path: '/press'
+      fullPath: '/dashboard/press'
+      preLoaderRoute: typeof DashboardDashboardPressRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
     '/_dashboard/dashboard/music': {
       id: '/_dashboard/dashboard/music'
       path: '/music'
@@ -252,6 +291,8 @@ interface DashboardDashboardRouteChildren {
   DashboardDashboardContactRoute: typeof DashboardDashboardContactRoute
   DashboardDashboardEventsRoute: typeof DashboardDashboardEventsRoute
   DashboardDashboardMusicRoute: typeof DashboardDashboardMusicRoute
+  DashboardDashboardPressRoute: typeof DashboardDashboardPressRoute
+  DashboardDashboardSocialsRoute: typeof DashboardDashboardSocialsRoute
   DashboardDashboardTechnicalRoute: typeof DashboardDashboardTechnicalRoute
 }
 
@@ -260,6 +301,8 @@ const DashboardDashboardRouteChildren: DashboardDashboardRouteChildren = {
   DashboardDashboardContactRoute: DashboardDashboardContactRoute,
   DashboardDashboardEventsRoute: DashboardDashboardEventsRoute,
   DashboardDashboardMusicRoute: DashboardDashboardMusicRoute,
+  DashboardDashboardPressRoute: DashboardDashboardPressRoute,
+  DashboardDashboardSocialsRoute: DashboardDashboardSocialsRoute,
   DashboardDashboardTechnicalRoute: DashboardDashboardTechnicalRoute,
 }
 
