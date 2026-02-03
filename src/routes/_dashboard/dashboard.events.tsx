@@ -5,6 +5,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { getEvents, upsertEvent, deleteEvent, reorderEvents } from '~/server/events'
 import { eventUpsertSchema, type EventUpsert } from '~/schemas/event'
 import { uploadFileFromInput } from '~/utils/upload'
+import { FORM_INPUT, FORM_INPUT_ERROR, BTN_BASE } from '~/components/forms'
+import { useListEditor } from '~/hooks/useListEditor'
 
 export const Route = createFileRoute('/_dashboard/dashboard/events')({
   loader: () => getEvents(),
@@ -13,7 +15,10 @@ export const Route = createFileRoute('/_dashboard/dashboard/events')({
 
 function EventsEditor() {
   const initialEvents = Route.useLoaderData()
-  const [events, setEvents] = useState(initialEvents || [])
+  const { items: events, handleDelete, handleReorder, addItem } = useListEditor(
+    initialEvents || [],
+    { deleteFn: deleteEvent, reorderFn: reorderEvents }
+  )
   const [adding, setAdding] = useState(false)
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -39,35 +44,13 @@ function EventsEditor() {
       data: { name: data.name, image_url: imageUrl, link_url: data.link_url || undefined, sort_order: events.length },
     })
     if ('event' in result && result.event) {
-      setEvents([...events, result.event])
+      addItem(result.event)
       reset()
       if (fileInputRef.current) fileInputRef.current.value = ''
     }
     setAdding(false)
   })
 
-  const handleDelete = async (id: string) => {
-    await deleteEvent({ data: id })
-    setEvents(events.filter((e: any) => e.id !== id))
-  }
-
-  const handleReorder = async (index: number, direction: 'up' | 'down') => {
-    const swapIndex = direction === 'up' ? index - 1 : index + 1
-    if (swapIndex < 0 || swapIndex >= events.length) return
-    const reordered = [...events]
-    const temp = reordered[index]
-    reordered[index] = reordered[swapIndex]
-    reordered[swapIndex] = temp
-    setEvents(reordered)
-    await reorderEvents({ data: { ids: reordered.map((e: any) => e.id) } })
-  }
-
-  const inputClass =
-    'w-full bg-dark-card border border-white/10 rounded-lg px-4 py-3 text-white placeholder-text-secondary/50 focus:border-accent focus:outline-none transition-colors text-sm'
-  const inputErrorClass =
-    'w-full bg-dark-card border border-red-500 rounded-lg px-4 py-3 text-white placeholder-text-secondary/50 focus:border-accent focus:outline-none transition-colors text-sm'
-  const btnClass =
-    'px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-colors'
 
   return (
     <div>
@@ -82,7 +65,7 @@ function EventsEditor() {
               type="text"
               placeholder="Event / Brand Name"
               {...register('name')}
-              className={errors.name ? inputErrorClass : inputClass}
+              className={errors.name ? FORM_INPUT_ERROR : FORM_INPUT}
             />
             {errors.name && <p className="text-xs text-red-400 mt-1">{errors.name.message}</p>}
           </div>
@@ -91,7 +74,7 @@ function EventsEditor() {
               type="url"
               placeholder="Link URL (optional)"
               {...register('link_url')}
-              className={errors.link_url ? inputErrorClass : inputClass}
+              className={errors.link_url ? FORM_INPUT_ERROR : FORM_INPUT}
             />
             {errors.link_url && <p className="text-xs text-red-400 mt-1">{errors.link_url.message}</p>}
           </div>
@@ -99,13 +82,13 @@ function EventsEditor() {
             type="file"
             accept="image/*"
             ref={fileInputRef}
-            className={inputClass}
+            className={FORM_INPUT}
           />
         </div>
         <button
           type="submit"
           disabled={adding || uploading}
-          className={`${btnClass} bg-accent text-black hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed mt-2`}
+          className={`${BTN_BASE} bg-accent text-black hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed mt-2`}
         >
           {uploading ? 'Uploading...' : adding ? 'Adding...' : 'Add Event'}
         </button>
@@ -140,7 +123,7 @@ function EventsEditor() {
                 </p>
                 <div className="flex gap-2">
                   <button
-                    onClick={() => handleReorder(index, 'up')}
+                    onClick={() => handleReorder?.(index, 'up')}
                     disabled={index === 0}
                     className="w-8 h-8 flex items-center justify-center rounded bg-white/10 text-white hover:bg-white/20 disabled:opacity-20 transition-colors text-xs"
                     title="Move up"
@@ -148,7 +131,7 @@ function EventsEditor() {
                     &#9650;
                   </button>
                   <button
-                    onClick={() => handleReorder(index, 'down')}
+                    onClick={() => handleReorder?.(index, 'down')}
                     disabled={index === events.length - 1}
                     className="w-8 h-8 flex items-center justify-center rounded bg-white/10 text-white hover:bg-white/20 disabled:opacity-20 transition-colors text-xs"
                     title="Move down"

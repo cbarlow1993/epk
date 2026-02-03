@@ -1,4 +1,5 @@
 import type { UseFormRegisterReturn, FieldError } from 'react-hook-form'
+import { FORM_LABEL, FORM_ERROR_MSG } from './styles'
 
 interface FormTextareaProps {
   label: string
@@ -12,7 +13,7 @@ interface FormTextareaProps {
 export function FormTextarea({ label, registration, error, rows = 8, placeholder, className }: FormTextareaProps) {
   return (
     <div className={className}>
-      <label className="block text-sm uppercase tracking-widest font-bold mb-2">{label}</label>
+      <label className={FORM_LABEL}>{label}</label>
       <textarea
         rows={rows}
         placeholder={placeholder}
@@ -21,7 +22,7 @@ export function FormTextarea({ label, registration, error, rows = 8, placeholder
           error ? 'border-red-500' : 'border-white/10'
         }`}
       />
-      {error && <p className="text-xs text-red-400 mt-1">{error.message}</p>}
+      {error && <p className={FORM_ERROR_MSG}>{error.message}</p>}
     </div>
   )
 }

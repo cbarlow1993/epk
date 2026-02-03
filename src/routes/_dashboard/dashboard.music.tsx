@@ -4,6 +4,9 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { getMixes, upsertMix, deleteMix, reorderMixes } from '~/server/mixes'
 import { mixUpsertSchema, MIX_CATEGORIES, type MixUpsert } from '~/schemas/mix'
+import { FORM_INPUT, FORM_INPUT_ERROR, BTN_BASE } from '~/components/forms'
+import { useListEditor } from '~/hooks/useListEditor'
+import { ReorderButtons } from '~/components/ReorderButtons'
 
 export const Route = createFileRoute('/_dashboard/dashboard/music')({
   loader: () => getMixes(),
@@ -17,7 +20,10 @@ const CATEGORY_OPTIONS = MIX_CATEGORIES.map((c) => ({
 
 function MusicEditor() {
   const initialMixes = Route.useLoaderData()
-  const [mixes, setMixes] = useState(initialMixes || [])
+  const { items: mixes, handleDelete, handleReorder, addItem, setItems: setMixes } = useListEditor(
+    initialMixes || [],
+    { deleteFn: deleteMix, reorderFn: reorderMixes }
+  )
   const [adding, setAdding] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editTitle, setEditTitle] = useState('')
@@ -33,16 +39,11 @@ function MusicEditor() {
     setAdding(true)
     const result = await upsertMix({ data: { ...data, sort_order: mixes.length } })
     if ('mix' in result && result.mix) {
-      setMixes([...mixes, result.mix])
+      addItem(result.mix)
       reset()
     }
     setAdding(false)
   })
-
-  const handleDelete = async (id: string) => {
-    await deleteMix({ data: id })
-    setMixes(mixes.filter((m: any) => m.id !== id))
-  }
 
   const handleEdit = (mix: any) => {
     setEditingId(mix.id)
@@ -54,28 +55,11 @@ function MusicEditor() {
   const handleSaveEdit = async (id: string) => {
     const result = await upsertMix({ data: { id, title: editTitle, url: editUrl, category: editCategory as any } })
     if ('mix' in result && result.mix) {
-      setMixes(mixes.map((m: any) => (m.id === id ? result.mix : m)))
+      setMixes(prev => prev.map((m: any) => (m.id === id ? result.mix : m)))
     }
     setEditingId(null)
   }
 
-  const handleReorder = async (index: number, direction: 'up' | 'down') => {
-    const swapIndex = direction === 'up' ? index - 1 : index + 1
-    if (swapIndex < 0 || swapIndex >= mixes.length) return
-    const reordered = [...mixes]
-    const temp = reordered[index]
-    reordered[index] = reordered[swapIndex]
-    reordered[swapIndex] = temp
-    setMixes(reordered)
-    await reorderMixes({ data: { ids: reordered.map((m: any) => m.id) } })
-  }
-
-  const inputClass =
-    'w-full bg-dark-card border border-white/10 rounded-lg px-4 py-3 text-white placeholder-text-secondary/50 focus:border-accent focus:outline-none transition-colors text-sm'
-  const inputErrorClass =
-    'w-full bg-dark-card border border-red-500 rounded-lg px-4 py-3 text-white placeholder-text-secondary/50 focus:border-accent focus:outline-none transition-colors text-sm'
-  const btnClass =
-    'px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-colors'
 
   return (
     <div>
@@ -90,7 +74,7 @@ function MusicEditor() {
               type="text"
               placeholder="Title"
               {...register('title')}
-              className={errors.title ? inputErrorClass : inputClass}
+              className={errors.title ? FORM_INPUT_ERROR : FORM_INPUT}
             />
             {errors.title && <p className="text-xs text-red-400 mt-1">{errors.title.message}</p>}
           </div>
@@ -99,12 +83,12 @@ function MusicEditor() {
               type="url"
               placeholder="URL (SoundCloud, Mixcloud, etc.)"
               {...register('url')}
-              className={errors.url ? inputErrorClass : inputClass}
+              className={errors.url ? FORM_INPUT_ERROR : FORM_INPUT}
             />
             {errors.url && <p className="text-xs text-red-400 mt-1">{errors.url.message}</p>}
           </div>
           <div>
-            <select {...register('category')} className={inputClass}>
+            <select {...register('category')} className={FORM_INPUT}>
               {CATEGORY_OPTIONS.map((c) => (
                 <option key={c.value} value={c.value}>{c.label}</option>
               ))}
@@ -115,7 +99,7 @@ function MusicEditor() {
         <button
           type="submit"
           disabled={adding}
-          className={`${btnClass} bg-accent text-black hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed mt-2`}
+          className={`${BTN_BASE} bg-accent text-black hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed mt-2`}
         >
           {adding ? 'Adding...' : 'Add Mix'}
         </button>
@@ -132,24 +116,7 @@ function MusicEditor() {
               className="bg-dark-card border border-white/10 rounded-xl p-4 flex items-center gap-4"
             >
               {/* Reorder Buttons */}
-              <div className="flex flex-col gap-1">
-                <button
-                  onClick={() => handleReorder(index, 'up')}
-                  disabled={index === 0}
-                  className="text-xs text-text-secondary hover:text-white disabled:opacity-20 transition-colors"
-                  title="Move up"
-                >
-                  &#9650;
-                </button>
-                <button
-                  onClick={() => handleReorder(index, 'down')}
-                  disabled={index === mixes.length - 1}
-                  className="text-xs text-text-secondary hover:text-white disabled:opacity-20 transition-colors"
-                  title="Move down"
-                >
-                  &#9660;
-                </button>
-              </div>
+              {handleReorder && <ReorderButtons index={index} total={mixes.length} onReorder={handleReorder} />}
 
               {/* Content */}
               <div className="flex-1 min-w-0">
@@ -159,18 +126,18 @@ function MusicEditor() {
                       type="text"
                       value={editTitle}
                       onChange={(e) => setEditTitle(e.target.value)}
-                      className={inputClass}
+                      className={FORM_INPUT}
                     />
                     <input
                       type="url"
                       value={editUrl}
                       onChange={(e) => setEditUrl(e.target.value)}
-                      className={inputClass}
+                      className={FORM_INPUT}
                     />
                     <select
                       value={editCategory}
                       onChange={(e) => setEditCategory(e.target.value)}
-                      className={inputClass}
+                      className={FORM_INPUT}
                     >
                       {CATEGORY_OPTIONS.map((c) => (
                         <option key={c.value} value={c.value}>{c.label}</option>
@@ -196,13 +163,13 @@ function MusicEditor() {
                   <>
                     <button
                       onClick={() => handleSaveEdit(mix.id)}
-                      className={`${btnClass} bg-accent text-black hover:bg-accent/80`}
+                      className={`${BTN_BASE} bg-accent text-black hover:bg-accent/80`}
                     >
                       Save
                     </button>
                     <button
                       onClick={() => setEditingId(null)}
-                      className={`${btnClass} bg-white/10 text-white hover:bg-white/20`}
+                      className={`${BTN_BASE} bg-white/10 text-white hover:bg-white/20`}
                     >
                       Cancel
                     </button>
@@ -211,13 +178,13 @@ function MusicEditor() {
                   <>
                     <button
                       onClick={() => handleEdit(mix)}
-                      className={`${btnClass} bg-white/10 text-white hover:bg-white/20`}
+                      className={`${BTN_BASE} bg-white/10 text-white hover:bg-white/20`}
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(mix.id)}
-                      className={`${btnClass} bg-red-500/20 text-red-400 hover:bg-red-500/30`}
+                      className={`${BTN_BASE} bg-red-500/20 text-red-400 hover:bg-red-500/30`}
                     >
                       Delete
                     </button>

@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect, isRedirect } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { getCurrentUser } from '~/server/auth'
 import { DashboardSidebar } from '~/components/DashboardSidebar'
 

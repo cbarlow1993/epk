@@ -6,6 +6,8 @@ import { getPressAssets, upsertPressAsset, deletePressAsset } from '~/server/pre
 import { ASSET_TYPES, type PressAssetUpsert } from '~/schemas/press-asset'
 import { uploadFileFromInput } from '~/utils/upload'
 import { z } from 'zod'
+import { FORM_INPUT, BTN_BASE } from '~/components/forms'
+import { useListEditor } from '~/hooks/useListEditor'
 
 export const Route = createFileRoute('/_dashboard/dashboard/press')({
   loader: () => getPressAssets(),
@@ -19,7 +21,10 @@ const ASSET_TYPE_OPTIONS = ASSET_TYPES.map((t) => ({
 
 function PressEditor() {
   const initialAssets = Route.useLoaderData()
-  const [assets, setAssets] = useState(initialAssets || [])
+  const { items: assets, handleDelete, addItem } = useListEditor(
+    initialAssets || [],
+    { deleteFn: deletePressAsset }
+  )
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -51,22 +56,13 @@ function PressEditor() {
       data: { title: assetTitle, file_url: fileUrl, type: typeVal || 'photo', sort_order: assets.length },
     })
     if ('asset' in result && result.asset) {
-      setAssets([...assets, result.asset])
+      addItem(result.asset)
       reset()
       if (fileInputRef.current) fileInputRef.current.value = ''
     }
     setUploading(false)
   }
 
-  const handleDelete = async (id: string) => {
-    await deletePressAsset({ data: id })
-    setAssets(assets.filter((a: any) => a.id !== id))
-  }
-
-  const inputClass =
-    'w-full bg-dark-card border border-white/10 rounded-lg px-4 py-3 text-white placeholder-text-secondary/50 focus:border-accent focus:outline-none transition-colors text-sm'
-  const btnClass =
-    'px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-colors'
 
   return (
     <div>
@@ -80,9 +76,9 @@ function PressEditor() {
             type="text"
             placeholder="Title (optional, defaults to filename)"
             {...register('title')}
-            className={inputClass}
+            className={FORM_INPUT}
           />
-          <select {...register('type')} className={inputClass}>
+          <select {...register('type')} className={FORM_INPUT}>
             {ASSET_TYPE_OPTIONS.map((t) => (
               <option key={t.value} value={t.value}>{t.label}</option>
             ))}
@@ -91,14 +87,14 @@ function PressEditor() {
             type="file"
             accept="image/*,video/*"
             ref={fileInputRef}
-            className={inputClass}
+            className={FORM_INPUT}
           />
         </div>
         <button
           type="button"
           onClick={handleUpload}
           disabled={uploading}
-          className={`${btnClass} bg-accent text-black hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={`${BTN_BASE} bg-accent text-black hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           {uploading ? 'Uploading...' : 'Upload'}
         </button>
