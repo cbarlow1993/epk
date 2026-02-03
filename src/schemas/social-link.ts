@@ -13,8 +13,4 @@ export const socialLinkUpsertSchema = z.object({
   sort_order: z.number().int().min(0).optional(),
 })
 
-export const socialLinkReorderSchema = z.object({
-  ids: z.array(z.string().uuid()).min(1),
-})
-
 export type SocialLinkUpsert = z.infer<typeof socialLinkUpsertSchema>

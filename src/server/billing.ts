@@ -1,14 +1,12 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getSupabaseServerClient } from '~/utils/supabase'
 import Stripe from 'stripe'
+import { withAuth } from './utils'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 const BASE_URL = process.env.APP_BASE_URL || 'http://localhost:3000'
 
 export const createCheckoutSession = createServerFn({ method: 'POST' }).handler(async () => {
-  const supabase = getSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
+  const { supabase, user } = await withAuth()
 
   const { data: profile } = await supabase.from('profiles').select('stripe_customer_id, slug').eq('id', user.id).single()
 
@@ -36,9 +34,7 @@ export const createCheckoutSession = createServerFn({ method: 'POST' }).handler(
 })
 
 export const createPortalSession = createServerFn({ method: 'POST' }).handler(async () => {
-  const supabase = getSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
+  const { supabase, user } = await withAuth()
 
   const { data: profile } = await supabase.from('profiles').select('stripe_customer_id').eq('id', user.id).single()
   if (!profile?.stripe_customer_id) return { error: 'No billing account' }

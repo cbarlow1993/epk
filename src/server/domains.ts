@@ -1,5 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getSupabaseServerClient } from '~/utils/supabase'
+import { withAuth } from './utils'
 
 const VERCEL_TOKEN = process.env.VERCEL_TOKEN
 const VERCEL_PROJECT_ID = process.env.VERCEL_PROJECT_ID
@@ -8,9 +8,7 @@ const VERCEL_TEAM_ID = process.env.VERCEL_TEAM_ID
 export const addCustomDomain = createServerFn({ method: 'POST' })
   .inputValidator((data: { domain: string }) => data)
   .handler(async ({ data }) => {
-    const supabase = getSupabaseServerClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return { error: 'Not authenticated' }
+    const { supabase, user } = await withAuth()
 
     const { data: profile } = await supabase.from('profiles').select('tier').eq('id', user.id).single()
     if (profile?.tier !== 'pro') return { error: 'Pro plan required for custom domains' }
@@ -35,9 +33,7 @@ export const addCustomDomain = createServerFn({ method: 'POST' })
   })
 
 export const removeCustomDomain = createServerFn({ method: 'POST' }).handler(async () => {
-  const supabase = getSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
+  const { supabase, user } = await withAuth()
 
   const { data: profile } = await supabase.from('profiles').select('custom_domain').eq('id', user.id).single()
   if (!profile?.custom_domain) return { error: 'No custom domain configured' }
@@ -59,9 +55,7 @@ export const removeCustomDomain = createServerFn({ method: 'POST' }).handler(asy
 export const checkDomainStatus = createServerFn({ method: 'POST' })
   .inputValidator((data: { domain: string }) => data)
   .handler(async ({ data }) => {
-    const supabase = getSupabaseServerClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return { error: 'Not authenticated' }
+    const { user } = await withAuth()
 
     const teamParam = VERCEL_TEAM_ID ? `?teamId=${VERCEL_TEAM_ID}` : ''
     const res = await fetch(`https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/domains/${data.domain}${teamParam}`, {

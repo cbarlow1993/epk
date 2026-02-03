@@ -8,8 +8,4 @@ export const eventUpsertSchema = z.object({
   sort_order: z.number().int().min(0).optional(),
 })
 
-export const eventReorderSchema = z.object({
-  ids: z.array(z.string().uuid()).min(1),
-})
-
 export type EventUpsert = z.infer<typeof eventUpsertSchema>

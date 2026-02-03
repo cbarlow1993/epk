@@ -13,8 +13,4 @@ export const mixUpsertSchema = z.object({
   sort_order: z.number().int().min(0).optional(),
 })
 
-export const mixReorderSchema = z.object({
-  ids: z.array(z.string().uuid()).min(1),
-})
-
 export type MixUpsert = z.infer<typeof mixUpsertSchema>

@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getSupabaseServerClient } from '~/utils/supabase'
 import { profileUpdateSchema } from '~/schemas/profile'
+import { withAuth, withAuthOrNull } from './utils'
 
 const RESERVED_SLUGS = new Set([
   'dashboard', 'login', 'signup', 'admin', 'api', 'settings',
@@ -23,8 +23,7 @@ const ALLOWED_PROFILE_FIELDS = new Set([
 ])
 
 export const getProfile = createServerFn({ method: 'GET' }).handler(async () => {
-  const supabase = getSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { supabase, user } = await withAuthOrNull()
   if (!user) return null
 
   const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
@@ -42,9 +41,7 @@ export const getProfile = createServerFn({ method: 'GET' }).handler(async () => 
 export const updateProfile = createServerFn({ method: 'POST' })
   .inputValidator((data: unknown) => profileUpdateSchema.partial().parse(data))
   .handler(async ({ data }) => {
-    const supabase = getSupabaseServerClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return { error: 'Not authenticated' }
+    const { supabase, user } = await withAuth()
 
     // Whitelist fields to prevent privilege escalation
     const sanitized: Record<string, unknown> = {}

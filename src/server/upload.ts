@@ -1,5 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getSupabaseServerClient } from '~/utils/supabase'
+import { withAuth } from './utils'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 const ALLOWED_CONTENT_TYPES = new Set([
@@ -16,9 +16,7 @@ const ALLOWED_FOLDERS = new Set(['images', 'press', 'audio'])
 export const uploadFile = createServerFn({ method: 'POST' })
   .inputValidator((data: { base64: string; fileName: string; contentType: string; folder: string }) => data)
   .handler(async ({ data }) => {
-    const supabase = getSupabaseServerClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return { error: 'Not authenticated' }
+    const { supabase, user } = await withAuth()
 
     // Validate content type
     if (!ALLOWED_CONTENT_TYPES.has(data.contentType)) {
