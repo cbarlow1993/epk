@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { getPublicProfile } from '~/server/public-profile'
 import { Nav } from '~/components/Nav'
+import { sanitize } from '~/utils/sanitize'
 import { EPKSection } from '~/components/EPKSection'
 import type { MixRow, EventRow, SocialLinkRow, PressAssetRow } from '~/types/database'
 
@@ -128,8 +129,8 @@ function PublicEPK() {
         {(profile.bio_left || profile.bio_right) && (
           <EPKSection id="bio" heading="Bio">
             <div className="grid md:grid-cols-2 gap-8 md:gap-12 text-text-secondary leading-relaxed">
-              {profile.bio_left && <div className="whitespace-pre-line">{profile.bio_left}</div>}
-              {profile.bio_right && <div className="whitespace-pre-line">{profile.bio_right}</div>}
+              {profile.bio_left && <div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: sanitize(profile.bio_left) }} />}
+              {profile.bio_right && <div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: sanitize(profile.bio_right) }} />}
             </div>
           </EPKSection>
         )}
@@ -196,13 +197,13 @@ function PublicEPK() {
               {technicalRider.preferred_setup && (
                 <div className="px-6 py-4 border-b border-white/5">
                   <p className="text-sm uppercase tracking-widest font-bold mb-3">Preferred Setup</p>
-                  <div className="text-text-secondary text-sm leading-relaxed whitespace-pre-line">{technicalRider.preferred_setup}</div>
+                  <div className="prose prose-invert prose-sm max-w-none text-text-secondary" dangerouslySetInnerHTML={{ __html: sanitize(technicalRider.preferred_setup) }} />
                 </div>
               )}
               {technicalRider.alternative_setup && (
                 <div className="px-6 py-4">
                   <p className="text-sm uppercase tracking-widest font-bold mb-3">Alternative Setup</p>
-                  <div className="text-text-secondary text-sm leading-relaxed whitespace-pre-line">{technicalRider.alternative_setup}</div>
+                  <div className="prose prose-invert prose-sm max-w-none text-text-secondary" dangerouslySetInnerHTML={{ __html: sanitize(technicalRider.alternative_setup) }} />
                 </div>
               )}
             </div>
