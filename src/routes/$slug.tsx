@@ -1,10 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { getPublicProfile } from '~/server/public-profile'
 import { submitBookingRequestForSlug } from '~/server/booking-requests'
 import { Nav } from '~/components/Nav'
 import { sanitize, sanitizeEmbed } from '~/utils/sanitize'
 import { EPKSection } from '~/components/EPKSection'
+import { Analytics, trackSectionView } from '~/components/Analytics'
 import type { MixRow, EventRow, SocialLinkRow, PressAssetRow } from '~/types/database'
 
 export const Route = createFileRoute('/$slug')({
@@ -154,6 +155,31 @@ function PublicEPK() {
   const font = search.font || profile.font_family || 'Inter'
   const name = profile.display_name || 'DJ'
 
+  // Track section views via IntersectionObserver
+  const mainRef = useRef<HTMLElement>(null)
+  useEffect(() => {
+    if (typeof window === 'undefined' || !mainRef.current) return
+
+    const tracked = new Set<string>()
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const id = entry.target.id
+          if (entry.isIntersecting && id && !tracked.has(id)) {
+            tracked.add(id)
+            trackSectionView(profile.slug as string, id)
+          }
+        }
+      },
+      { threshold: 0.3 }
+    )
+
+    const sections = mainRef.current.querySelectorAll('section[id]')
+    sections.forEach((section) => observer.observe(section))
+
+    return () => observer.disconnect()
+  }, [profile.slug])
+
   const navSections = [
     (profile.bio_left || profile.bio_right) && { label: 'Bio', href: '#bio' },
     mixes.length > 0 && { label: 'Music', href: '#music' },
@@ -175,8 +201,9 @@ function PublicEPK() {
       } as React.CSSProperties}
       className="min-h-screen text-white"
     >
+      <Analytics slug={profile.slug as string} />
       <Nav displayName={name} sections={navSections} />
-      <main>
+      <main ref={mainRef}>
         {/* Hero */}
         <section className="relative h-screen flex items-center justify-center overflow-hidden">
           {profile.hero_image_url ? (
