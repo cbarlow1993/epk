@@ -1,4 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
+import { z } from 'zod'
 import { withAuth } from './utils'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
@@ -14,7 +15,12 @@ const ALLOWED_CONTENT_TYPES = new Set([
 const ALLOWED_FOLDERS = new Set(['images', 'press', 'audio', 'profile', 'hero', 'events'])
 
 export const uploadFile = createServerFn({ method: 'POST' })
-  .inputValidator((data: { base64: string; fileName: string; contentType: string; folder: string }) => data)
+  .inputValidator((data: unknown) => z.object({
+    base64: z.string().min(1),
+    fileName: z.string().min(1).max(200),
+    contentType: z.string().min(1),
+    folder: z.string().min(1),
+  }).parse(data))
   .handler(async ({ data }) => {
     const { supabase, user } = await withAuth()
 

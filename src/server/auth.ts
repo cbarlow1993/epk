@@ -1,4 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
+import { z } from 'zod'
 import { getSupabaseServerClient } from '~/utils/supabase.server'
 
 export const getCurrentUser = createServerFn({ method: 'GET' }).handler(async () => {
@@ -17,7 +18,7 @@ export const getCurrentUser = createServerFn({ method: 'GET' }).handler(async ()
 })
 
 export const loginWithEmail = createServerFn({ method: 'POST' })
-  .inputValidator((data: { email: string; password: string }) => data)
+  .inputValidator((data: unknown) => z.object({ email: z.string().email(), password: z.string().min(1) }).parse(data))
   .handler(async ({ data }) => {
     const supabase = getSupabaseServerClient()
 
@@ -34,7 +35,7 @@ export const loginWithEmail = createServerFn({ method: 'POST' })
   })
 
 export const signupWithEmail = createServerFn({ method: 'POST' })
-  .inputValidator((data: { email: string; password: string; displayName: string }) => data)
+  .inputValidator((data: unknown) => z.object({ email: z.string().email(), password: z.string().min(6), displayName: z.string().min(1).max(100) }).parse(data))
   .handler(async ({ data }) => {
     const supabase = getSupabaseServerClient()
 

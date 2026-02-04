@@ -225,9 +225,11 @@ CREATE TABLE booking_requests (
 
 ALTER TABLE booking_requests ENABLE ROW LEVEL SECURITY;
 
--- Anyone can insert a booking request (public form)
+-- Anyone can insert a booking request for published profiles
 CREATE POLICY "Public can submit booking requests" ON booking_requests
-  FOR INSERT WITH CHECK (true);
+  FOR INSERT WITH CHECK (
+    EXISTS (SELECT 1 FROM profiles WHERE id = profile_id AND published = true)
+  );
 
 -- Only the profile owner can read/update their booking requests
 CREATE POLICY "Owner can view booking requests" ON booking_requests

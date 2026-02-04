@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { inviteMemberSchema, updateMemberRoleSchema, assignProfilesSchema } from '~/schemas/organization'
 import { withAuth } from './utils'
 import { sendTeamInviteEmail } from './email'
+import { getSupabaseAdmin } from '~/utils/supabase.server'
 
 export const getTeamMembers = createServerFn({ method: 'GET' }).handler(async () => {
   const { supabase, user } = await withAuth()
@@ -70,10 +71,11 @@ export const inviteTeamMember = createServerFn({ method: 'POST' })
 export const acceptInvite = createServerFn({ method: 'POST' })
   .inputValidator((data: unknown) => z.object({ token: z.string().min(1) }).parse(data))
   .handler(async ({ data: { token } }) => {
-    const { supabase, user } = await withAuth()
+    const { user } = await withAuth()
+    const admin = getSupabaseAdmin()
 
-    // Find invite
-    const { data: invite } = await supabase
+    // Find invite using admin client (invitee can't pass RLS — they're not a member yet)
+    const { data: invite } = await admin
       .from('organization_invites')
       .select('*')
       .eq('token', token)
@@ -88,8 +90,8 @@ export const acceptInvite = createServerFn({ method: 'POST' })
       return { error: 'This invite was sent to a different email address' }
     }
 
-    // Add user to organization
-    const { error: memberError } = await supabase
+    // Add user to organization (use admin to bypass RLS)
+    const { error: memberError } = await admin
       .from('organization_members')
       .insert({
         organization_id: invite.organization_id,
@@ -100,7 +102,7 @@ export const acceptInvite = createServerFn({ method: 'POST' })
     if (memberError) return { error: memberError.message }
 
     // Mark invite as accepted
-    await supabase
+    await admin
       .from('organization_invites')
       .update({ accepted_at: new Date().toISOString() })
       .eq('id', invite.id)

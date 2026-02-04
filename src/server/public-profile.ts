@@ -1,8 +1,9 @@
 import { createServerFn } from '@tanstack/react-start'
+import { z } from 'zod'
 import { getSupabaseServerClient } from '~/utils/supabase.server'
 
 export const getPublicProfile = createServerFn({ method: 'GET' })
-  .inputValidator((slug: string) => slug)
+  .inputValidator((data: unknown) => z.string().min(1).max(100).parse(data))
   .handler(async ({ data: slug }) => {
     const supabase = getSupabaseServerClient()
 
