@@ -4,19 +4,17 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { getMixes, upsertMix, deleteMix, reorderMixes } from '~/server/mixes'
 import { mixUpsertSchema, MIX_CATEGORIES, type MixUpsert } from '~/schemas/mix'
-import { FORM_INPUT, FORM_INPUT_ERROR, BTN_BASE } from '~/components/forms'
+import { FORM_INPUT, FORM_INPUT_ERROR, BTN_BASE, toSelectOptions } from '~/components/forms'
 import { useListEditor } from '~/hooks/useListEditor'
 import { ReorderButtons } from '~/components/ReorderButtons'
+import type { MixRow } from '~/types/database'
 
 export const Route = createFileRoute('/_dashboard/dashboard/music')({
   loader: () => getMixes(),
   component: MusicEditor,
 })
 
-const CATEGORY_OPTIONS = MIX_CATEGORIES.map((c) => ({
-  value: c,
-  label: c.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()),
-}))
+const CATEGORY_OPTIONS = toSelectOptions(MIX_CATEGORIES)
 
 function MusicEditor() {
   const initialMixes = Route.useLoaderData()
@@ -45,7 +43,7 @@ function MusicEditor() {
     setAdding(false)
   })
 
-  const handleEdit = (mix: any) => {
+  const handleEdit = (mix: MixRow) => {
     setEditingId(mix.id)
     setEditTitle(mix.title)
     setEditUrl(mix.url)
@@ -53,9 +51,9 @@ function MusicEditor() {
   }
 
   const handleSaveEdit = async (id: string) => {
-    const result = await upsertMix({ data: { id, title: editTitle, url: editUrl, category: editCategory as any } })
+    const result = await upsertMix({ data: { id, title: editTitle, url: editUrl, category: editCategory as MixRow['category'] } })
     if ('mix' in result && result.mix) {
-      setMixes(prev => prev.map((m: any) => (m.id === id ? result.mix : m)))
+      setMixes(prev => prev.map((m) => (m.id === id ? result.mix : m)))
     }
     setEditingId(null)
   }
@@ -110,7 +108,7 @@ function MusicEditor() {
         <p className="text-text-secondary text-sm">No mixes yet. Add one above.</p>
       ) : (
         <div className="space-y-3">
-          {mixes.map((mix: any, index: number) => (
+          {mixes.map((mix, index) => (
             <div
               key={mix.id}
               className="bg-dark-card border border-white/10 rounded-xl p-4 flex items-center gap-4"

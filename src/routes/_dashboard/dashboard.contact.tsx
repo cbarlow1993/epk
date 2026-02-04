@@ -6,6 +6,7 @@ import { bookingContactUpdateSchema, type BookingContactUpdate } from '~/schemas
 import { FormInput } from '~/components/forms'
 import { useDashboardSave } from '~/hooks/useDashboardSave'
 import { DashboardHeader } from '~/components/DashboardHeader'
+import type { BookingContactRow } from '~/types/database'
 
 export const Route = createFileRoute('/_dashboard/dashboard/contact')({
   loader: () => getBookingContact(),
@@ -13,16 +14,16 @@ export const Route = createFileRoute('/_dashboard/dashboard/contact')({
 })
 
 function BookingContactEditor() {
-  const initialData = Route.useLoaderData()
+  const initialData = Route.useLoaderData() as BookingContactRow | null
   const { saving, saved, error, onSave: save } = useDashboardSave(updateBookingContact)
 
   const { register, handleSubmit, formState: { errors, isDirty } } = useForm<BookingContactUpdate>({
     resolver: zodResolver(bookingContactUpdateSchema),
     defaultValues: {
-      manager_name: (initialData as Record<string, string> | null)?.manager_name || '',
-      email: (initialData as Record<string, string> | null)?.email || '',
-      phone: (initialData as Record<string, string> | null)?.phone || '',
-      address: (initialData as Record<string, string> | null)?.address || '',
+      manager_name: initialData?.manager_name || '',
+      email: initialData?.email || '',
+      phone: initialData?.phone || '',
+      address: initialData?.address || '',
     },
   })
 

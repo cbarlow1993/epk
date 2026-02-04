@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { getPublicProfile } from '~/server/public-profile'
 import { Nav } from '~/components/Nav'
 import { FadeIn } from '~/components/FadeIn'
+import type { MixRow, EventRow, SocialLinkRow, PressAssetRow } from '~/types/database'
 
 export const Route = createFileRoute('/$slug')({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -85,7 +86,7 @@ function PublicEPK() {
             )}
             {socialLinks.length > 0 && (
               <div className="flex items-center justify-center gap-4 mt-4">
-                {socialLinks.map((link: any) => (
+                {socialLinks.map((link: SocialLinkRow) => (
                   <a
                     key={link.id}
                     href={link.url}
@@ -126,19 +127,19 @@ function PublicEPK() {
                 <div className="w-20 h-1 bg-accent mb-8 shadow-[0_0_10px_var(--color-accent-glow)]" />
                 <h2 className="text-4xl md:text-5xl font-black uppercase tracking-wider mb-12">Listen</h2>
                 {Object.entries(
-                  mixes.reduce((acc: Record<string, typeof mixes>, mix: any) => {
+                  mixes.reduce<Record<string, MixRow[]>>((acc, mix) => {
                     const cat = mix.category || 'other'
                     if (!acc[cat]) acc[cat] = []
                     acc[cat].push(mix)
                     return acc
                   }, {})
-                ).map(([category, categoryMixes]: [string, any[]]) => (
+                ).map(([category, categoryMixes]) => (
                   <div key={category} className="mb-10">
                     <h3 className="text-lg font-bold uppercase tracking-wider text-accent mb-6 capitalize">
                       {category.replace(/-/g, ' ')}
                     </h3>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {categoryMixes.map((mix: any) => (
+                      {categoryMixes.map((mix) => (
                         <a key={mix.id} href={mix.url} target="_blank" rel="noopener noreferrer"
                           className="bg-dark-card border border-white/5 rounded-lg p-4 hover:border-accent/30 transition-colors">
                           <p className="font-bold text-sm mb-1">{mix.title}</p>
@@ -163,7 +164,7 @@ function PublicEPK() {
                   Events <span className="text-accent">&amp;</span> Brands
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                  {events.map((event: any) => (
+                  {events.map((event: EventRow) => (
                     <a
                       key={event.id}
                       href={event.link_url || '#'}
@@ -221,7 +222,7 @@ function PublicEPK() {
                 <div className="w-20 h-1 bg-accent mb-8 shadow-[0_0_10px_var(--color-accent-glow)]" />
                 <h2 className="text-4xl md:text-5xl font-black uppercase tracking-wider mb-12">Press Assets</h2>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {pressAssets.map((asset: any) => (
+                  {pressAssets.map((asset: PressAssetRow) => (
                     <a
                       key={asset.title}
                       href={asset.file_url}

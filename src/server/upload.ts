@@ -11,7 +11,7 @@ const ALLOWED_CONTENT_TYPES = new Set([
   'audio/mpeg',
   'audio/wav',
 ])
-const ALLOWED_FOLDERS = new Set(['images', 'press', 'audio'])
+const ALLOWED_FOLDERS = new Set(['images', 'press', 'audio', 'profile', 'hero', 'events'])
 
 export const uploadFile = createServerFn({ method: 'POST' })
   .inputValidator((data: { base64: string; fileName: string; contentType: string; folder: string }) => data)

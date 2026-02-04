@@ -99,7 +99,7 @@ function EventsEditor() {
         <p className="text-text-secondary text-sm">No events yet. Add one above.</p>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {events.map((event: any, index: number) => (
+          {events.map((event, index) => (
             <div
               key={event.id}
               className="group relative aspect-square bg-dark-card border border-white/10 rounded-xl overflow-hidden"

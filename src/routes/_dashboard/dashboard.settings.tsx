@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { getProfile } from '~/server/profile'
+import type { ProfileRow } from '~/types/database'
 import { createCheckoutSession, createPortalSession } from '~/server/billing'
 import { addCustomDomain, removeCustomDomain, checkDomainStatus } from '~/server/domains'
 
@@ -77,7 +78,7 @@ function SettingsPage() {
   )
 }
 
-function CustomDomainSection({ profile }: { profile: any }) {
+function CustomDomainSection({ profile }: { profile: ProfileRow | null }) {
   const [domain, setDomain] = useState(profile?.custom_domain || '')
   const [status, setStatus] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)

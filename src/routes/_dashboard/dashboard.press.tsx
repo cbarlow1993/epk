@@ -6,7 +6,7 @@ import { getPressAssets, upsertPressAsset, deletePressAsset } from '~/server/pre
 import { ASSET_TYPES, type PressAssetUpsert } from '~/schemas/press-asset'
 import { uploadFileFromInput } from '~/utils/upload'
 import { z } from 'zod'
-import { FORM_INPUT, BTN_BASE } from '~/components/forms'
+import { FORM_INPUT, BTN_BASE, toSelectOptions } from '~/components/forms'
 import { useListEditor } from '~/hooks/useListEditor'
 
 export const Route = createFileRoute('/_dashboard/dashboard/press')({
@@ -14,10 +14,7 @@ export const Route = createFileRoute('/_dashboard/dashboard/press')({
   component: PressEditor,
 })
 
-const ASSET_TYPE_OPTIONS = ASSET_TYPES.map((t) => ({
-  value: t,
-  label: t.charAt(0).toUpperCase() + t.slice(1),
-}))
+const ASSET_TYPE_OPTIONS = toSelectOptions(ASSET_TYPES)
 
 function PressEditor() {
   const initialAssets = Route.useLoaderData()
@@ -105,7 +102,7 @@ function PressEditor() {
         <p className="text-text-secondary text-sm">No press assets yet. Upload one above.</p>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {assets.map((asset: any) => (
+          {assets.map((asset) => (
             <div
               key={asset.id}
               className="group relative aspect-square bg-dark-card border border-white/10 rounded-xl overflow-hidden"

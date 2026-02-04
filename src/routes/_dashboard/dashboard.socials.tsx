@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { getSocialLinks, upsertSocialLink, deleteSocialLink, reorderSocialLinks } from '~/server/social-links'
 import { socialLinkUpsertSchema, SOCIAL_PLATFORMS, type SocialLinkUpsert } from '~/schemas/social-link'
-import { FORM_INPUT, FORM_INPUT_ERROR, BTN_BASE } from '~/components/forms'
+import { FORM_INPUT, FORM_INPUT_ERROR, BTN_BASE, toSelectOptions } from '~/components/forms'
 import { useListEditor } from '~/hooks/useListEditor'
 import { ReorderButtons } from '~/components/ReorderButtons'
 
@@ -13,10 +13,7 @@ export const Route = createFileRoute('/_dashboard/dashboard/socials')({
   component: SocialsEditor,
 })
 
-const PLATFORM_OPTIONS = SOCIAL_PLATFORMS.map((p) => ({
-  value: p,
-  label: p.charAt(0).toUpperCase() + p.slice(1),
-}))
+const PLATFORM_OPTIONS = toSelectOptions(SOCIAL_PLATFORMS)
 
 function SocialsEditor() {
   const initialLinks = Route.useLoaderData()
@@ -97,7 +94,7 @@ function SocialsEditor() {
         <p className="text-text-secondary text-sm">No social links yet. Add one above.</p>
       ) : (
         <div className="space-y-3">
-          {links.map((link: any, index: number) => (
+          {links.map((link, index) => (
             <div
               key={link.id}
               className="bg-dark-card border border-white/10 rounded-xl p-4 flex items-center gap-4"

@@ -8,3 +8,11 @@ export const FORM_ERROR_MSG = 'text-xs text-red-400 mt-1'
 
 // Button base used in list page forms
 export const BTN_BASE = 'px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-colors'
+
+// Convert a readonly const array to { value, label } options for <select> elements
+export function toSelectOptions<T extends string>(values: readonly T[]): { value: T; label: string }[] {
+  return values.map((v) => ({
+    value: v,
+    label: v.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+  }))
+}
