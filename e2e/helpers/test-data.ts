@@ -5,7 +5,7 @@ export const TEST_USER = {
 }
 
 export const TEST_SIGNUP_USER = {
-  email: 'test_playwright_signup@example.com',
+  email: 'test_playwright_signup@testmail.app',
   password: 'Test1234!',
   displayName: 'Test Signup DJ',
 }

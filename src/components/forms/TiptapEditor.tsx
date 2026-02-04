@@ -22,10 +22,10 @@ function ToolbarButton({ onClick, active, children, title }: {
       type="button"
       onClick={onClick}
       title={title}
-      className={`px-2 py-1 rounded text-xs font-bold transition-colors ${
+      className={`px-2 py-1 rounded text-xs font-semibold transition-colors ${
         active
-          ? 'bg-accent text-black'
-          : 'text-text-secondary hover:text-white hover:bg-white/10'
+          ? 'bg-accent text-white'
+          : 'text-text-secondary hover:text-text-primary hover:bg-border'
       }`}
     >
       {children}
@@ -76,10 +76,10 @@ export function TiptapEditor({ label, content, onChange, placeholder }: TiptapEd
 
   return (
     <div>
-      <label className="block text-sm uppercase tracking-widest font-bold mb-2">{label}</label>
-      <div className="border border-white/10 rounded-lg overflow-hidden bg-dark-card">
+      <label className="block text-sm font-medium text-text-secondary mb-2">{label}</label>
+      <div className="border border-border rounded-lg overflow-hidden bg-white">
         {/* Toolbar */}
-        <div className="flex flex-wrap gap-1 px-3 py-2 border-b border-white/10 bg-dark-surface/50">
+        <div className="flex flex-wrap gap-1 px-3 py-2 border-b border-border bg-bg">
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
             active={editor.isActive('heading', { level: 2 })}
@@ -94,7 +94,7 @@ export function TiptapEditor({ label, content, onChange, placeholder }: TiptapEd
           >
             H3
           </ToolbarButton>
-          <div className="w-px bg-white/10 mx-1" />
+          <div className="w-px bg-border mx-1" />
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleBold().run()}
             active={editor.isActive('bold')}
@@ -109,7 +109,7 @@ export function TiptapEditor({ label, content, onChange, placeholder }: TiptapEd
           >
             I
           </ToolbarButton>
-          <div className="w-px bg-white/10 mx-1" />
+          <div className="w-px bg-border mx-1" />
           <ToolbarButton
             onClick={() => editor.chain().focus().toggleBulletList().run()}
             active={editor.isActive('bulletList')}
@@ -124,7 +124,7 @@ export function TiptapEditor({ label, content, onChange, placeholder }: TiptapEd
           >
             1.
           </ToolbarButton>
-          <div className="w-px bg-white/10 mx-1" />
+          <div className="w-px bg-border mx-1" />
           <ToolbarButton
             onClick={setLink}
             active={editor.isActive('link')}
@@ -136,7 +136,7 @@ export function TiptapEditor({ label, content, onChange, placeholder }: TiptapEd
         {/* Editor */}
         <EditorContent
           editor={editor}
-          className="prose prose-invert prose-sm max-w-none px-4 py-3 min-h-[200px] focus-within:ring-1 focus-within:ring-accent [&_.tiptap]:outline-none [&_.tiptap]:min-h-[180px] [&_.tiptap_p.is-editor-empty:first-child::before]:text-text-secondary/50 [&_.tiptap_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.tiptap_p.is-editor-empty:first-child::before]:float-left [&_.tiptap_p.is-editor-empty:first-child::before]:h-0 [&_.tiptap_p.is-editor-empty:first-child::before]:pointer-events-none"
+          className="prose prose-sm max-w-none px-4 py-3 min-h-[200px] focus-within:ring-1 focus-within:ring-accent [&_.tiptap]:outline-none [&_.tiptap]:min-h-[180px] [&_.tiptap_p.is-editor-empty:first-child::before]:text-text-secondary/50 [&_.tiptap_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.tiptap_p.is-editor-empty:first-child::before]:float-left [&_.tiptap_p.is-editor-empty:first-child::before]:h-0 [&_.tiptap_p.is-editor-empty:first-child::before]:pointer-events-none"
         />
       </div>
     </div>

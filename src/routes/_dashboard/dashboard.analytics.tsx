@@ -69,15 +69,15 @@ function AnalyticsPage() {
   if (!isPro) {
     return (
       <div>
-        <h1 className="text-2xl font-black uppercase tracking-wider mb-8">Analytics</h1>
+        <h1 className="text-2xl font-display font-semibold tracking-tight mb-8">Analytics</h1>
         <div className={`${SETTINGS_CARD} max-w-lg`}>
-          <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Pro Feature</h2>
+          <h2 className="font-medium text-text-secondary mb-4">Pro Feature</h2>
           <p className="text-text-secondary text-sm mb-4">
             Upgrade to Pro to access detailed analytics about your EPK page views, referrers, and device breakdown.
           </p>
           <Link
             to="/dashboard/settings"
-            className={`${BTN_BASE} bg-accent text-black hover:bg-accent/80 inline-block`}
+            className={`${BTN_BASE} bg-accent text-white hover:bg-accent/80 inline-block`}
           >
             Upgrade to Pro
           </Link>
@@ -92,7 +92,7 @@ function AnalyticsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-black uppercase tracking-wider">Analytics</h1>
+        <h1 className="text-2xl font-display font-semibold tracking-tight">Analytics</h1>
         <div className="flex gap-2">
           {[7, 30, 90].map((d) => (
             <button
@@ -101,8 +101,8 @@ function AnalyticsPage() {
               onClick={() => setDays(d)}
               className={`${BTN_BASE} ${
                 days === d
-                  ? 'bg-accent text-black'
-                  : 'bg-white/10 text-text-secondary hover:text-white'
+                  ? 'bg-accent text-white'
+                  : 'bg-bg text-text-secondary hover:text-text-primary'
               }`}
             >
               {d}d
@@ -113,7 +113,7 @@ function AnalyticsPage() {
 
       {error && (
         <div className={`${SETTINGS_CARD} mb-6`}>
-          <p className="text-red-400 text-sm">{error}</p>
+          <p className="text-red-500 text-sm">{error}</p>
         </div>
       )}
 
@@ -126,19 +126,19 @@ function AnalyticsPage() {
           {/* Summary Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className={SETTINGS_CARD}>
-              <p className="text-xs uppercase tracking-widest text-text-secondary mb-1">Page Views</p>
+              <p className="text-xs font-medium text-text-secondary mb-1">Page Views</p>
               <p className="text-2xl font-black">{data.pageViews.toLocaleString()}</p>
             </div>
             <div className={SETTINGS_CARD}>
-              <p className="text-xs uppercase tracking-widest text-text-secondary mb-1">Unique Visitors</p>
+              <p className="text-xs font-medium text-text-secondary mb-1">Unique Visitors</p>
               <p className="text-2xl font-black">{data.uniqueVisitors.toLocaleString()}</p>
             </div>
             <div className={SETTINGS_CARD}>
-              <p className="text-xs uppercase tracking-widest text-text-secondary mb-1">Top Referrer</p>
+              <p className="text-xs font-medium text-text-secondary mb-1">Top Referrer</p>
               <p className="text-lg font-bold truncate">{topReferrer}</p>
             </div>
             <div className={SETTINGS_CARD}>
-              <p className="text-xs uppercase tracking-widest text-text-secondary mb-1">Top Device</p>
+              <p className="text-xs font-medium text-text-secondary mb-1">Top Device</p>
               <p className="text-lg font-bold capitalize">{topDevice}</p>
             </div>
           </div>
@@ -146,7 +146,7 @@ function AnalyticsPage() {
           {/* Daily Views Chart */}
           {data.dailyViews.length > 0 && (
             <div className={SETTINGS_CARD}>
-              <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Daily Views</h2>
+              <h2 className="font-medium text-text-secondary mb-4">Daily Views</h2>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={data.dailyViews}>
@@ -169,7 +169,7 @@ function AnalyticsPage() {
             {/* Top Referrers */}
             {data.topReferrers.length > 0 && (
               <div className={SETTINGS_CARD}>
-                <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Top Referrers</h2>
+                <h2 className="font-medium text-text-secondary mb-4">Top Referrers</h2>
                 <div className="space-y-2">
                   {data.topReferrers.map((r) => (
                     <div key={r.referrer} className="flex items-center justify-between text-sm">
@@ -184,7 +184,7 @@ function AnalyticsPage() {
             {/* Device Breakdown */}
             {data.deviceBreakdown.length > 0 && (
               <div className={SETTINGS_CARD}>
-                <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Devices</h2>
+                <h2 className="font-medium text-text-secondary mb-4">Devices</h2>
                 <div className="h-48 flex items-center justify-center">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>

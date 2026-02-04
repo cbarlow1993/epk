@@ -68,7 +68,7 @@ function ThemeEditor() {
               className={`relative rounded-lg border p-4 text-left transition-all ${
                 selectedTemplate === tpl.id
                   ? 'border-accent bg-accent/10 ring-1 ring-accent'
-                  : 'border-white/10 hover:border-white/20 bg-dark-card'
+                  : 'border-border hover:border-border bg-white'
               }`}
             >
               <div className="flex items-center gap-2 mb-2">
@@ -108,7 +108,7 @@ function ThemeEditor() {
             <label className={FORM_LABEL}>Font</label>
             <select
               {...register('font_family')}
-              className="w-full bg-dark-card border border-white/10 rounded-lg px-4 py-3 text-white focus:border-accent focus:outline-none"
+              className="w-full bg-white border border-border rounded-lg px-4 py-3 text-text-primary focus:border-accent focus:outline-none"
             >
               {FONT_OPTIONS.map((font) => (
                 <option key={font} value={font} style={{ fontFamily: font }}>{font}</option>
@@ -117,7 +117,7 @@ function ThemeEditor() {
           </div>
 
           {/* Preview swatch */}
-          <div className="rounded-lg border border-white/10 overflow-hidden">
+          <div className="rounded-lg border border-border overflow-hidden">
             <div className="p-4" style={{ backgroundColor: bgColor }}>
               <p className="font-bold text-sm" style={{ fontFamily, color: '#fff' }}>Preview Swatch</p>
               <p className="text-xs mt-1" style={{ color: accentColor }}>Accent colour</p>
@@ -130,7 +130,7 @@ function ThemeEditor() {
         <div className="hidden lg:block">
           <label className={FORM_LABEL}>Live Preview</label>
           {previewUrl ? (
-            <div className="border border-white/10 rounded-lg overflow-hidden bg-dark-surface h-[70vh]">
+            <div className="border border-border rounded-lg overflow-hidden bg-white h-[70vh]">
               <iframe
                 src={`${previewUrl}?preview=true&accent=${encodeURIComponent(accentColor)}&bg=${encodeURIComponent(bgColor)}&font=${encodeURIComponent(fontFamily)}`}
                 className="w-full h-full"
@@ -138,7 +138,7 @@ function ThemeEditor() {
               />
             </div>
           ) : (
-            <div className="border border-white/10 rounded-lg p-8 text-center text-text-secondary text-sm">
+            <div className="border border-border rounded-lg p-8 text-center text-text-secondary text-sm">
               Set a URL slug on the Profile page to enable live preview.
             </div>
           )}

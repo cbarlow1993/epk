@@ -33,11 +33,24 @@ test.describe('Authentication', () => {
     await deleteTestUser(TEST_SIGNUP_USER.email)
 
     await page.goto('/signup')
+    await page.waitForLoadState('networkidle')
 
-    await page.locator('#displayName').fill(TEST_SIGNUP_USER.displayName)
-    await page.locator('#email').fill(TEST_SIGNUP_USER.email)
-    await page.locator('#password').fill(TEST_SIGNUP_USER.password)
-    await page.locator('button[type="submit"]').click()
+    // Wait for the form to hydrate, then fill with retry loop (SSR hydration can replace DOM nodes)
+    await page.locator('#displayName').waitFor({ timeout: 15_000 })
+
+    let success = false
+    for (let attempt = 0; attempt < 5 && !success; attempt++) {
+      try {
+        await page.locator('#displayName').fill(TEST_SIGNUP_USER.displayName, { timeout: 3_000 })
+        await page.locator('#email').fill(TEST_SIGNUP_USER.email, { timeout: 3_000 })
+        await page.locator('#password').fill(TEST_SIGNUP_USER.password, { timeout: 3_000 })
+        await page.locator('button[type="submit"]').click({ timeout: 3_000 })
+        success = true
+      } catch {
+        await page.waitForTimeout(1000)
+      }
+    }
+    if (!success) throw new Error('Failed to submit signup form after retries')
 
     await page.waitForURL('**/dashboard', { timeout: 15_000 })
     await expect(page).toHaveURL(/\/dashboard/)
@@ -56,8 +69,8 @@ test.describe('Authentication', () => {
     await page.locator('button[type="submit"]').click()
     await page.waitForURL('**/dashboard', { timeout: 15_000 })
 
-    // Click logout in sidebar
-    await page.locator('button', { hasText: 'Log out' }).click()
+    // Click logout in sidebar (there are two: mobile drawer + desktop sidebar; pick first visible)
+    await page.locator('button', { hasText: 'Log out' }).first().click()
 
     // Should redirect to login
     await page.waitForURL('**/login', { timeout: 15_000 })

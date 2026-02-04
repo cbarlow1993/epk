@@ -28,6 +28,7 @@ test.describe('Dashboard Profile', () => {
 
   test('edit display name and tagline then save', async ({ page }) => {
     await page.goto('/dashboard')
+    await page.waitForLoadState('networkidle')
 
     // Edit display name
     const displayNameInput = page.locator('input[name="display_name"]')
@@ -49,8 +50,12 @@ test.describe('Dashboard Profile', () => {
     // "Saved" indicator should appear
     await expect(page.locator('text=Saved')).toBeVisible({ timeout: 10_000 })
 
+    // Wait for all network requests to complete before reloading
+    await page.waitForLoadState('networkidle')
+
     // Reload and verify values persisted
     await page.reload()
+    await page.waitForLoadState('networkidle')
     await expect(page.locator('input[name="display_name"]')).toHaveValue('Updated DJ Name')
     await expect(page.locator('input[name="tagline"]')).toHaveValue('Test Tagline')
   })
@@ -74,6 +79,7 @@ test.describe('Dashboard Profile', () => {
 
   test('toggle publish and verify persistence', async ({ page }) => {
     await page.goto('/dashboard')
+    await page.waitForLoadState('networkidle')
 
     // Published should be off by default
     const toggle = page.locator('button[role="switch"][aria-label="Toggle published status"]')
@@ -88,27 +94,53 @@ test.describe('Dashboard Profile', () => {
     await saveButton.click({ force: true })
     await expect(page.locator('text=Saved')).toBeVisible({ timeout: 10_000 })
 
+    // Wait for all network requests to complete before reloading
+    await page.waitForLoadState('networkidle')
+
     // Reload and verify
     await page.reload()
+    await page.waitForLoadState('networkidle')
     const toggleAfter = page.locator('button[role="switch"][aria-label="Toggle published status"]')
     await expect(toggleAfter).toHaveAttribute('aria-checked', 'true')
   })
 
   test('edit genres and verify persistence', async ({ page }) => {
     await page.goto('/dashboard')
+    await page.waitForLoadState('networkidle')
 
-    // The genres input has a specific placeholder
-    const genres = page.locator('input[placeholder="House, Tech House, Melodic House"]')
-    await genres.clear()
-    await genres.fill('House, Tech House, Melodic Techno')
+    // Genres are chip-based buttons. Click predefined genre chips to select them.
+    // The genre buttons are inside the Genres section.
+    const houseChip = page.locator('button', { hasText: /^House$/ })
+    const techHouseChip = page.locator('button', { hasText: /^Tech House$/ })
+
+    await houseChip.first().click()
+    await techHouseChip.first().click()
+
+    // Also add a custom genre via the input
+    const customGenreInput = page.locator('input[placeholder="Add custom genre..."]')
+    await customGenreInput.fill('Melodic Techno')
+    await customGenreInput.press('Enter')
 
     // Save
     const saveButton = page.locator('button[type="submit"]')
     await saveButton.click({ force: true })
     await expect(page.locator('text=Saved')).toBeVisible({ timeout: 10_000 })
 
-    // Reload and verify
+    // Wait for all network requests to complete before reloading
+    await page.waitForLoadState('networkidle')
+
+    // Reload and verify genres persisted
     await page.reload()
-    await expect(page.locator('input[placeholder="House, Tech House, Melodic House"]')).toHaveValue('House, Tech House, Melodic Techno')
+    await page.waitForLoadState('networkidle')
+
+    // Selected predefined genres should have the accent style (bg-accent)
+    const houseChipAfter = page.locator('button', { hasText: /^House$/ }).first()
+    await expect(houseChipAfter).toHaveClass(/bg-accent/)
+
+    const techHouseChipAfter = page.locator('button', { hasText: /^Tech House$/ }).first()
+    await expect(techHouseChipAfter).toHaveClass(/bg-accent/)
+
+    // Custom genre should appear as a removable pill
+    await expect(page.locator('button', { hasText: /Melodic Techno/ })).toBeVisible()
   })
 })

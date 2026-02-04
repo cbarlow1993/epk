@@ -12,8 +12,8 @@ export const Route = createFileRoute('/_dashboard/dashboard/inquiries')({
 const STATUS_COLORS: Record<string, string> = {
   new: 'bg-accent/20 text-accent',
   read: 'bg-blue-500/20 text-blue-400',
-  replied: 'bg-green-500/20 text-green-400',
-  archived: 'bg-white/10 text-text-secondary',
+  replied: 'bg-green-500/10 text-green-600',
+  archived: 'bg-bg text-text-secondary',
 }
 
 const STATUS_OPTIONS: BookingRequestRow['status'][] = ['new', 'read', 'replied', 'archived']
@@ -32,18 +32,18 @@ function InquiriesDashboard() {
 
   return (
     <div>
-      <h1 className="text-2xl font-black uppercase tracking-wider mb-8">Booking Inquiries</h1>
+      <h1 className="text-2xl font-display font-semibold tracking-tight mb-8">Booking Inquiries</h1>
 
       {requests.length === 0 ? (
         <p className="text-text-secondary text-sm">No booking inquiries yet. They'll appear here when someone submits the form on your EPK.</p>
       ) : (
         <div className="space-y-3">
           {requests.map((req) => (
-            <div key={req.id} className="bg-dark-card border border-white/10 rounded-xl overflow-hidden">
+            <div key={req.id} className="bg-white border border-border rounded-xl overflow-hidden">
               <button
                 type="button"
                 onClick={() => setExpandedId(expandedId === req.id ? null : req.id)}
-                className="w-full flex items-center gap-4 px-4 py-3 text-left hover:bg-white/5 transition-colors"
+                className="w-full flex items-center gap-4 px-4 py-3 text-left hover:bg-border transition-colors"
               >
                 <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded ${STATUS_COLORS[req.status]}`}>
                   {req.status}
@@ -56,7 +56,7 @@ function InquiriesDashboard() {
               </button>
 
               {expandedId === req.id && (
-                <div className="px-4 pb-4 border-t border-white/5">
+                <div className="px-4 pb-4 border-t border-border">
                   <div className="grid sm:grid-cols-2 gap-x-8 gap-y-2 py-4 text-sm">
                     <div><span className="text-text-secondary">Email:</span> <a href={`mailto:${req.email}`} className="text-accent hover:underline">{req.email}</a></div>
                     {req.event_name && <div><span className="text-text-secondary">Event:</span> {req.event_name}</div>}
@@ -64,8 +64,8 @@ function InquiriesDashboard() {
                     {req.venue_location && <div><span className="text-text-secondary">Venue:</span> {req.venue_location}</div>}
                     {req.budget_range && <div><span className="text-text-secondary">Budget:</span> {req.budget_range}</div>}
                   </div>
-                  <div className="bg-dark-surface/50 rounded-lg p-4 mb-4">
-                    <p className="text-xs text-text-secondary uppercase tracking-wider mb-2">Message</p>
+                  <div className="bg-white/50 rounded-lg p-4 mb-4">
+                    <p className="text-xs font-medium text-text-secondary mb-2">Message</p>
                     <p className="text-sm whitespace-pre-line">{req.message}</p>
                   </div>
                   <div className="flex gap-2">
@@ -74,7 +74,7 @@ function InquiriesDashboard() {
                         key={s}
                         type="button"
                         onClick={() => handleStatusChange(req.id, s)}
-                        className={`${BTN_BASE} text-xs ${req.status === s ? 'bg-accent text-black' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                        className={`${BTN_BASE} text-xs ${req.status === s ? 'bg-accent text-white' : 'bg-bg text-text-primary hover:bg-border'}`}
                       >
                         {s}
                       </button>

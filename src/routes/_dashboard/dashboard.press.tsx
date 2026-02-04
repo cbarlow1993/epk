@@ -58,11 +58,11 @@ function PressEditor() {
 
   return (
     <div>
-      <h1 className="text-2xl font-black uppercase tracking-wider mb-8">Press Assets</h1>
+      <h1 className="text-2xl font-display font-semibold tracking-tight mb-8">Press Assets</h1>
 
       {/* Upload Form */}
       <div className={CARD_SECTION}>
-        <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Upload Asset</h2>
+        <h2 className="font-medium text-text-secondary mb-4">Upload Asset</h2>
         <div className="grid md:grid-cols-3 gap-4 mb-4">
           <input
             type="text"
@@ -100,7 +100,7 @@ function PressEditor() {
           {assets.map((asset, index) => (
             <div
               key={asset.id}
-              className="group relative aspect-square bg-dark-card border border-white/10 rounded-xl overflow-hidden"
+              className="group relative aspect-square bg-white border border-border rounded-xl overflow-hidden"
             >
               {asset.type === 'video' ? (
                 <div className="w-full h-full flex flex-col items-center justify-center text-text-secondary">
@@ -124,7 +124,7 @@ function PressEditor() {
                 onReorder={handleReorder!}
                 onDelete={() => handleDelete(asset.id)}
               >
-                <span className="inline-block bg-white/10 rounded px-2 py-0.5 text-[10px] text-text-secondary uppercase tracking-wider">
+                <span className="inline-block bg-bg rounded px-2 py-0.5 text-[10px] text-text-secondary uppercase tracking-wider">
                   {asset.type}
                 </span>
               </GridItemOverlay>

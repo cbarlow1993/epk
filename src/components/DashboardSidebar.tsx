@@ -44,8 +44,8 @@ export function DashboardSidebar({ profile, isAgency = false }: { profile: Sideb
   const navContent = (
     <>
       {/* Header */}
-      <div className="p-6 border-b border-white/5">
-        <p className="font-bold text-sm truncate">{profile.display_name}</p>
+      <div className="p-6 border-b border-border">
+        <p className="font-semibold text-sm truncate text-text-primary">{profile.display_name}</p>
         <a
           href={`/${profile.slug}`}
           target="_blank"
@@ -67,8 +67,8 @@ export function DashboardSidebar({ profile, isAgency = false }: { profile: Sideb
               onClick={() => setMobileOpen(false)}
               className={`block px-6 py-2.5 text-sm transition-colors ${
                 isActive
-                  ? 'text-white bg-white/5 border-r-2 border-accent'
-                  : 'text-text-secondary hover:text-white hover:bg-white/5'
+                  ? 'text-accent bg-accent/5 border-r-2 border-accent font-medium'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-border'
               }`}
             >
               {item.label}
@@ -78,10 +78,10 @@ export function DashboardSidebar({ profile, isAgency = false }: { profile: Sideb
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-white/5">
+      <div className="p-4 border-t border-border">
         <button
           onClick={handleLogout}
-          className="w-full text-sm text-text-secondary hover:text-white transition-colors text-left px-2 py-1"
+          className="w-full text-sm text-text-secondary hover:text-text-primary transition-colors text-left px-2 py-1"
         >
           Log out
         </button>
@@ -92,10 +92,10 @@ export function DashboardSidebar({ profile, isAgency = false }: { profile: Sideb
   return (
     <>
       {/* Mobile header bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-dark-surface border-b border-white/5 flex items-center px-4 z-50">
+      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white border-b border-border flex items-center px-4 z-50">
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="text-white p-2 -ml-2"
+          className="text-text-primary p-2 -ml-2"
           aria-label="Toggle menu"
         >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
@@ -106,20 +106,20 @@ export function DashboardSidebar({ profile, isAgency = false }: { profile: Sideb
             )}
           </svg>
         </button>
-        <span className="ml-3 font-bold text-sm truncate">{profile.display_name}</span>
+        <span className="ml-3 font-semibold text-sm truncate text-text-primary">{profile.display_name}</span>
       </div>
 
       {/* Mobile overlay */}
       {mobileOpen && (
         <div
-          className="md:hidden fixed inset-0 bg-black/50 z-40"
+          className="md:hidden fixed inset-0 bg-black/20 z-40"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
       {/* Mobile drawer */}
       <aside
-        className={`md:hidden fixed top-14 left-0 bottom-0 w-64 bg-dark-surface border-r border-white/5 flex flex-col z-40 transition-transform ${
+        className={`md:hidden fixed top-14 left-0 bottom-0 w-64 bg-white border-r border-border flex flex-col z-40 transition-transform ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -127,7 +127,7 @@ export function DashboardSidebar({ profile, isAgency = false }: { profile: Sideb
       </aside>
 
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex fixed top-0 left-0 h-full w-64 bg-dark-surface border-r border-white/5 flex-col z-40">
+      <aside className="hidden md:flex fixed top-0 left-0 h-full w-64 bg-white border-r border-border flex-col z-40">
         {navContent}
       </aside>
     </>

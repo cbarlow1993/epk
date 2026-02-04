@@ -17,7 +17,7 @@ const ROLE_COLORS: Record<string, string> = {
   owner: 'bg-amber-500/20 text-amber-400',
   admin: 'bg-purple-500/20 text-purple-400',
   manager: 'bg-blue-500/20 text-blue-400',
-  artist: 'bg-green-500/20 text-green-400',
+  artist: 'bg-green-500/10 text-green-600',
 }
 
 const INVITABLE_ROLES: { value: OrgRole; label: string }[] = [
@@ -54,12 +54,12 @@ function TeamPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-black uppercase tracking-wider mb-8">Team</h1>
+      <h1 className="text-2xl font-display font-semibold tracking-tight mb-8">Team</h1>
 
       {/* Invite Form */}
       {isAdmin && (
         <form onSubmit={handleInvite} className={CARD_SECTION}>
-          <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Invite Team Member</h2>
+          <h2 className="font-medium text-text-secondary mb-4">Invite Team Member</h2>
           <div className="flex gap-3">
             <input
               type="email"
@@ -88,11 +88,11 @@ function TeamPage() {
       {/* Members List */}
       <div className="space-y-3">
         {members.map((member: { id: string; role: string; user_id: string }) => (
-          <div key={member.id} className="bg-dark-card border border-white/10 rounded-xl p-4 flex items-center gap-4">
+          <div key={member.id} className="bg-white border border-border rounded-xl p-4 flex items-center gap-4">
             <div className="flex-1">
               <p className="font-bold text-sm">{member.user_id.slice(0, 8)}...</p>
             </div>
-            <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded ${ROLE_COLORS[member.role] || 'bg-white/10 text-text-secondary'}`}>
+            <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded ${ROLE_COLORS[member.role] || 'bg-bg text-text-secondary'}`}>
               {member.role}
             </span>
             {isAdmin && member.role !== 'owner' && (

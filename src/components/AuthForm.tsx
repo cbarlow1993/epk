@@ -48,12 +48,12 @@ export function AuthForm({ title, fields, submitLabel, loadingLabel, onSubmit, f
   }
 
   return (
-    <div className="min-h-screen bg-dark-bg flex items-center justify-center px-4">
+    <div className="min-h-screen bg-bg flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <h1 className="text-3xl font-black uppercase tracking-wider text-center mb-8">{title}</h1>
+        <h1 className="text-3xl font-display font-semibold tracking-tight text-center mb-8">{title}</h1>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 mb-6 text-red-400 text-sm">
+          <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-6 text-red-600 text-sm">
             {error}
           </div>
         )}
@@ -71,7 +71,7 @@ export function AuthForm({ title, fields, submitLabel, loadingLabel, onSubmit, f
                   options: { redirectTo: `${window.location.origin}/dashboard` },
                 })
               }}
-              className="w-full border border-white/10 hover:border-white/20 text-white font-bold py-3 rounded-lg transition-colors text-sm uppercase tracking-wider"
+              className="w-full bg-white border border-border hover:border-text-secondary/20 text-text-primary font-semibold py-3 rounded-lg transition-colors text-sm shadow-card hover:shadow-card-hover"
             >
               Continue with {provider.charAt(0).toUpperCase() + provider.slice(1)}
             </button>
@@ -79,9 +79,9 @@ export function AuthForm({ title, fields, submitLabel, loadingLabel, onSubmit, f
         </div>
 
         <div className="flex items-center gap-4 mb-6">
-          <div className="flex-1 h-px bg-white/10" />
-          <span className="text-text-secondary text-xs uppercase tracking-wider">or</span>
-          <div className="flex-1 h-px bg-white/10" />
+          <div className="flex-1 h-px bg-border" />
+          <span className="text-text-secondary text-xs">or</span>
+          <div className="flex-1 h-px bg-border" />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -103,7 +103,7 @@ export function AuthForm({ title, fields, submitLabel, loadingLabel, onSubmit, f
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-accent hover:bg-accent/80 disabled:opacity-50 text-white font-bold uppercase tracking-widest py-3 rounded-lg transition-colors"
+            className="w-full bg-accent hover:bg-accent/80 disabled:opacity-50 text-white font-semibold py-3 rounded-lg transition-colors"
           >
             {loading ? loadingLabel : submitLabel}
           </button>

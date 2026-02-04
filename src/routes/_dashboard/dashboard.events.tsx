@@ -55,11 +55,11 @@ function EventsEditor() {
 
   return (
     <div>
-      <h1 className="text-2xl font-black uppercase tracking-wider mb-8">Events / Brands</h1>
+      <h1 className="text-2xl font-display font-semibold tracking-tight mb-8">Events / Brands</h1>
 
       {/* Add Form */}
       <form onSubmit={onAdd} className={CARD_SECTION}>
-        <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Add Event</h2>
+        <h2 className="font-medium text-text-secondary text-sm mb-4">Add Event</h2>
         <div className="grid md:grid-cols-3 gap-4 mb-2">
           <div>
             <input
@@ -103,7 +103,7 @@ function EventsEditor() {
           {events.map((event, index) => (
             <div
               key={event.id}
-              className="group relative aspect-square bg-dark-card border border-white/10 rounded-xl overflow-hidden"
+              className="group relative aspect-square bg-white border border-border rounded-xl overflow-hidden"
             >
               {event.image_url ? (
                 <img

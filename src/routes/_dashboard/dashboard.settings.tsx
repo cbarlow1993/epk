@@ -36,12 +36,12 @@ function SettingsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-black uppercase tracking-wider mb-8">Settings</h1>
+      <h1 className="text-2xl font-display font-semibold tracking-tight mb-8">Settings</h1>
 
       <div className="space-y-8 max-w-2xl">
         {/* Account Info */}
         <div className={SETTINGS_CARD}>
-          <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Account</h2>
+          <h2 className="font-medium text-text-secondary text-sm mb-4">Account</h2>
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
               <span className="text-text-secondary">Plan</span>
@@ -62,7 +62,7 @@ function SettingsPage() {
 
         {/* Billing */}
         <div className={SETTINGS_CARD}>
-          <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Billing</h2>
+          <h2 className="font-medium text-text-secondary text-sm mb-4">Billing</h2>
           {profile?.tier === 'pro' ? (
             <div>
               <p className="text-sm text-text-secondary mb-4">You're on the <span className="text-accent font-bold">Pro</span> plan.</p>
@@ -70,7 +70,7 @@ function SettingsPage() {
                 type="button"
                 onClick={() => redirectToBilling(createPortalSession)}
                 disabled={billingLoading}
-                className="bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white text-sm font-bold uppercase tracking-widest px-6 py-2 rounded-lg transition-colors"
+                className="bg-bg hover:bg-border disabled:opacity-30 text-text-primary text-sm font-medium px-6 py-2 rounded-lg transition-colors"
               >
                 {billingLoading ? 'Loading...' : 'Manage Subscription'}
               </button>
@@ -82,13 +82,13 @@ function SettingsPage() {
                 type="button"
                 onClick={() => redirectToBilling(createCheckoutSession)}
                 disabled={billingLoading}
-                className="bg-accent hover:bg-accent/80 disabled:opacity-30 text-white text-sm font-bold uppercase tracking-widest px-6 py-2 rounded-lg transition-colors"
+                className="bg-accent hover:bg-accent/80 disabled:opacity-30 text-white text-sm font-medium px-6 py-2 rounded-lg transition-colors"
               >
                 {billingLoading ? 'Loading...' : 'Upgrade to Pro'}
               </button>
             </div>
           )}
-          {billingError && <p className="text-xs text-red-400 mt-3">{billingError}</p>}
+          {billingError && <p className="text-xs text-red-500 mt-3">{billingError}</p>}
         </div>
 
         {/* Branding */}
@@ -112,7 +112,7 @@ function BrandingSection({ profile }: { profile: ProfileRow | null }) {
   if (profile?.tier !== 'pro') {
     return (
       <div className={SETTINGS_CARD}>
-        <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Branding</h2>
+        <h2 className="font-medium text-text-secondary text-sm mb-4">Branding</h2>
         <p className="text-text-secondary text-sm">Upgrade to Pro to customise branding.</p>
       </div>
     )
@@ -140,7 +140,7 @@ function BrandingSection({ profile }: { profile: ProfileRow | null }) {
 
   return (
     <div className={SETTINGS_CARD}>
-      <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Branding</h2>
+      <h2 className="font-medium text-text-secondary text-sm mb-4">Branding</h2>
       <div className="space-y-4">
         <div>
           <label className="text-xs text-text-secondary block mb-1">Favicon URL</label>
@@ -149,7 +149,7 @@ function BrandingSection({ profile }: { profile: ProfileRow | null }) {
             value={faviconUrl}
             onChange={(e) => setFaviconUrl(e.target.value)}
             placeholder="https://example.com/favicon.ico"
-            className="w-full bg-dark-bg border border-white/10 rounded-lg px-4 py-2 text-white text-sm focus:border-accent focus:outline-none"
+            className="w-full bg-bg border border-border rounded-lg px-4 py-2 text-text-primary text-sm focus:border-accent focus:outline-none"
           />
         </div>
         <div className="flex items-center gap-3">
@@ -173,7 +173,7 @@ function BrandingSection({ profile }: { profile: ProfileRow | null }) {
             onChange={(e) => setMetaDescription(e.target.value.slice(0, 300))}
             placeholder="Custom description for search engines and social sharing..."
             rows={3}
-            className="w-full bg-dark-bg border border-white/10 rounded-lg px-4 py-2 text-white text-sm focus:border-accent focus:outline-none resize-none"
+            className="w-full bg-bg border border-border rounded-lg px-4 py-2 text-text-primary text-sm focus:border-accent focus:outline-none resize-none"
           />
         </div>
         <div className="flex items-center gap-3">
@@ -181,12 +181,12 @@ function BrandingSection({ profile }: { profile: ProfileRow | null }) {
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="bg-accent hover:bg-accent/80 disabled:opacity-30 text-white text-sm font-bold uppercase tracking-widest px-6 py-2 rounded-lg transition-colors"
+            className="bg-accent hover:bg-accent/80 disabled:opacity-30 text-white text-sm font-medium px-6 py-2 rounded-lg transition-colors"
           >
             {saving ? 'Saving...' : 'Save'}
           </button>
-          {saved && <span className="text-xs text-green-400">Saved!</span>}
-          {error && <span className="text-xs text-red-400">{error}</span>}
+          {saved && <span className="text-xs text-green-600">Saved!</span>}
+          {error && <span className="text-xs text-red-500">{error}</span>}
         </div>
       </div>
     </div>
@@ -225,7 +225,7 @@ function CustomDomainSection({ profile }: { profile: ProfileRow | null }) {
   if (profile?.tier !== 'pro') {
     return (
       <div className={SETTINGS_CARD}>
-        <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Custom Domain</h2>
+        <h2 className="font-medium text-text-secondary text-sm mb-4">Custom Domain</h2>
         <p className="text-text-secondary text-sm">Upgrade to Pro to use a custom domain.</p>
       </div>
     )
@@ -233,13 +233,13 @@ function CustomDomainSection({ profile }: { profile: ProfileRow | null }) {
 
   return (
     <div className={SETTINGS_CARD}>
-      <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Custom Domain</h2>
+      <h2 className="font-medium text-text-secondary text-sm mb-4">Custom Domain</h2>
       {profile?.custom_domain ? (
         <div className="space-y-3">
           <p className="text-sm">Current domain: <span className="font-mono text-accent">{profile.custom_domain}</span></p>
           <div className="flex gap-2">
-            <button type="button" onClick={handleCheck} className="text-xs text-text-secondary hover:text-white transition-colors">Check status</button>
-            <button type="button" onClick={handleRemove} disabled={loading} className="text-xs text-red-400 hover:text-red-300 transition-colors">Remove</button>
+            <button type="button" onClick={handleCheck} className="text-xs text-text-secondary hover:text-text-primary transition-colors">Check status</button>
+            <button type="button" onClick={handleRemove} disabled={loading} className="text-xs text-red-500 hover:text-red-400 transition-colors">Remove</button>
           </div>
         </div>
       ) : (
@@ -249,13 +249,13 @@ function CustomDomainSection({ profile }: { profile: ProfileRow | null }) {
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
             placeholder="yourdomain.com"
-            className="w-full bg-dark-bg border border-white/10 rounded-lg px-4 py-2 text-white text-sm focus:border-accent focus:outline-none"
+            className="w-full bg-bg border border-border rounded-lg px-4 py-2 text-text-primary text-sm focus:border-accent focus:outline-none"
           />
           <button
             type="button"
             onClick={handleAdd}
             disabled={!domain || loading}
-            className="bg-accent hover:bg-accent/80 disabled:opacity-30 text-white text-sm font-bold uppercase tracking-widest px-6 py-2 rounded-lg transition-colors"
+            className="bg-accent hover:bg-accent/80 disabled:opacity-30 text-white text-sm font-medium px-6 py-2 rounded-lg transition-colors"
           >
             {loading ? 'Adding...' : 'Add Domain'}
           </button>

@@ -21,7 +21,7 @@ function RosterPage() {
   if (!org) {
     return (
       <div>
-        <h1 className="text-2xl font-black uppercase tracking-wider mb-8">Artist Roster</h1>
+        <h1 className="text-2xl font-display font-semibold tracking-tight mb-8">Artist Roster</h1>
         <p className="text-text-secondary">
           You are not part of an agency.{' '}
           <Link to="/onboarding" className="text-accent hover:underline">
@@ -48,12 +48,12 @@ function RosterPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-black uppercase tracking-wider mb-8">Artist Roster</h1>
+      <h1 className="text-2xl font-display font-semibold tracking-tight mb-8">Artist Roster</h1>
 
       {/* Add Artist Form */}
       {isAdmin && (
         <form onSubmit={handleAdd} className={CARD_SECTION}>
-          <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Add Artist</h2>
+          <h2 className="font-medium text-text-secondary mb-4">Add Artist</h2>
           <div className="grid sm:grid-cols-2 gap-4 mb-4">
             <input
               type="text"
@@ -97,12 +97,12 @@ function RosterPage() {
             tier: string
             published: boolean
           }) => (
-            <div key={profile.id} className="bg-dark-card border border-white/10 rounded-xl overflow-hidden">
-              <div className="aspect-video bg-dark-surface flex items-center justify-center">
+            <div key={profile.id} className="bg-white border border-border rounded-xl overflow-hidden">
+              <div className="aspect-video bg-white flex items-center justify-center">
                 {profile.profile_image_url ? (
                   <img src={profile.profile_image_url} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-4xl font-black text-white/10">
+                  <span className="text-4xl font-black text-border">
                     {(profile.display_name || '?')[0]}
                   </span>
                 )}
@@ -114,7 +114,7 @@ function RosterPage() {
                     className={`text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded ${
                       profile.tier === 'pro'
                         ? 'bg-accent/20 text-accent'
-                        : 'bg-white/10 text-text-secondary'
+                        : 'bg-bg text-text-secondary'
                     }`}
                   >
                     {profile.tier}
@@ -125,7 +125,7 @@ function RosterPage() {
                   <Link
                     to="/dashboard"
                     search={{ profile: profile.id }}
-                    className={`${BTN_BASE} text-xs bg-accent text-black hover:bg-accent/80`}
+                    className={`${BTN_BASE} text-xs bg-accent text-white hover:bg-accent/80`}
                   >
                     Edit
                   </Link>
@@ -134,7 +134,7 @@ function RosterPage() {
                       href={`/${profile.slug}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`${BTN_BASE} text-xs bg-white/10 text-white hover:bg-white/20`}
+                      className={`${BTN_BASE} text-xs bg-bg text-text-primary hover:bg-border`}
                     >
                       View
                     </a>

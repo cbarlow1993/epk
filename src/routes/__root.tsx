@@ -23,7 +23,7 @@ export const Route = createRootRoute({
     links: [
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
-      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap' },
+      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;600;700;900&family=DM+Sans:wght@400;500;600;700&display=swap' },
     ],
     scripts: [
       {
@@ -48,7 +48,7 @@ function RootComponent() {
       <head>
         <HeadContent />
       </head>
-      <body className="bg-dark-bg text-white font-display antialiased">
+      <body className="bg-bg text-text-primary font-body antialiased">
         <Outlet />
         <Scripts />
       </body>

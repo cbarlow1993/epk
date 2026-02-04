@@ -7,6 +7,7 @@ import { sanitize, sanitizeEmbed } from '~/utils/sanitize'
 import { EPKSection } from '~/components/EPKSection'
 import { Analytics, trackSectionView } from '~/components/Analytics'
 import { getTemplate } from '~/utils/templates'
+import { isLightBackground } from '~/utils/color'
 import type { MixRow, EventRow, SocialLinkRow, PressAssetRow } from '~/types/database'
 
 export const Route = createFileRoute('/$slug')({
@@ -20,7 +21,7 @@ export const Route = createFileRoute('/$slug')({
   head: ({ loaderData }) => {
     const profile = loaderData?.profile
     const name = profile?.display_name || 'DJ'
-    const font = profile?.font_family || 'Inter'
+    const font = profile?.font_family || 'DM Sans'
     const fontParam = font.replace(/ /g, '+')
     const tagline = profile?.tagline
     const genres = profile?.genres as string[] | undefined
@@ -48,13 +49,13 @@ export const Route = createFileRoute('/$slug')({
   },
   component: PublicEPK,
   notFoundComponent: () => (
-    <div className="min-h-screen bg-dark-bg flex items-center justify-center">
+    <div className="min-h-screen bg-bg flex items-center justify-center">
       <p className="text-text-secondary">This EPK page doesn't exist.</p>
     </div>
   ),
 })
 
-function BookingForm({ slug }: { slug: string }) {
+function BookingForm({ slug, isLight }: { slug: string; isLight: boolean }) {
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
@@ -85,20 +86,22 @@ function BookingForm({ slug }: { slug: string }) {
 
   if (submitted) {
     return (
-      <div className="bg-dark-card border border-accent/20 rounded-xl p-8 text-center">
-        <p className="text-accent font-bold text-lg mb-2">Inquiry Sent!</p>
+      <div className={`border border-accent/20 rounded-xl p-8 text-center ${isLight ? 'bg-white' : 'bg-white/5'}`}>
+        <p className="text-accent font-semibold text-lg mb-2">Inquiry Sent!</p>
         <p className="text-text-secondary text-sm">Thanks for reaching out. You'll hear back soon.</p>
       </div>
     )
   }
 
-  const inputClass = 'w-full bg-dark-surface border border-white/10 rounded-lg px-4 py-3 text-white placeholder-text-secondary/50 focus:border-accent focus:outline-none transition-colors text-sm'
+  const inputClass = isLight
+    ? 'w-full bg-white border border-black/10 rounded-lg px-4 py-3 text-text-primary placeholder-text-secondary/50 focus:border-accent focus:outline-none transition-colors text-sm'
+    : 'w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:border-accent focus:outline-none transition-colors text-sm'
 
   return (
-    <form onSubmit={handleSubmit} className="bg-dark-card border border-white/5 rounded-xl p-6 mt-8">
-      <h3 className="text-sm uppercase tracking-widest font-bold mb-6">Send Booking Inquiry</h3>
+    <form onSubmit={handleSubmit} className={`border rounded-xl p-6 mt-8 ${isLight ? 'bg-white border-black/6' : 'bg-white/5 border-white/5'}`}>
+      <h3 className="text-sm font-medium mb-6">Send Booking Inquiry</h3>
       {error && (
-        <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 mb-4 text-red-400 text-sm">{error}</div>
+        <div className={`rounded-lg px-4 py-3 mb-4 text-sm ${isLight ? 'bg-red-50 border border-red-200 text-red-600' : 'bg-red-500/10 border border-red-500/20 text-red-400'}`}>{error}</div>
       )}
       <input
         type="text"
@@ -134,7 +137,7 @@ function BookingForm({ slug }: { slug: string }) {
         onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
         className={`${inputClass} mb-4`} />
       <button type="submit" disabled={submitting}
-        className="bg-accent hover:bg-accent/80 disabled:opacity-50 text-black font-bold uppercase tracking-widest py-3 px-8 rounded-lg transition-colors text-sm">
+        className="bg-accent hover:bg-accent/80 disabled:opacity-50 text-white font-semibold py-3 px-8 rounded-lg transition-colors text-sm">
         {submitting ? 'Sending...' : 'Send Inquiry'}
       </button>
     </form>
@@ -146,7 +149,7 @@ function PublicEPK() {
   const search = Route.useSearch()
 
   if (!data) return (
-    <div className="min-h-screen bg-dark-bg flex items-center justify-center">
+    <div className="min-h-screen bg-bg flex items-center justify-center">
       <p className="text-text-secondary">Page not found.</p>
     </div>
   )
@@ -154,10 +157,11 @@ function PublicEPK() {
   const { profile, socialLinks, mixes, events, technicalRider, bookingContact, pressAssets } = data
 
   const template = getTemplate(profile.template || 'default')
-  const accent = search.accent || profile.accent_color || '#3b82f6'
-  const bg = search.bg || profile.bg_color || '#0a0a0f'
-  const font = search.font || profile.font_family || 'Inter'
+  const accent = search.accent || profile.accent_color || '#B85C38'
+  const bg = search.bg || profile.bg_color || '#FAF9F6'
+  const font = search.font || profile.font_family || 'DM Sans'
   const name = profile.display_name || 'DJ'
+  const isLight = isLightBackground(bg)
 
   // Track section views via IntersectionObserver
   const mainRef = useRef<HTMLElement>(null)
@@ -193,17 +197,23 @@ function PublicEPK() {
     bookingContact && bookingContact.manager_name && { label: 'Contact', href: '#contact' },
   ].filter((s): s is { label: string; href: string } => !!s)
 
+  // Conditional classes based on background brightness
+  const textClass = isLight ? 'text-text-primary' : 'text-white'
+  const textSecClass = isLight ? 'text-text-secondary' : 'text-white/60'
+  const proseClass = isLight ? 'prose prose-sm max-w-none' : 'prose prose-invert prose-sm max-w-none'
+  const borderClass = isLight ? 'border-black/6' : 'border-white/5'
+  const cardBgClass = isLight ? 'bg-white' : 'bg-white/5'
+  const socialBorderClass = isLight ? 'border-black/10' : 'border-white/20'
+
   return (
     <div
       style={{
         '--color-accent': accent,
-        '--color-accent-glow': accent,
-        '--color-dark-bg': bg,
         '--font-display': `'${font}', sans-serif`,
         backgroundColor: bg,
         fontFamily: `'${font}', sans-serif`,
       } as React.CSSProperties}
-      className="min-h-screen text-white"
+      className={`min-h-screen ${textClass}`}
     >
       <Analytics slug={profile.slug as string} />
       <Nav displayName={name} sections={navSections} />
@@ -219,31 +229,32 @@ function PublicEPK() {
               {profile.hero_image_url ? (
                 <img src={profile.hero_image_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
               ) : (
-                <div className="absolute inset-0 bg-gradient-to-b from-dark-bg via-dark-surface to-dark-bg" />
+                <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, ${bg}, ${isLight ? '#f0ede8' : '#111'}, ${bg})` }} />
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-dark-bg/90 via-transparent to-dark-bg/60" />
+              <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${bg}e6, transparent, ${bg}99)` }} />
             </>
           )}
           <div className="relative z-10 text-center">
-            <h1 className="text-6xl md:text-8xl font-black tracking-tight mb-2">
-              {(profile.display_name || 'DJ').toUpperCase()}
+            {/* Hero text is always light when there's an image overlay */}
+            <h1 className={`text-6xl md:text-8xl font-bold tracking-tight mb-2 ${profile.hero_image_url ? 'text-white' : ''}`}>
+              {profile.display_name || 'DJ'}
             </h1>
             {profile.tagline && (
-              <p className="text-lg md:text-xl tracking-[0.3em] text-text-secondary uppercase mb-8">
+              <p className={`text-lg md:text-xl mb-8 ${profile.hero_image_url ? 'text-white/70' : textSecClass}`}>
                 {profile.tagline}
               </p>
             )}
             {profile.genres && (profile.genres as string[]).length > 0 && (
               <div className="flex flex-wrap justify-center gap-2 mt-4">
                 {(profile.genres as string[]).map((genre) => (
-                  <span key={genre} className="px-3 py-1 rounded-full text-xs font-bold bg-accent/20 text-accent">
+                  <span key={genre} className="px-3 py-1 rounded-full text-xs font-semibold bg-accent/20 text-accent">
                     {genre}
                   </span>
                 ))}
               </div>
             )}
             {(profile.bpm_min || profile.bpm_max) && (
-              <p className="text-sm text-text-secondary mt-3">
+              <p className={`text-sm mt-3 ${profile.hero_image_url ? 'text-white/50' : textSecClass}`}>
                 {profile.bpm_min && profile.bpm_max
                   ? `${profile.bpm_min}\u2013${profile.bpm_max} BPM`
                   : profile.bpm_min ? `${profile.bpm_min}+ BPM` : `Up to ${profile.bpm_max} BPM`}
@@ -259,7 +270,7 @@ function PublicEPK() {
                     rel="noopener noreferrer"
                     title={link.platform}
                     aria-label={`${link.platform} profile`}
-                    className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-sm font-bold uppercase hover:border-accent hover:text-accent transition-colors"
+                    className={`w-10 h-10 rounded-full border ${profile.hero_image_url ? 'border-white/20 hover:border-accent hover:text-accent' : `${socialBorderClass} hover:border-accent hover:text-accent`} flex items-center justify-center text-sm font-semibold transition-colors`}
                   >
                     {link.platform.charAt(0)}
                   </a>
@@ -278,9 +289,9 @@ function PublicEPK() {
                   template.bioLayout === 'two-column'
                     ? 'grid md:grid-cols-2 gap-8 md:gap-12'
                     : 'space-y-6'
-                } text-text-secondary leading-relaxed`}>
-                  {profile.bio_left && <div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: sanitize(profile.bio_left) }} />}
-                  {profile.bio_right && <div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: sanitize(profile.bio_right) }} />}
+                } ${textSecClass} leading-relaxed`}>
+                  {profile.bio_left && <div className={proseClass} dangerouslySetInnerHTML={{ __html: sanitize(profile.bio_left) }} />}
+                  {profile.bio_right && <div className={proseClass} dangerouslySetInnerHTML={{ __html: sanitize(profile.bio_right) }} />}
                 </div>
               </EPKSection>
             ) : null,
@@ -296,12 +307,12 @@ function PublicEPK() {
                   }, {} as Record<string, MixRow[]>)
                 ).map(([category, categoryMixes]) => (
                   <div key={category} className="mb-10">
-                    <h3 className="text-lg font-bold uppercase tracking-wider text-accent mb-6 capitalize">
+                    <h3 className="text-lg font-semibold text-accent mb-6 capitalize">
                       {category.replace(/-/g, ' ')}
                     </h3>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {categoryMixes.map((mix) => (
-                        <div key={mix.id} className="bg-dark-card border border-white/5 rounded-lg overflow-hidden">
+                        <div key={mix.id} className={`${cardBgClass} border ${borderClass} rounded-lg overflow-hidden`}>
                           {mix.embed_html ? (
                             <div
                               className="w-full [&_iframe]:w-full [&_iframe]:rounded-none"
@@ -310,8 +321,8 @@ function PublicEPK() {
                           ) : (
                             <a href={mix.url} target="_blank" rel="noopener noreferrer"
                               className="block p-4 hover:border-accent/30 transition-colors">
-                              <p className="font-bold text-sm mb-1">{mix.title}</p>
-                              <p className="text-xs text-text-secondary truncate">{mix.url}</p>
+                              <p className="font-semibold text-sm mb-1">{mix.title}</p>
+                              <p className={`text-xs ${textSecClass} truncate`}>{mix.url}</p>
                             </a>
                           )}
                         </div>
@@ -331,15 +342,15 @@ function PublicEPK() {
                       href={event.link_url || '#'}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group block rounded-lg overflow-hidden border border-white/5 hover:border-accent/30 transition-all hover:scale-105"
+                      className={`group block rounded-lg overflow-hidden border ${borderClass} hover:border-accent/30 transition-all hover:scale-105`}
                     >
-                      <div className="aspect-square overflow-hidden bg-dark-card">
+                      <div className={`aspect-square overflow-hidden ${cardBgClass}`}>
                         {event.image_url && (
                           <img src={event.image_url} alt={event.name} className="w-full h-full object-cover object-center" loading="lazy" />
                         )}
                       </div>
-                      <div className="bg-dark-card/80 backdrop-blur-sm px-3 py-2">
-                        <p className="text-xs text-center text-text-secondary leading-tight">{event.name}</p>
+                      <div className={`${cardBgClass} backdrop-blur-sm px-3 py-2`}>
+                        <p className={`text-xs text-center ${textSecClass} leading-tight`}>{event.name}</p>
                       </div>
                     </a>
                   ))}
@@ -349,17 +360,17 @@ function PublicEPK() {
 
             technical: technicalRider && (technicalRider.preferred_setup || technicalRider.alternative_setup) ? (
               <EPKSection key="technical" id="technical" heading="Technical Rider" maxWidth="max-w-4xl">
-                <div className="bg-dark-card backdrop-blur-sm rounded-xl border border-white/5 overflow-hidden">
+                <div className={`${cardBgClass} backdrop-blur-sm rounded-xl border ${borderClass} overflow-hidden`}>
                   {technicalRider.preferred_setup && (
-                    <div className="px-6 py-4 border-b border-white/5">
-                      <p className="text-sm uppercase tracking-widest font-bold mb-3">Preferred Setup</p>
-                      <div className="prose prose-invert prose-sm max-w-none text-text-secondary" dangerouslySetInnerHTML={{ __html: sanitize(technicalRider.preferred_setup) }} />
+                    <div className={`px-6 py-4 border-b ${borderClass}`}>
+                      <p className="text-sm font-medium mb-3">Preferred Setup</p>
+                      <div className={`${proseClass} ${textSecClass}`} dangerouslySetInnerHTML={{ __html: sanitize(technicalRider.preferred_setup) }} />
                     </div>
                   )}
                   {technicalRider.alternative_setup && (
                     <div className="px-6 py-4">
-                      <p className="text-sm uppercase tracking-widest font-bold mb-3">Alternative Setup</p>
-                      <div className="prose prose-invert prose-sm max-w-none text-text-secondary" dangerouslySetInnerHTML={{ __html: sanitize(technicalRider.alternative_setup) }} />
+                      <p className="text-sm font-medium mb-3">Alternative Setup</p>
+                      <div className={`${proseClass} ${textSecClass}`} dangerouslySetInnerHTML={{ __html: sanitize(technicalRider.alternative_setup) }} />
                     </div>
                   )}
                 </div>
@@ -376,10 +387,10 @@ function PublicEPK() {
                       download
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-dark-card border border-white/5 rounded-lg p-4 hover:border-accent/30 transition-colors group"
+                      className={`${cardBgClass} border ${borderClass} rounded-lg p-4 hover:border-accent/30 transition-colors group`}
                     >
-                      <p className="font-bold text-sm mb-1">{asset.title}</p>
-                      <p className="text-xs text-text-secondary group-hover:text-accent transition-colors">Download</p>
+                      <p className="font-semibold text-sm mb-1">{asset.title}</p>
+                      <p className={`text-xs ${textSecClass} group-hover:text-accent transition-colors`}>Download</p>
                     </a>
                   ))}
                 </div>
@@ -388,12 +399,12 @@ function PublicEPK() {
 
             contact: bookingContact && bookingContact.manager_name ? (
               <EPKSection key="contact" id="contact" heading="Booking Contact" maxWidth="max-w-4xl">
-                <div className="text-text-secondary space-y-2">
+                <div className={`${textSecClass} space-y-2`}>
                   <p><strong>Management:</strong> {bookingContact.manager_name}</p>
                   {bookingContact.email && <p><strong>Email:</strong> {bookingContact.email}</p>}
                   {bookingContact.phone && <p><strong>Phone:</strong> {bookingContact.phone}</p>}
                 </div>
-                <BookingForm slug={profile.slug as string} />
+                <BookingForm slug={profile.slug as string} isLight={isLight} />
               </EPKSection>
             ) : null,
           }
@@ -403,15 +414,15 @@ function PublicEPK() {
 
       {/* Agency Branding */}
       {data.organization && (
-        <div className="py-6 text-center border-t border-white/5">
-          <p className="text-xs text-text-secondary">
+        <div className={`py-6 text-center border-t ${borderClass}`}>
+          <p className={`text-xs ${textSecClass}`}>
             Represented by{' '}
             {data.organization.website_url ? (
               <a href={data.organization.website_url} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
                 {data.organization.name}
               </a>
             ) : (
-              <span className="text-white">{data.organization.name}</span>
+              <span>{data.organization.name}</span>
             )}
           </p>
         </div>
@@ -419,8 +430,8 @@ function PublicEPK() {
 
       {/* Branded footer for free tier */}
       {!(profile.hide_platform_branding && profile.tier === 'pro') && (
-        <footer className="py-6 text-center border-t border-white/5">
-          <p className="text-xs text-text-secondary">
+        <footer className={`py-6 text-center border-t ${borderClass}`}>
+          <p className={`text-xs ${textSecClass}`}>
             Built with <a href="/" className="text-accent hover:underline">DJ EPK</a>
           </p>
         </footer>

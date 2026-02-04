@@ -83,8 +83,8 @@ function ProfileEditor() {
                   setValue('slug', cleaned, { shouldDirty: true })
                 },
               })}
-              className={`flex-1 bg-dark-card border rounded-lg px-4 py-3 text-white focus:border-accent focus:outline-none transition-colors ${
-                errors.slug ? 'border-red-500' : 'border-white/10'
+              className={`flex-1 bg-white border rounded-lg px-4 py-3 text-text-primary focus:border-accent focus:outline-none transition-colors ${
+                errors.slug ? 'border-red-500' : 'border-border'
               }`}
             />
           </div>
@@ -117,8 +117,8 @@ function ProfileEditor() {
                   }}
                   className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
                     isSelected
-                      ? 'bg-accent text-black'
-                      : 'bg-dark-card border border-white/10 text-text-secondary hover:border-accent/30'
+                      ? 'bg-accent text-white'
+                      : 'bg-white border border-border text-text-secondary hover:border-accent/30'
                   }`}
                 >
                   {genre}
@@ -137,7 +137,7 @@ function ProfileEditor() {
                     const current = watch('genres') || []
                     setValue('genres', current.filter((g: string) => g !== genre), { shouldDirty: true })
                   }}
-                  className="px-3 py-1.5 rounded-full text-xs font-bold bg-accent text-black transition-colors"
+                  className="px-3 py-1.5 rounded-full text-xs font-bold bg-accent text-white transition-colors"
                 >
                   {genre} &times;
                 </button>
@@ -197,7 +197,7 @@ function ProfileEditor() {
           <label className={FORM_LABEL}>Profile Photo</label>
           <div className="flex items-center gap-4">
             {profileImageUrl && (
-              <img src={profileImageUrl} alt="Profile" className="w-24 h-24 rounded-full object-cover border border-white/10" />
+              <img src={profileImageUrl} alt="Profile" className="w-24 h-24 rounded-full object-cover border border-border" />
             )}
             <div>
               <input
@@ -218,7 +218,7 @@ function ProfileEditor() {
         <div>
           <label className={FORM_LABEL}>Hero Image</label>
           {heroImageUrl && (
-            <img src={heroImageUrl} alt="Hero" className="w-full h-32 rounded-lg object-cover border border-white/10 mb-3" />
+            <img src={heroImageUrl} alt="Hero" className="w-full h-32 rounded-lg object-cover border border-border mb-3" />
           )}
           <input
             ref={heroInputRef}
@@ -234,7 +234,7 @@ function ProfileEditor() {
         </div>
 
         <div className="flex items-center gap-3">
-          <label className="text-sm uppercase tracking-widest font-bold">Published</label>
+          <label className="font-medium text-text-secondary text-sm">Published</label>
           <button
             type="button"
             role="switch"
@@ -243,7 +243,7 @@ function ProfileEditor() {
             onClick={() => {
               setValue('published', !published, { shouldDirty: true })
             }}
-            className={`w-12 h-6 rounded-full transition-colors relative ${published ? 'bg-accent' : 'bg-white/10'}`}
+            className={`w-12 h-6 rounded-full transition-colors relative ${published ? 'bg-accent' : 'bg-border'}`}
           >
             <div className={`w-5 h-5 rounded-full bg-white absolute top-0.5 transition-transform ${published ? 'translate-x-6' : 'translate-x-0.5'}`} />
           </button>

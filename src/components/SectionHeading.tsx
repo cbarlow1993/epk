@@ -1,8 +1,8 @@
 export function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <div className="w-20 h-1 bg-accent mb-8 shadow-[0_0_10px_var(--color-accent-glow)]" />
-      <h2 className="text-4xl md:text-5xl font-black uppercase tracking-wider mb-12">
+      <div className="w-12 h-0.5 bg-accent mb-8" />
+      <h2 className="text-4xl md:text-5xl font-display font-semibold tracking-tight mb-12">
         {children}
       </h2>
     </>

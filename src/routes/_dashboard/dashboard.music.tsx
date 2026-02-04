@@ -74,11 +74,11 @@ function MusicEditor() {
 
   return (
     <div>
-      <h1 className="text-2xl font-black uppercase tracking-wider mb-8">Music / Mixes</h1>
+      <h1 className="text-2xl font-display font-semibold tracking-tight mb-8">Music / Mixes</h1>
 
       {/* Add Form */}
       <form onSubmit={onAdd} className={CARD_SECTION}>
-        <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Add Mix</h2>
+        <h2 className="font-medium text-text-secondary text-sm mb-4">Add Mix</h2>
         <div className="grid md:grid-cols-3 gap-4 mb-2">
           <div>
             <input
@@ -124,7 +124,7 @@ function MusicEditor() {
           {mixes.map((mix, index) => (
             <div
               key={mix.id}
-              className="bg-dark-card border border-white/10 rounded-xl p-4 flex items-center gap-4"
+              className="bg-white border border-border rounded-xl p-4 flex items-center gap-4"
             >
               {/* Reorder Buttons */}
               {handleReorder && <ReorderButtons index={index} total={mixes.length} onReorder={handleReorder} />}
@@ -157,10 +157,10 @@ function MusicEditor() {
                   </div>
                 ) : (
                   <div>
-                    <p className="font-bold text-white truncate">{mix.title}</p>
+                    <p className="font-bold text-text-primary truncate">{mix.title}</p>
                     <p className="text-xs text-text-secondary truncate">
                       {mix.url}
-                      <span className="ml-2 inline-block bg-white/10 rounded px-2 py-0.5 text-[10px] uppercase tracking-wider">
+                      <span className="ml-2 inline-block bg-border rounded px-2 py-0.5 text-[10px] uppercase tracking-wider">
                         {mix.category}
                       </span>
                     </p>
@@ -182,7 +182,7 @@ function MusicEditor() {
                     <button
                       type="button"
                       onClick={() => setEditingId(null)}
-                      className={`${BTN_BASE} bg-white/10 text-white hover:bg-white/20`}
+                      className={`${BTN_BASE} bg-bg text-text-primary hover:bg-border`}
                     >
                       Cancel
                     </button>
@@ -192,7 +192,7 @@ function MusicEditor() {
                     <button
                       type="button"
                       onClick={() => handleEdit(mix)}
-                      className={`${BTN_BASE} bg-white/10 text-white hover:bg-white/20`}
+                      className={`${BTN_BASE} bg-bg text-text-primary hover:bg-border`}
                     >
                       Edit
                     </button>

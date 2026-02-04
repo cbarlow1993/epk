@@ -32,7 +32,7 @@ function StorageBar({ used, limit }: { used: number; limit: number }) {
         <span>{formatBytes(used)} used</span>
         <span>{formatBytes(limit)} total</span>
       </div>
-      <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+      <div className="h-2 bg-bg rounded-full overflow-hidden">
         <div
           className="h-full bg-accent rounded-full transition-all"
           style={{ width: `${pct}%` }}
@@ -69,7 +69,7 @@ function DropZone({
       onDragLeave={() => setDragOver(false)}
       onDrop={handleDrop}
       className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors mb-6 ${
-        dragOver ? 'border-accent bg-accent/5' : 'border-white/10 hover:border-white/20'
+        dragOver ? 'border-accent bg-accent/5' : 'border-border hover:border-border'
       }`}
     >
       <p className="text-text-secondary text-sm mb-3">
@@ -103,10 +103,10 @@ function FileCard({
   const isImage = file.file_type === 'image'
 
   return (
-    <div className="bg-dark-card border border-white/10 rounded-lg overflow-hidden group">
+    <div className="bg-white border border-border rounded-lg overflow-hidden group">
       {/* Preview area */}
       <div
-        className="h-36 flex items-center justify-center bg-white/5 cursor-pointer"
+        className="h-36 flex items-center justify-center bg-border cursor-pointer"
         onClick={() => isImage && onPreview(file)}
       >
         {isImage ? (
@@ -116,7 +116,7 @@ function FileCard({
             className="w-full h-full object-cover"
           />
         ) : (
-          <span className="text-xs uppercase tracking-widest font-bold text-text-secondary bg-white/10 px-3 py-1 rounded">
+          <span className="text-xs font-medium text-text-secondary bg-bg px-3 py-1 rounded">
             {file.file_type}
           </span>
         )}
@@ -146,13 +146,13 @@ function FileCard({
             download
             target="_blank"
             rel="noopener noreferrer"
-            className={`${BTN_BASE} text-xs bg-white/10 hover:bg-white/20 text-white`}
+            className={`${BTN_BASE} text-xs bg-bg hover:bg-border text-text-primary`}
           >
             Download
           </a>
           <button
             onClick={() => onDelete(file.id)}
-            className={`${BTN_BASE} text-xs bg-red-500/20 text-red-400 hover:bg-red-500/30`}
+            className={`${BTN_BASE} text-xs bg-red-500/10 text-red-500 hover:bg-red-500/20`}
           >
             Delete
           </button>
@@ -196,15 +196,15 @@ function FolderSidebar({
   const [newName, setNewName] = useState('')
 
   return (
-    <div className="w-48 flex-shrink-0 border-r border-white/10 pr-4 mr-4">
-      <h3 className="text-xs uppercase tracking-widest font-bold text-text-secondary mb-3">Folders</h3>
+    <div className="w-48 flex-shrink-0 border-r border-border pr-4 mr-4">
+      <h3 className="text-xs font-medium text-text-secondary mb-3">Folders</h3>
 
       <button
         onClick={() => onSelect(null)}
         className={`block w-full text-left text-sm px-2 py-1.5 rounded transition-colors mb-1 ${
           currentFolder === null
             ? 'bg-accent/20 text-accent font-bold'
-            : 'text-text-secondary hover:text-white hover:bg-white/5'
+            : 'text-text-secondary hover:text-text-primary hover:bg-border'
         }`}
       >
         All Files
@@ -217,14 +217,14 @@ function FolderSidebar({
             className={`flex-1 text-left text-sm px-2 py-1.5 rounded transition-colors truncate ${
               currentFolder === folder.id
                 ? 'bg-accent/20 text-accent font-bold'
-                : 'text-text-secondary hover:text-white hover:bg-white/5'
+                : 'text-text-secondary hover:text-text-primary hover:bg-border'
             }`}
           >
             {folder.name}
           </button>
           <button
             onClick={() => onDeleteFolder(folder.id)}
-            className="text-red-400 hover:text-red-300 text-xs opacity-0 group-hover:opacity-100 transition-opacity px-1"
+            className="text-red-500 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity px-1"
             aria-label={`Delete folder ${folder.name}`}
           >
             x
@@ -362,19 +362,19 @@ function FilesPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-black uppercase tracking-wider mb-8">File Repository</h1>
+      <h1 className="text-2xl font-display font-semibold tracking-tight mb-8">File Repository</h1>
 
       <StorageBar used={storageUsage.used} limit={storageUsage.limit} />
 
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg px-4 py-3 mb-4">
+        <div className="bg-red-500/10 border border-red-500/30 text-red-500 text-sm rounded-lg px-4 py-3 mb-4">
           {error}
         </div>
       )}
 
       {!isPro && (
         <div className={`${SETTINGS_CARD} mb-6`}>
-          <h2 className="text-sm uppercase tracking-widest font-bold mb-2">Free Tier</h2>
+          <h2 className="font-medium text-text-secondary mb-2">Free Tier</h2>
           <p className="text-sm text-text-secondary mb-3">
             You have {formatBytes(storageUsage.limit)} of storage. Upgrade to Pro for 100 GB storage, folders, and more.
           </p>

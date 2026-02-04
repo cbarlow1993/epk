@@ -21,14 +21,22 @@ export default async function globalSetup(_config: FullConfig) {
   const context = await browser.newContext()
   const page = await context.newPage()
 
-  await page.goto('http://localhost:3000/login')
-  await page.waitForLoadState('networkidle')
+  // Navigate to login page with retry (SSR may 500 on first load)
+  for (let navAttempt = 0; navAttempt < 5; navAttempt++) {
+    await page.goto('http://localhost:3000/login')
+    await page.waitForLoadState('networkidle')
 
-  // Debug: log what's on the page
-  const url = page.url()
-  const title = await page.title()
-  const bodyText = await page.locator('body').innerText().catch(() => 'EMPTY')
-  console.log(`[global-setup] URL: ${url}, Title: ${title}, Body preview: ${bodyText.substring(0, 200)}`)
+    const bodyText = await page.locator('body').innerText().catch(() => 'EMPTY')
+    console.log(`[global-setup] Attempt ${navAttempt + 1}: Body preview: ${bodyText.substring(0, 200)}`)
+
+    // Check if we got the actual login page (has form fields)
+    const hasForm = await page.locator('#email').isVisible().catch(() => false)
+    if (hasForm) break
+
+    // If we got an error page, wait and retry
+    console.log(`[global-setup] Login page not ready, retrying in 3s...`)
+    await page.waitForTimeout(3000)
+  }
 
   // Wait for the form to appear
   await page.locator('#email').waitFor({ timeout: 15_000 })
