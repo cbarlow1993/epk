@@ -193,6 +193,9 @@ CREATE TRIGGER profiles_updated_at BEFORE UPDATE ON profiles FOR EACH ROW EXECUT
 CREATE TRIGGER technical_rider_updated_at BEFORE UPDATE ON technical_rider FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 CREATE TRIGGER booking_contact_updated_at BEFORE UPDATE ON booking_contact FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
+-- Migration: Add stripe_subscription_id to profiles
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT;
+
 -- Supabase Storage bucket for uploads
 -- Run this in the Supabase dashboard under Storage:
 -- Create a bucket called "uploads" with public access

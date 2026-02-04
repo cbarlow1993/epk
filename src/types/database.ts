@@ -20,6 +20,7 @@ export interface ProfileRow {
   bio_right: string | null
   tier: 'free' | 'pro'
   stripe_customer_id: string | null
+  stripe_subscription_id: string | null
   custom_domain: string | null
   custom_css: string | null
   created_at: string
@@ -83,7 +84,7 @@ export interface TechnicalRiderRow {
 }
 
 export interface PublicProfileData {
-  profile: Omit<ProfileRow, 'id' | 'stripe_customer_id' | 'custom_css'>
+  profile: Omit<ProfileRow, 'id' | 'stripe_customer_id' | 'stripe_subscription_id' | 'custom_css'>
   socialLinks: SocialLinkRow[]
   mixes: MixRow[]
   events: EventRow[]
