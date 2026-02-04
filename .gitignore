@@ -5,3 +5,5 @@ dist
 .vinxi
 .nitro
 .env
+.vercel
+.env*.local

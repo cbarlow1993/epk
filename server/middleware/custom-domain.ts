@@ -9,7 +9,7 @@ const MAIN_DOMAINS = [
 
 // Module-scoped client — stateless, safe to reuse across requests
 const supabase = createClient(
-  process.env.VITE_SUPABASE_URL!,
+  process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
 )
 

@@ -9,7 +9,7 @@ import {
 export function getSupabaseServerClient() {
   const supabase = createServerClient(
     import.meta.env.VITE_SUPABASE_URL,
-    import.meta.env.VITE_SUPABASE_KEY,
+    import.meta.env.VITE_SUPABASE_ANON_KEY,
     {
       cookies: {
         getAll() {
@@ -38,7 +38,7 @@ export function getSupabaseServerClient() {
 // Admin client for server-only operations that bypass RLS (no cookies needed)
 export function getSupabaseAdmin() {
   return createClient(
-    import.meta.env.VITE_SUPABASE_URL,
+    process.env.SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   )
 }
