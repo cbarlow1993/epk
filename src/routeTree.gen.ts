@@ -29,7 +29,7 @@ import { Route as DashboardDashboardSettingsRouteImport } from './routes/_dashbo
 import { Route as DashboardDashboardRosterRouteImport } from './routes/_dashboard/dashboard.roster'
 import { Route as DashboardDashboardPressRouteImport } from './routes/_dashboard/dashboard.press'
 import { Route as DashboardDashboardMusicRouteImport } from './routes/_dashboard/dashboard.music'
-import { Route as DashboardDashboardInquiriesRouteImport } from './routes/_dashboard/dashboard.inquiries'
+import { Route as DashboardDashboardIntegrationsRouteImport } from './routes/_dashboard/dashboard.integrations'
 import { Route as DashboardDashboardFilesRouteImport } from './routes/_dashboard/dashboard.files'
 import { Route as DashboardDashboardEventsRouteImport } from './routes/_dashboard/dashboard.events'
 import { Route as DashboardDashboardContactRouteImport } from './routes/_dashboard/dashboard.contact'
@@ -141,10 +141,10 @@ const DashboardDashboardMusicRoute = DashboardDashboardMusicRouteImport.update({
   path: '/music',
   getParentRoute: () => DashboardDashboardRoute,
 } as any)
-const DashboardDashboardInquiriesRoute =
-  DashboardDashboardInquiriesRouteImport.update({
-    id: '/inquiries',
-    path: '/inquiries',
+const DashboardDashboardIntegrationsRoute =
+  DashboardDashboardIntegrationsRouteImport.update({
+    id: '/integrations',
+    path: '/integrations',
     getParentRoute: () => DashboardDashboardRoute,
   } as any)
 const DashboardDashboardFilesRoute = DashboardDashboardFilesRouteImport.update({
@@ -206,7 +206,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/contact': typeof DashboardDashboardContactRoute
   '/dashboard/events': typeof DashboardDashboardEventsRoute
   '/dashboard/files': typeof DashboardDashboardFilesRoute
-  '/dashboard/inquiries': typeof DashboardDashboardInquiriesRoute
+  '/dashboard/integrations': typeof DashboardDashboardIntegrationsRoute
   '/dashboard/music': typeof DashboardDashboardMusicRoute
   '/dashboard/press': typeof DashboardDashboardPressRoute
   '/dashboard/roster': typeof DashboardDashboardRosterRoute
@@ -234,7 +234,7 @@ export interface FileRoutesByTo {
   '/dashboard/contact': typeof DashboardDashboardContactRoute
   '/dashboard/events': typeof DashboardDashboardEventsRoute
   '/dashboard/files': typeof DashboardDashboardFilesRoute
-  '/dashboard/inquiries': typeof DashboardDashboardInquiriesRoute
+  '/dashboard/integrations': typeof DashboardDashboardIntegrationsRoute
   '/dashboard/music': typeof DashboardDashboardMusicRoute
   '/dashboard/press': typeof DashboardDashboardPressRoute
   '/dashboard/roster': typeof DashboardDashboardRosterRoute
@@ -265,7 +265,7 @@ export interface FileRoutesById {
   '/_dashboard/dashboard/contact': typeof DashboardDashboardContactRoute
   '/_dashboard/dashboard/events': typeof DashboardDashboardEventsRoute
   '/_dashboard/dashboard/files': typeof DashboardDashboardFilesRoute
-  '/_dashboard/dashboard/inquiries': typeof DashboardDashboardInquiriesRoute
+  '/_dashboard/dashboard/integrations': typeof DashboardDashboardIntegrationsRoute
   '/_dashboard/dashboard/music': typeof DashboardDashboardMusicRoute
   '/_dashboard/dashboard/press': typeof DashboardDashboardPressRoute
   '/_dashboard/dashboard/roster': typeof DashboardDashboardRosterRoute
@@ -296,7 +296,7 @@ export interface FileRouteTypes {
     | '/dashboard/contact'
     | '/dashboard/events'
     | '/dashboard/files'
-    | '/dashboard/inquiries'
+    | '/dashboard/integrations'
     | '/dashboard/music'
     | '/dashboard/press'
     | '/dashboard/roster'
@@ -324,7 +324,7 @@ export interface FileRouteTypes {
     | '/dashboard/contact'
     | '/dashboard/events'
     | '/dashboard/files'
-    | '/dashboard/inquiries'
+    | '/dashboard/integrations'
     | '/dashboard/music'
     | '/dashboard/press'
     | '/dashboard/roster'
@@ -354,7 +354,7 @@ export interface FileRouteTypes {
     | '/_dashboard/dashboard/contact'
     | '/_dashboard/dashboard/events'
     | '/_dashboard/dashboard/files'
-    | '/_dashboard/dashboard/inquiries'
+    | '/_dashboard/dashboard/integrations'
     | '/_dashboard/dashboard/music'
     | '/_dashboard/dashboard/press'
     | '/_dashboard/dashboard/roster'
@@ -521,11 +521,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardMusicRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
-    '/_dashboard/dashboard/inquiries': {
-      id: '/_dashboard/dashboard/inquiries'
-      path: '/inquiries'
-      fullPath: '/dashboard/inquiries'
-      preLoaderRoute: typeof DashboardDashboardInquiriesRouteImport
+    '/_dashboard/dashboard/integrations': {
+      id: '/_dashboard/dashboard/integrations'
+      path: '/integrations'
+      fullPath: '/dashboard/integrations'
+      preLoaderRoute: typeof DashboardDashboardIntegrationsRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
     '/_dashboard/dashboard/files': {
@@ -588,7 +588,7 @@ interface DashboardDashboardRouteChildren {
   DashboardDashboardContactRoute: typeof DashboardDashboardContactRoute
   DashboardDashboardEventsRoute: typeof DashboardDashboardEventsRoute
   DashboardDashboardFilesRoute: typeof DashboardDashboardFilesRoute
-  DashboardDashboardInquiriesRoute: typeof DashboardDashboardInquiriesRoute
+  DashboardDashboardIntegrationsRoute: typeof DashboardDashboardIntegrationsRoute
   DashboardDashboardMusicRoute: typeof DashboardDashboardMusicRoute
   DashboardDashboardPressRoute: typeof DashboardDashboardPressRoute
   DashboardDashboardRosterRoute: typeof DashboardDashboardRosterRoute
@@ -609,7 +609,7 @@ const DashboardDashboardRouteChildren: DashboardDashboardRouteChildren = {
   DashboardDashboardContactRoute: DashboardDashboardContactRoute,
   DashboardDashboardEventsRoute: DashboardDashboardEventsRoute,
   DashboardDashboardFilesRoute: DashboardDashboardFilesRoute,
-  DashboardDashboardInquiriesRoute: DashboardDashboardInquiriesRoute,
+  DashboardDashboardIntegrationsRoute: DashboardDashboardIntegrationsRoute,
   DashboardDashboardMusicRoute: DashboardDashboardMusicRoute,
   DashboardDashboardPressRoute: DashboardDashboardPressRoute,
   DashboardDashboardRosterRoute: DashboardDashboardRosterRoute,

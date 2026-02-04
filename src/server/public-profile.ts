@@ -38,17 +38,20 @@ export const getPublicProfile = createServerFn({ method: 'GET' })
       { data: technicalRider },
       { data: bookingContact },
       { data: pressAssets },
+      { data: integrations },
     ] = await Promise.all([
       supabase.from('social_links').select('*').eq('profile_id', profileId).order('sort_order'),
       supabase.from('mixes').select('*').eq('profile_id', profileId).order('sort_order'),
       supabase.from('events').select('*').eq('profile_id', profileId).order('sort_order'),
       supabase.from('technical_rider').select('*').eq('profile_id', profileId).single(),
       supabase.from('booking_contact').select('*').eq('profile_id', profileId).single(),
-      supabase.from('press_assets').select('*').eq('profile_id', profileId).order('sort_order'),
+      supabase.from('files').select('*').eq('profile_id', profileId).eq('is_press_asset', true).order('sort_order'),
+      supabase.from('integrations').select('*').eq('profile_id', profileId).eq('enabled', true).order('sort_order'),
     ])
 
     return {
       profile,
+      profileId,
       socialLinks: socialLinks || [],
       mixes: mixes || [],
       events: events || [],
@@ -56,5 +59,10 @@ export const getPublicProfile = createServerFn({ method: 'GET' })
       bookingContact: bookingContact || null,
       pressAssets: pressAssets || [],
       organization,
+      integrations: (integrations || []).map((row) => {
+        const config = { ...(row.config as Record<string, unknown>) }
+        delete config.api_key
+        return { ...row, config }
+      }),
     }
   })

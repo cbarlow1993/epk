@@ -1,6 +1,5 @@
 import type { MIX_CATEGORIES } from '~/schemas/mix'
 import type { SOCIAL_PLATFORMS } from '~/schemas/social-link'
-import type { ASSET_TYPES } from '~/schemas/press-asset'
 
 /** Row types representing what Supabase returns from select('*') queries */
 
@@ -16,8 +15,8 @@ export interface ProfileRow {
   accent_color: string | null
   bg_color: string | null
   font_family: string | null
-  bio_left: string | null
-  bio_right: string | null
+  short_bio: string | null
+  bio: Record<string, unknown> | null
   tier: 'free' | 'pro'
   stripe_customer_id: string | null
   stripe_subscription_id: string | null
@@ -67,16 +66,6 @@ export interface SocialLinkRow {
   created_at: string
 }
 
-export interface PressAssetRow {
-  id: string
-  profile_id: string
-  title: string
-  file_url: string
-  type: (typeof ASSET_TYPES)[number]
-  sort_order: number
-  created_at: string
-}
-
 export interface BookingContactRow {
   id: string
   profile_id: string
@@ -89,22 +78,8 @@ export interface BookingContactRow {
 export interface TechnicalRiderRow {
   id: string
   profile_id: string
-  preferred_setup: string | null
-  alternative_setup: string | null
-}
-
-export interface BookingRequestRow {
-  id: string
-  profile_id: string
-  name: string
-  email: string
-  event_name: string | null
-  event_date: string | null
-  venue_location: string | null
-  budget_range: string | null
-  message: string
-  status: 'new' | 'read' | 'replied' | 'archived'
-  created_at: string
+  preferred_setup: Record<string, unknown> | null
+  alternative_setup: Record<string, unknown> | null
 }
 
 export interface FolderRow {
@@ -124,6 +99,11 @@ export interface FileRow {
   file_type: string
   file_size: number
   mime_type: string | null
+  is_press_asset: boolean
+  press_title: string | null
+  press_type: 'photo' | 'video' | 'logo' | null
+  sort_order: number
+  source: string
   created_at: string
   tags?: string[]
 }
@@ -169,5 +149,16 @@ export interface PublicProfileData {
   events: EventRow[]
   technicalRider: TechnicalRiderRow | null
   bookingContact: BookingContactRow | null
-  pressAssets: PressAssetRow[]
+  pressAssets: FileRow[]
+}
+
+export interface IntegrationRow {
+  id: string
+  profile_id: string
+  type: string
+  enabled: boolean
+  config: Record<string, unknown>
+  sort_order: number
+  created_at: string
+  updated_at: string
 }

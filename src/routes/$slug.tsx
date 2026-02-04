@@ -1,14 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { getPublicProfile } from '~/server/public-profile'
-import { submitBookingRequestForSlug } from '~/server/booking-requests'
 import { Nav } from '~/components/Nav'
 import { sanitize, sanitizeEmbed } from '~/utils/sanitize'
+import { BlockRenderer } from '~/components/BlockRenderer'
 import { EPKSection } from '~/components/EPKSection'
 import { Analytics, trackSectionView } from '~/components/Analytics'
 import { getTemplate } from '~/utils/templates'
 import { isLightBackground } from '~/utils/color'
-import type { MixRow, EventRow, SocialLinkRow, PressAssetRow } from '~/types/database'
+import type { MixRow, EventRow, SocialLinkRow, FileRow } from '~/types/database'
 
 export const Route = createFileRoute('/$slug')({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -21,7 +21,7 @@ export const Route = createFileRoute('/$slug')({
   head: ({ loaderData }) => {
     const profile = loaderData?.profile
     const name = profile?.display_name || 'DJ'
-    const font = profile?.font_family || 'DM Sans'
+    const font = profile?.font_family || 'Instrument Sans'
     const fontParam = font.replace(/ /g, '+')
     const tagline = profile?.tagline
     const genres = profile?.genres as string[] | undefined
@@ -55,92 +55,104 @@ export const Route = createFileRoute('/$slug')({
   ),
 })
 
-function BookingForm({ slug, isLight }: { slug: string; isLight: boolean }) {
-  const [submitting, setSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-  const [error, setError] = useState('')
-  const [formData, setFormData] = useState({
-    name: '', email: '', event_name: '', event_date: '', venue_location: '',
-    budget_range: '', message: '', honeypot: '',
-  })
+function BioContent({ bio, proseClass, textSecClass, accentColor }: {
+  bio: import('@editorjs/editorjs').OutputData
+  proseClass: string
+  textSecClass: string
+  accentColor: string
+}) {
+  const [expanded, setExpanded] = useState(false)
+  const contentRef = useRef<HTMLDivElement>(null)
+  const isLong = bio.blocks && bio.blocks.length > 3
+
+  return (
+    <div className={`${textSecClass} leading-relaxed`}>
+      <div
+        ref={contentRef}
+        className="overflow-hidden transition-[max-height] duration-500 ease-in-out"
+        style={{ maxHeight: !isLong || expanded ? '9999px' : '16rem' }}
+      >
+        <BlockRenderer data={bio} className={proseClass} />
+      </div>
+      {isLong && !expanded && (
+        <div className="relative -mt-12 pt-12 bg-gradient-to-t from-inherit">
+          <button
+            type="button"
+            onClick={() => setExpanded(true)}
+            className="text-sm font-semibold uppercase tracking-wider hover:underline"
+            style={{ color: accentColor }}
+          >
+            Read more
+          </button>
+        </div>
+      )}
+      {isLong && expanded && (
+        <button
+          type="button"
+          onClick={() => setExpanded(false)}
+          className="mt-4 text-sm font-semibold uppercase tracking-wider hover:underline"
+          style={{ color: accentColor }}
+        >
+          Read less
+        </button>
+      )}
+    </div>
+  )
+}
+
+function MailchimpForm({ profileId, heading, buttonText, textSecClass }: {
+  profileId: string
+  heading: string
+  buttonText: string
+  textSecClass: string
+}) {
+  const [email, setEmail] = useState('')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [message, setMessage] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (formData.honeypot) return
-    setSubmitting(true)
-    setError('')
+    setStatus('loading')
 
-    const result = await submitBookingRequestForSlug({
-      data: { slug, request: formData },
-    })
+    const { subscribeMailchimp } = await import('~/server/integrations')
+    const result = await subscribeMailchimp({ data: { profileId, email } })
 
     if ('error' in result && result.error) {
-      setError(result.error)
-      setSubmitting(false)
-      return
+      setStatus('error')
+      setMessage(result.error as string)
+    } else {
+      setStatus('success')
+      setMessage('Thanks for subscribing!')
+      setEmail('')
     }
-
-    setSubmitted(true)
-    setSubmitting(false)
   }
-
-  if (submitted) {
-    return (
-      <div className={`border border-accent/20 rounded-xl p-8 text-center ${isLight ? 'bg-white' : 'bg-white/5'}`}>
-        <p className="text-accent font-semibold text-lg mb-2">Inquiry Sent!</p>
-        <p className="text-text-secondary text-sm">Thanks for reaching out. You'll hear back soon.</p>
-      </div>
-    )
-  }
-
-  const inputClass = isLight
-    ? 'w-full bg-white border border-black/10 rounded-lg px-4 py-3 text-text-primary placeholder-text-secondary/50 focus:border-accent focus:outline-none transition-colors text-sm'
-    : 'w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:border-accent focus:outline-none transition-colors text-sm'
 
   return (
-    <form onSubmit={handleSubmit} className={`border rounded-xl p-6 mt-8 ${isLight ? 'bg-white border-black/6' : 'bg-white/5 border-white/5'}`}>
-      <h3 className="text-sm font-medium mb-6">Send Booking Inquiry</h3>
-      {error && (
-        <div className={`rounded-lg px-4 py-3 mb-4 text-sm ${isLight ? 'bg-red-50 border border-red-200 text-red-600' : 'bg-red-500/10 border border-red-500/20 text-red-400'}`}>{error}</div>
+    <div className="max-w-md mx-auto text-center">
+      <p className={`${textSecClass} mb-4`}>{heading}</p>
+      {status === 'success' ? (
+        <p className="text-green-600 font-semibold text-sm">{message}</p>
+      ) : (
+        <form onSubmit={handleSubmit} className="flex gap-2">
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Your email"
+            className="flex-1 bg-transparent border border-current/20 px-4 py-2 text-sm placeholder-current/40 focus:border-accent focus:outline-none"
+          />
+          <button
+            type="submit"
+            disabled={status === 'loading'}
+            className="px-6 py-2 text-xs font-semibold uppercase tracking-wider bg-accent text-white hover:opacity-90 disabled:opacity-50 transition-opacity"
+          >
+            {status === 'loading' ? '...' : buttonText}
+          </button>
+        </form>
       )}
-      <input
-        type="text"
-        name="website"
-        value={formData.honeypot}
-        onChange={(e) => setFormData(prev => ({ ...prev, honeypot: e.target.value }))}
-        className="absolute -left-[9999px]"
-        tabIndex={-1}
-        autoComplete="off"
-        aria-hidden="true"
-      />
-      <div className="grid sm:grid-cols-2 gap-4 mb-4">
-        <input type="text" placeholder="Your Name *" required value={formData.name}
-          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-          className={inputClass} />
-        <input type="email" placeholder="Your Email *" required value={formData.email}
-          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-          className={inputClass} />
-        <input type="text" placeholder="Event Name" value={formData.event_name}
-          onChange={(e) => setFormData(prev => ({ ...prev, event_name: e.target.value }))}
-          className={inputClass} />
-        <input type="date" placeholder="Event Date" value={formData.event_date}
-          onChange={(e) => setFormData(prev => ({ ...prev, event_date: e.target.value }))}
-          className={inputClass} />
-        <input type="text" placeholder="Venue / Location" value={formData.venue_location}
-          onChange={(e) => setFormData(prev => ({ ...prev, venue_location: e.target.value }))}
-          className={inputClass} />
-        <input type="text" placeholder="Budget Range" value={formData.budget_range}
-          onChange={(e) => setFormData(prev => ({ ...prev, budget_range: e.target.value }))}
-          className={inputClass} />
-      </div>
-      <textarea placeholder="Your Message *" required rows={4} value={formData.message}
-        onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-        className={`${inputClass} mb-4`} />
-      <button type="submit" disabled={submitting}
-        className="bg-accent hover:bg-accent/80 disabled:opacity-50 text-white font-semibold py-3 px-8 rounded-lg transition-colors text-sm">
-        {submitting ? 'Sending...' : 'Send Inquiry'}
-      </button>
-    </form>
+      {status === 'error' && <p className="text-red-500 text-xs mt-2">{message}</p>}
+    </div>
   )
 }
 
@@ -157,9 +169,9 @@ function PublicEPK() {
   const { profile, socialLinks, mixes, events, technicalRider, bookingContact, pressAssets } = data
 
   const template = getTemplate(profile.template || 'default')
-  const accent = search.accent || profile.accent_color || '#B85C38'
-  const bg = search.bg || profile.bg_color || '#FAF9F6'
-  const font = search.font || profile.font_family || 'DM Sans'
+  const accent = search.accent || profile.accent_color || '#FF0000'
+  const bg = search.bg || profile.bg_color || '#FFFFFF'
+  const font = search.font || profile.font_family || 'Instrument Sans'
   const name = profile.display_name || 'DJ'
   const isLight = isLightBackground(bg)
 
@@ -188,13 +200,48 @@ function PublicEPK() {
     return () => observer.disconnect()
   }, [profile.slug])
 
+  // Inject third-party analytics scripts
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const intList = data?.integrations || []
+
+    const ga = intList.find((i: { type: string }) => i.type === 'google_analytics')
+    if (ga) {
+      const mid = (ga.config as { measurement_id: string }).measurement_id
+      if (mid) {
+        const script1 = document.createElement('script')
+        script1.src = `https://www.googletagmanager.com/gtag/js?id=${mid}`
+        script1.async = true
+        document.head.appendChild(script1)
+
+        const script2 = document.createElement('script')
+        script2.textContent = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${mid}');`
+        document.head.appendChild(script2)
+      }
+    }
+
+    const pl = intList.find((i: { type: string }) => i.type === 'plausible')
+    if (pl) {
+      const domain = (pl.config as { domain: string }).domain
+      if (domain) {
+        const script = document.createElement('script')
+        script.src = 'https://plausible.io/js/script.js'
+        script.defer = true
+        script.setAttribute('data-domain', domain)
+        document.head.appendChild(script)
+      }
+    }
+  }, [data?.integrations])
+
   const navSections = [
-    (profile.bio_left || profile.bio_right) && { label: 'Bio', href: '#bio' },
+    profile.bio && { label: 'Bio', href: '#bio' },
     mixes.length > 0 && { label: 'Music', href: '#music' },
     events.length > 0 && { label: 'Events', href: '#events' },
     technicalRider && (technicalRider.preferred_setup || technicalRider.alternative_setup) && { label: 'Technical', href: '#technical' },
     pressAssets.length > 0 && { label: 'Press', href: '#press' },
     bookingContact && bookingContact.manager_name && { label: 'Contact', href: '#contact' },
+    (data?.integrations || []).some((i: { type: string }) => ['soundcloud', 'spotify', 'mixcloud'].includes(i.type)) && { label: 'Listen', href: '#listen-embeds' },
+    (data?.integrations || []).some((i: { type: string }) => ['mailchimp', 'custom_embed'].includes(i.type)) && { label: 'Newsletter', href: '#newsletter' },
   ].filter((s): s is { label: string; href: string } => !!s)
 
   // Conditional classes based on background brightness
@@ -247,7 +294,7 @@ function PublicEPK() {
             {profile.genres && (profile.genres as string[]).length > 0 && (
               <div className="flex flex-wrap justify-center gap-2 mt-4">
                 {(profile.genres as string[]).map((genre) => (
-                  <span key={genre} className="px-3 py-1 rounded-full text-xs font-semibold bg-accent/20 text-accent">
+                  <span key={genre} className="px-3 py-1 text-xs font-semibold uppercase tracking-wider bg-accent/20 text-accent">
                     {genre}
                   </span>
                 ))}
@@ -283,16 +330,19 @@ function PublicEPK() {
         {/* Template-ordered sections */}
         {template.sectionOrder.map((sectionId) => {
           const sectionRenderers: Record<string, React.ReactNode> = {
-            bio: (profile.bio_left || profile.bio_right) ? (
+            bio: profile.bio || profile.short_bio ? (
               <EPKSection key="bio" id="bio" heading="Bio">
-                <div className={`${
-                  template.bioLayout === 'two-column'
-                    ? 'grid md:grid-cols-2 gap-8 md:gap-12'
-                    : 'space-y-6'
-                } ${textSecClass} leading-relaxed`}>
-                  {profile.bio_left && <div className={proseClass} dangerouslySetInnerHTML={{ __html: sanitize(profile.bio_left) }} />}
-                  {profile.bio_right && <div className={proseClass} dangerouslySetInnerHTML={{ __html: sanitize(profile.bio_right) }} />}
-                </div>
+                {profile.short_bio && (
+                  <p className={`text-lg leading-relaxed mb-6 ${textSecClass}`}>{profile.short_bio}</p>
+                )}
+                {profile.bio && (
+                  <BioContent
+                    bio={profile.bio as import('@editorjs/editorjs').OutputData}
+                    proseClass={proseClass}
+                    textSecClass={textSecClass}
+                    accentColor={accent}
+                  />
+                )}
               </EPKSection>
             ) : null,
 
@@ -312,7 +362,7 @@ function PublicEPK() {
                     </h3>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {categoryMixes.map((mix) => (
-                        <div key={mix.id} className={`${cardBgClass} border ${borderClass} rounded-lg overflow-hidden`}>
+                        <div key={mix.id} className={`${cardBgClass} border ${borderClass} overflow-hidden`}>
                           {mix.embed_html ? (
                             <div
                               className="w-full [&_iframe]:w-full [&_iframe]:rounded-none"
@@ -342,7 +392,7 @@ function PublicEPK() {
                       href={event.link_url || '#'}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`group block rounded-lg overflow-hidden border ${borderClass} hover:border-accent/30 transition-all hover:scale-105`}
+                      className={`group block overflow-hidden border ${borderClass} hover:border-accent/30 transition-all hover:scale-105`}
                     >
                       <div className={`aspect-square overflow-hidden ${cardBgClass}`}>
                         {event.image_url && (
@@ -360,17 +410,17 @@ function PublicEPK() {
 
             technical: technicalRider && (technicalRider.preferred_setup || technicalRider.alternative_setup) ? (
               <EPKSection key="technical" id="technical" heading="Technical Rider" maxWidth="max-w-4xl">
-                <div className={`${cardBgClass} backdrop-blur-sm rounded-xl border ${borderClass} overflow-hidden`}>
+                <div className={`${cardBgClass} backdrop-blur-sm border ${borderClass} overflow-hidden`}>
                   {technicalRider.preferred_setup && (
                     <div className={`px-6 py-4 border-b ${borderClass}`}>
                       <p className="text-sm font-medium mb-3">Preferred Setup</p>
-                      <div className={`${proseClass} ${textSecClass}`} dangerouslySetInnerHTML={{ __html: sanitize(technicalRider.preferred_setup) }} />
+                      <BlockRenderer data={technicalRider.preferred_setup as import('@editorjs/editorjs').OutputData} className={`${proseClass} ${textSecClass}`} />
                     </div>
                   )}
                   {technicalRider.alternative_setup && (
                     <div className="px-6 py-4">
                       <p className="text-sm font-medium mb-3">Alternative Setup</p>
-                      <div className={`${proseClass} ${textSecClass}`} dangerouslySetInnerHTML={{ __html: sanitize(technicalRider.alternative_setup) }} />
+                      <BlockRenderer data={technicalRider.alternative_setup as import('@editorjs/editorjs').OutputData} className={`${proseClass} ${textSecClass}`} />
                     </div>
                   )}
                 </div>
@@ -380,16 +430,16 @@ function PublicEPK() {
             press: pressAssets && pressAssets.length > 0 ? (
               <EPKSection key="press" id="press" heading="Press Assets">
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {pressAssets.map((asset: PressAssetRow) => (
+                  {pressAssets.map((asset: FileRow) => (
                     <a
                       key={asset.id}
                       href={asset.file_url}
                       download
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`${cardBgClass} border ${borderClass} rounded-lg p-4 hover:border-accent/30 transition-colors group`}
+                      className={`${cardBgClass} border ${borderClass} p-4 hover:border-accent/30 transition-colors group`}
                     >
-                      <p className="font-semibold text-sm mb-1">{asset.title}</p>
+                      <p className="font-semibold text-sm mb-1">{asset.press_title || asset.name}</p>
                       <p className={`text-xs ${textSecClass} group-hover:text-accent transition-colors`}>Download</p>
                     </a>
                   ))}
@@ -404,12 +454,59 @@ function PublicEPK() {
                   {bookingContact.email && <p><strong>Email:</strong> {bookingContact.email}</p>}
                   {bookingContact.phone && <p><strong>Phone:</strong> {bookingContact.phone}</p>}
                 </div>
-                <BookingForm slug={profile.slug as string} isLight={isLight} />
               </EPKSection>
             ) : null,
           }
           return sectionRenderers[sectionId] || null
         })}
+
+        {/* Integration sections */}
+        {(() => {
+          const intList = data?.integrations || []
+          const embedIntegrations = intList.filter(
+            (i: { type: string }) => ['soundcloud', 'spotify', 'mixcloud'].includes(i.type)
+          )
+          const marketingIntegrations = intList.filter(
+            (i: { type: string }) => ['mailchimp', 'custom_embed'].includes(i.type)
+          )
+
+          return (
+            <>
+              {embedIntegrations.length > 0 && (
+                <EPKSection id="listen-embeds" heading="Listen">
+                  <div className="space-y-6">
+                    {embedIntegrations.map((integration: { id: string; config: Record<string, string> }) => (
+                      integration.config.embed_html ? (
+                        <div
+                          key={integration.id}
+                          className="[&_iframe]:w-full [&_iframe]:rounded-none"
+                          dangerouslySetInnerHTML={{ __html: sanitizeEmbed(integration.config.embed_html) }}
+                        />
+                      ) : null
+                    ))}
+                  </div>
+                </EPKSection>
+              )}
+
+              {marketingIntegrations.length > 0 && marketingIntegrations.map((integration: { id: string; type: string; config: Record<string, string> }) => (
+                integration.type === 'mailchimp' ? (
+                  <EPKSection key={integration.id} id="newsletter" heading={integration.config.form_heading || 'Newsletter'}>
+                    <MailchimpForm
+                      profileId={data!.profileId}
+                      heading={integration.config.form_heading || 'Join my mailing list'}
+                      buttonText={integration.config.button_text || 'Subscribe'}
+                      textSecClass={textSecClass}
+                    />
+                  </EPKSection>
+                ) : integration.type === 'custom_embed' && integration.config.embed_html ? (
+                  <EPKSection key={integration.id} id="newsletter" heading={integration.config.label || 'Newsletter'}>
+                    <div dangerouslySetInnerHTML={{ __html: sanitize(integration.config.embed_html) }} />
+                  </EPKSection>
+                ) : null
+              ))}
+            </>
+          )
+        })()}
       </main>
 
       {/* Agency Branding */}
