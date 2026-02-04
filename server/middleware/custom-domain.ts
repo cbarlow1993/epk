@@ -1,12 +1,17 @@
-import { defineEventHandler, getRequestURL } from 'h3'
 import { createClient } from '@supabase/supabase-js'
 
 const MAIN_DOMAINS = [
   'localhost',
   'localhost:3000',
   '127.0.0.1',
-  // Production domain will be added here
+  'epk-chi.vercel.app',
 ]
+
+// Module-scoped client — stateless, safe to reuse across requests
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+)
 
 export default defineEventHandler(async (event) => {
   const url = getRequestURL(event)
@@ -29,11 +34,6 @@ export default defineEventHandler(async (event) => {
 
   // Only rewrite the root path for custom domains
   if (url.pathname === '/' || url.pathname === '') {
-    const supabase = createClient(
-      process.env.VITE_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    )
-
     const { data: profile } = await supabase
       .from('profiles')
       .select('slug')

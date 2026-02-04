@@ -7,7 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 const BASE_URL = process.env.APP_BASE_URL || 'http://localhost:3000'
 
 export const createCheckoutSession = createServerFn({ method: 'POST' })
-  .inputValidator((data: unknown) => z.object({ profileId: z.string().uuid().optional() }).parse(data))
+  .inputValidator((data: unknown) => z.object({ profileId: z.string().uuid().optional() }).parse(data ?? {}))
   .handler(async ({ data }) => {
     const { supabase, user } = await withAuth()
 

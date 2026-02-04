@@ -1,4 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
+import { z } from 'zod'
 import { withAuth } from './utils'
 
 const VERCEL_TOKEN = process.env.VERCEL_TOKEN
@@ -6,7 +7,7 @@ const VERCEL_PROJECT_ID = process.env.VERCEL_PROJECT_ID
 const VERCEL_TEAM_ID = process.env.VERCEL_TEAM_ID
 
 export const addCustomDomain = createServerFn({ method: 'POST' })
-  .inputValidator((data: { domain: string }) => data)
+  .inputValidator((data: unknown) => z.object({ domain: z.string().min(1).max(253).regex(/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/, 'Invalid domain format') }).parse(data))
   .handler(async ({ data }) => {
     const { supabase, user } = await withAuth()
 
@@ -53,9 +54,18 @@ export const removeCustomDomain = createServerFn({ method: 'POST' }).handler(asy
 })
 
 export const checkDomainStatus = createServerFn({ method: 'POST' })
-  .inputValidator((data: { domain: string }) => data)
+  .inputValidator((data: unknown) => z.object({ domain: z.string().min(1).max(253) }).parse(data))
   .handler(async ({ data }) => {
-    const { user } = await withAuth()
+    const { supabase, user } = await withAuth()
+
+    // Verify the domain belongs to this user
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('custom_domain')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.custom_domain !== data.domain) return { configured: false }
 
     const teamParam = VERCEL_TEAM_ID ? `?teamId=${VERCEL_TEAM_ID}` : ''
     const res = await fetch(`https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/domains/${data.domain}${teamParam}`, {

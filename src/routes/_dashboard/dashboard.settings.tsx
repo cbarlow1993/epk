@@ -12,13 +12,27 @@ export const Route = createFileRoute('/_dashboard/dashboard/settings')({
   component: SettingsPage,
 })
 
-async function redirectToBilling(action: () => Promise<Record<string, unknown>>) {
-  const result = await action()
-  if ('url' in result && typeof result.url === 'string') window.location.href = result.url
-}
-
 function SettingsPage() {
   const profile = Route.useLoaderData()
+  const [billingLoading, setBillingLoading] = useState(false)
+  const [billingError, setBillingError] = useState('')
+
+  const redirectToBilling = async (action: () => Promise<Record<string, unknown>>) => {
+    setBillingLoading(true)
+    setBillingError('')
+    try {
+      const result = await action()
+      if ('url' in result && typeof result.url === 'string') {
+        window.location.href = result.url
+      } else if ('error' in result && typeof result.error === 'string') {
+        setBillingError(result.error)
+        setBillingLoading(false)
+      }
+    } catch {
+      setBillingError('Something went wrong. Please try again.')
+      setBillingLoading(false)
+    }
+  }
 
   return (
     <div>
@@ -55,9 +69,10 @@ function SettingsPage() {
               <button
                 type="button"
                 onClick={() => redirectToBilling(createPortalSession)}
-                className="bg-white/10 hover:bg-white/20 text-white text-sm font-bold uppercase tracking-widest px-6 py-2 rounded-lg transition-colors"
+                disabled={billingLoading}
+                className="bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white text-sm font-bold uppercase tracking-widest px-6 py-2 rounded-lg transition-colors"
               >
-                Manage Subscription
+                {billingLoading ? 'Loading...' : 'Manage Subscription'}
               </button>
             </div>
           ) : (
@@ -66,12 +81,14 @@ function SettingsPage() {
               <button
                 type="button"
                 onClick={() => redirectToBilling(createCheckoutSession)}
-                className="bg-accent hover:bg-accent/80 text-white text-sm font-bold uppercase tracking-widest px-6 py-2 rounded-lg transition-colors"
+                disabled={billingLoading}
+                className="bg-accent hover:bg-accent/80 disabled:opacity-30 text-white text-sm font-bold uppercase tracking-widest px-6 py-2 rounded-lg transition-colors"
               >
-                Upgrade to Pro
+                {billingLoading ? 'Loading...' : 'Upgrade to Pro'}
               </button>
             </div>
           )}
+          {billingError && <p className="text-xs text-red-400 mt-3">{billingError}</p>}
         </div>
 
         {/* Branding */}
