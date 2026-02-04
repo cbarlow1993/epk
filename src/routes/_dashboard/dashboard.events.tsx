@@ -36,9 +36,9 @@ function EventsEditor() {
     const file = fileInputRef.current?.files?.[0]
     if (file) {
       setUploading(true)
-      const url = await uploadFileFromInput(file, 'events')
+      const result = await uploadFileFromInput(file, 'events')
       setUploading(false)
-      if (url) imageUrl = url
+      if (result) imageUrl = result.url
     }
 
     const result = await upsertEvent({
@@ -55,7 +55,7 @@ function EventsEditor() {
 
   return (
     <div>
-      <h1 className="text-2xl font-display font-semibold tracking-tight mb-8">Events / Brands</h1>
+      <h1 className="text-2xl font-display font-extrabold tracking-tight uppercase mb-8">Events / Brands</h1>
 
       {/* Add Form */}
       <form onSubmit={onAdd} className={CARD_SECTION}>
@@ -103,7 +103,7 @@ function EventsEditor() {
           {events.map((event, index) => (
             <div
               key={event.id}
-              className="group relative aspect-square bg-white border border-border rounded-xl overflow-hidden"
+              className="group relative aspect-square bg-white border border-border overflow-hidden"
             >
               {event.image_url ? (
                 <img
@@ -112,7 +112,7 @@ function EventsEditor() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-text-secondary text-xs uppercase tracking-wider">
+                <div className="w-full h-full flex items-center justify-center text-text-secondary text-xs font-medium">
                   {event.name}
                 </div>
               )}

@@ -2,9 +2,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 import { fileMoveSchema, fileTagsSchema } from '~/schemas/file'
 import { withAuth } from './utils'
-
-const STORAGE_LIMIT_FREE = 5 * 1024 * 1024 * 1024   // 5GB
-const STORAGE_LIMIT_PRO = 100 * 1024 * 1024 * 1024   // 100GB
+import { checkStorageQuota } from './storage'
 
 export const getFiles = createServerFn({ method: 'GET' })
   .inputValidator((data: unknown) => z.object({ folderId: z.string().uuid().nullable().optional() }).parse(data))
@@ -42,18 +40,9 @@ export const getFiles = createServerFn({ method: 'GET' })
 
 export const getStorageUsage = createServerFn({ method: 'GET' }).handler(async () => {
   const { supabase, user } = await withAuth()
-
   const { data: profile } = await supabase.from('profiles').select('tier').eq('id', user.id).single()
-
-  const { data: files } = await supabase
-    .from('files')
-    .select('file_size')
-    .eq('profile_id', user.id)
-
-  const used = files?.reduce((sum: number, f: { file_size: number }) => sum + f.file_size, 0) || 0
-  const limit = profile?.tier === 'pro' ? STORAGE_LIMIT_PRO : STORAGE_LIMIT_FREE
-
-  return { used, limit, tier: profile?.tier || 'free' }
+  const quota = await checkStorageQuota(supabase, user.id)
+  return { used: quota.used, limit: quota.limit, tier: profile?.tier || 'free' }
 })
 
 export const uploadFileToRepo = createServerFn({ method: 'POST' })
@@ -68,19 +57,11 @@ export const uploadFileToRepo = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const { supabase, user } = await withAuth()
 
-    const { data: profile } = await supabase.from('profiles').select('tier').eq('id', user.id).single()
-    const limit = profile?.tier === 'pro' ? STORAGE_LIMIT_PRO : STORAGE_LIMIT_FREE
-
-    const { data: existingFiles } = await supabase
-      .from('files')
-      .select('file_size')
-      .eq('profile_id', user.id)
-    const currentUsage = existingFiles?.reduce((sum: number, f: { file_size: number }) => sum + f.file_size, 0) || 0
-
     const buffer = Buffer.from(data.base64, 'base64')
     const actualSize = buffer.length
 
-    if (currentUsage + actualSize > limit) {
+    const quota = await checkStorageQuota(supabase, user.id)
+    if (quota.used + actualSize > quota.limit) {
       return { error: 'Storage limit exceeded. Upgrade to Pro for 100GB storage.' }
     }
 

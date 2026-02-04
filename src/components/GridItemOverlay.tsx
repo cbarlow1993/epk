@@ -12,7 +12,7 @@ const OVERLAY_BTN = 'w-8 h-8 flex items-center justify-center rounded bg-white/1
 export function GridItemOverlay({ label, index, total, onReorder, onDelete, children }: GridItemOverlayProps) {
   return (
     <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
-      <p className="text-white text-xs font-bold uppercase tracking-wider text-center px-2 truncate w-full">
+      <p className="text-white text-xs font-medium tracking-tight text-center px-2 truncate w-full">
         {label}
       </p>
       {children}
@@ -38,7 +38,7 @@ export function GridItemOverlay({ label, index, total, onReorder, onDelete, chil
         <button
           type="button"
           onClick={onDelete}
-          className="w-8 h-8 flex items-center justify-center rounded bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors text-xs"
+          className="w-8 h-8 flex items-center justify-center rounded bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-colors text-xs"
           title="Delete"
         >
           &#10005;

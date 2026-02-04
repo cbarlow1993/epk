@@ -16,9 +16,9 @@ function OnboardingPage() {
 
   if (!accountType) {
     return (
-      <div className="min-h-screen bg-dark-bg flex items-center justify-center px-4">
+      <div className="min-h-screen bg-bg flex items-center justify-center px-4">
         <div className="w-full max-w-lg">
-          <h1 className="text-3xl font-black uppercase tracking-wider text-center mb-8">Welcome</h1>
+          <h1 className="text-3xl font-display font-extrabold tracking-tight uppercase text-center mb-8">Welcome</h1>
           <p className="text-text-secondary text-center mb-8">How will you be using DJ EPK?</p>
           <div className="grid sm:grid-cols-2 gap-4">
             <button
@@ -60,12 +60,12 @@ function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark-bg flex items-center justify-center px-4">
+    <div className="min-h-screen bg-bg flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <h1 className="text-3xl font-black uppercase tracking-wider text-center mb-8">Create Agency</h1>
+        <h1 className="text-3xl font-display font-extrabold tracking-tight uppercase text-center mb-8">Create Agency</h1>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 mb-6 text-red-400 text-sm">{error}</div>
+          <div className="border border-red-500 px-4 py-3 mb-6 text-red-500 text-sm">{error}</div>
         )}
 
         <form onSubmit={handleCreateOrg} className="space-y-6">
@@ -103,7 +103,7 @@ function OnboardingPage() {
 
         <button
           onClick={() => setAccountType(null)}
-          className="text-text-secondary text-sm text-center mt-6 block mx-auto hover:text-white"
+          className="text-text-secondary text-sm text-center mt-6 block mx-auto hover:text-text-primary"
         >
           Go back
         </button>

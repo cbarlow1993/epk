@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EPKDJ - Retrowave DJ Press Kit Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --deep-purple: #1a0533;
+  --mid-purple: #2d0a5e;
+  --hot-pink: #FF2D95;
+  --electric-blue: #00D4FF;
+  --chrome: #C0C0C0;
+  --chrome-light: #E8E8E8;
+  --dark-bg: #0d0118;
+  --card-bg: rgba(26, 5, 51, 0.85);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Exo 2', sans-serif;
+  background: var(--dark-bg);
+  color: var(--chrome-light);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* Scanline overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ---- NAV ---- */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 1.25rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.4s, padding 0.4s, box-shadow 0.4s;
+}
+
+nav.scrolled {
+  background: rgba(13, 1, 24, 0.95);
+  padding: 0.75rem 2rem;
+  box-shadow: 0 2px 30px rgba(255, 45, 149, 0.15);
+  backdrop-filter: blur(12px);
+}
+
+.nav-logo {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 800;
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, var(--hot-pink), var(--electric-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-decoration: none;
+}
+
+.nav-links { display: flex; gap: 2rem; align-items: center; }
+
+.nav-links a {
+  color: var(--chrome);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover { color: var(--hot-pink); }
+
+.nav-cta {
+  background: linear-gradient(135deg, var(--hot-pink), #cc1a75);
+  color: #fff !important;
+  padding: 0.5rem 1.25rem;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+
+.nav-cta:hover {
+  box-shadow: 0 0 20px rgba(255, 45, 149, 0.5);
+  transform: translateY(-1px);
+}
+
+.mobile-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.mobile-toggle span {
+  display: block;
+  width: 26px;
+  height: 2px;
+  background: var(--chrome-light);
+  transition: transform 0.3s;
+}
+
+/* ---- HERO ---- */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 6rem 1.5rem 4rem;
+  overflow: hidden;
+}
+
+/* Sunset gradient background */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg,
+      var(--dark-bg) 0%,
+      #1a0533 20%,
+      #3d0a6e 40%,
+      #8b1a4a 55%,
+      #c94b2a 65%,
+      #e8872a 72%,
+      #f0c040 78%,
+      #f0c040 80%,
+      var(--dark-bg) 80.5%,
+      var(--dark-bg) 100%
+    );
+  z-index: 0;
+}
+
+/* Horizontal sun stripes */
+.sun-stripes {
+  position: absolute;
+  bottom: 19.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  height: 120px;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.sun-stripes::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 8px,
+    var(--dark-bg) 8px,
+    var(--dark-bg) 14px
+  );
+}
+
+/* Retro perspective grid floor */
+.grid-floor {
+  position: absolute;
+  bottom: 0;
+  left: -50%;
+  right: -50%;
+  height: 40%;
+  background:
+    linear-gradient(90deg, transparent 49.5%, rgba(255, 45, 149, 0.3) 49.5%, rgba(255, 45, 149, 0.3) 50.5%, transparent 50.5%),
+    repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(0, 212, 255, 0.15) 59px, rgba(0, 212, 255, 0.15) 61px),
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0, 212, 255, 0.15) 39px, rgba(0, 212, 255, 0.15) 41px);
+  background-size: 100% 100%, 60px 40px, 60px 40px;
+  transform: perspective(400px) rotateX(60deg);
+  transform-origin: center top;
+  z-index: 1;
+  animation: gridScroll 4s linear infinite;
+}
+
+@keyframes gridScroll {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to { background-position: 0 0, 0 40px, 0 40px; }
+}
+
+/* Floating geometric shapes */
+.geo-shapes {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.geo {
+  position: absolute;
+  border: 2px solid;
+  opacity: 0.15;
+  animation: floatGeo 12s ease-in-out infinite;
+}
+
+.geo:nth-child(1) {
+  width: 60px;
+  height: 60px;
+  border-color: var(--hot-pink);
+  top: 15%;
+  left: 8%;
+  transform: rotate(45deg);
+  animation-delay: 0s;
+}
+
+.geo:nth-child(2) {
+  width: 40px;
+  height: 40px;
+  border-color: var(--electric-blue);
+  top: 25%;
+  right: 12%;
+  border-radius: 50%;
+  animation-delay: -3s;
+}
+
+.geo:nth-child(3) {
+  width: 0;
+  height: 0;
+  border: none;
+  border-left: 25px solid transparent;
+  border-right: 25px solid transparent;
+  border-bottom: 45px solid rgba(255, 45, 149, 0.15);
+  top: 35%;
+  left: 15%;
+  animation-delay: -6s;
+}
+
+.geo:nth-child(4) {
+  width: 80px;
+  height: 80px;
+  border-color: var(--electric-blue);
+  top: 10%;
+  right: 25%;
+  transform: rotate(30deg);
+  animation-delay: -2s;
+}
+
+.geo:nth-child(5) {
+  width: 30px;
+  height: 30px;
+  border-color: var(--hot-pink);
+  border-radius: 50%;
+  top: 40%;
+  right: 6%;
+  animation-delay: -8s;
+}
+
+@keyframes floatGeo {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33% { transform: translateY(-20px) rotate(15deg); }
+  66% { transform: translateY(10px) rotate(-10deg); }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+}
+
+.hero-tag {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--electric-blue);
+  margin-bottom: 1.25rem;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+/* Chrome metallic heading */
+.hero h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(
+    180deg,
+    #fff 0%,
+    #e8e8e8 25%,
+    #a0a0a0 50%,
+    #e8e8e8 75%,
+    #fff 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 30px rgba(255, 45, 149, 0.3));
+}
+
+.hero p {
+  font-size: 1.15rem;
+  color: rgba(232, 232, 232, 0.8);
+  max-width: 550px;
+  margin: 0 auto 2.5rem;
+  font-weight: 300;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Pulsing neon CTA */
+.btn-neon {
+  display: inline-block;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 1rem 2.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.3s;
+  position: relative;
+}
+
+.btn-neon-pink {
+  background: var(--hot-pink);
+  color: #fff;
+  box-shadow: 0 0 15px rgba(255, 45, 149, 0.4), 0 0 40px rgba(255, 45, 149, 0.2);
+  animation: neonPulse 2s ease-in-out infinite;
+}
+
+.btn-neon-pink:hover { transform: translateY(-2px) scale(1.03); }
+
+@keyframes neonPulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(255, 45, 149, 0.4), 0 0 40px rgba(255, 45, 149, 0.2); }
+  50% { box-shadow: 0 0 25px rgba(255, 45, 149, 0.6), 0 0 60px rgba(255, 45, 149, 0.3), 0 0 80px rgba(255, 45, 149, 0.1); }
+}
+
+.btn-neon-outline {
+  background: transparent;
+  color: var(--electric-blue);
+  border: 2px solid var(--electric-blue);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.2), inset 0 0 10px rgba(0, 212, 255, 0.05);
+}
+
+.btn-neon-outline:hover {
+  background: rgba(0, 212, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3), inset 0 0 15px rgba(0, 212, 255, 0.1);
+}
+
+/* ---- SECTIONS COMMON ---- */
+section { padding: 6rem 1.5rem; position: relative; }
+
+.section-inner { max-width: 1100px; margin: 0 auto; }
+
+.section-tag {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--electric-blue);
+  text-align: center;
+  margin-bottom: 0.75rem;
+  text-shadow: 0 0 8px rgba(0, 212, 255, 0.4);
+}
+
+.section-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: var(--chrome-light);
+}
+
+.section-subtitle {
+  text-align: center;
+  color: rgba(192, 192, 192, 0.7);
+  max-width: 550px;
+  margin: 0 auto 3.5rem;
+  font-weight: 300;
+}
+
+/* ---- FEATURES ---- */
+.features-section { background: var(--dark-bg); }
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.feature-card {
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 45, 149, 0.1);
+  border-left: 3px solid var(--hot-pink);
+  border-radius: 6px;
+  padding: 2rem;
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--hot-pink), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 30px rgba(255, 45, 149, 0.1), 0 10px 40px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 45, 149, 0.3);
+}
+
+.feature-card:hover::before { opacity: 1; }
+
+.feature-card:nth-child(even) { border-left-color: var(--electric-blue); }
+.feature-card:nth-child(even)::before {
+  background: linear-gradient(90deg, var(--electric-blue), transparent);
+}
+
+.feature-icon {
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.feature-card h3 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+
+.feature-card p {
+  font-size: 0.9rem;
+  color: rgba(192, 192, 192, 0.7);
+  line-height: 1.6;
+}
+
+/* ---- PRICING ---- */
+.pricing-section {
+  background: linear-gradient(180deg, var(--dark-bg) 0%, var(--deep-purple) 50%, var(--dark-bg) 100%);
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.price-card {
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+}
+
+.price-card:hover {
+  transform: translateY(-4px);
+}
+
+.price-card.featured {
+  border-color: var(--hot-pink);
+  box-shadow: 0 0 40px rgba(255, 45, 149, 0.15), 0 0 80px rgba(255, 45, 149, 0.05);
+}
+
+.price-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--hot-pink), #cc1a75);
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.35rem 1.25rem;
+  border-radius: 20px;
+}
+
+.price-card h3 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--chrome-light);
+}
+
+.price-amount {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 3rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 0.25rem;
+}
+
+.price-amount span { font-size: 1rem; font-weight: 400; color: var(--chrome); }
+
+.price-period {
+  font-size: 0.85rem;
+  color: rgba(192, 192, 192, 0.5);
+  margin-bottom: 2rem;
+}
+
+.price-features {
+  list-style: none;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.price-features li {
+  padding: 0.5rem 0;
+  font-size: 0.9rem;
+  color: rgba(232, 232, 232, 0.75);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.price-features li::before {
+  content: '\2713';
+  color: var(--electric-blue);
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.price-card .btn-neon { width: 100%; text-align: center; display: block; }
+
+.price-card.featured .btn-neon-outline {
+  border-color: var(--hot-pink);
+  color: var(--hot-pink);
+  box-shadow: 0 0 10px rgba(255, 45, 149, 0.2);
+}
+
+/* ---- FINAL CTA ---- */
+.cta-section {
+  text-align: center;
+  padding: 8rem 1.5rem;
+  background: var(--dark-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-section::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(255, 45, 149, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cta-section .section-title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin-bottom: 1rem;
+}
+
+.cta-section p {
+  color: rgba(192, 192, 192, 0.7);
+  max-width: 500px;
+  margin: 0 auto 2.5rem;
+  font-weight: 300;
+}
+
+/* ---- FOOTER ---- */
+footer {
+  background: var(--dark-bg);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+
+footer p {
+  font-size: 0.8rem;
+  color: rgba(192, 192, 192, 0.4);
+}
+
+footer a {
+  color: var(--hot-pink);
+  text-decoration: none;
+}
+
+/* ---- ANIMATIONS ---- */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav-links.open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(13, 1, 24, 0.97);
+    padding: 1.5rem 2rem;
+    gap: 1rem;
+    border-bottom: 1px solid rgba(255, 45, 149, 0.15);
+  }
+  .mobile-toggle { display: flex; }
+  .hero h1 { font-size: clamp(2rem, 8vw, 3rem); }
+  .hero-buttons { flex-direction: column; align-items: center; }
+  .features-grid { grid-template-columns: 1fr; }
+  .pricing-grid { grid-template-columns: 1fr; max-width: 380px; }
+  section { padding: 4rem 1.25rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav id="nav">
+  <a href="#" class="nav-logo">EPKDJ</a>
+  <div class="nav-links" id="navLinks">
+    <a href="#features">Features</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#cta">Get Started</a>
+    <a href="#cta" class="nav-cta">Sign Up Free</a>
+  </div>
+  <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Hero -->
+<section class="hero" id="hero">
+  <div class="geo-shapes">
+    <div class="geo"></div>
+    <div class="geo"></div>
+    <div class="geo"></div>
+    <div class="geo"></div>
+    <div class="geo"></div>
+  </div>
+  <div class="sun-stripes"></div>
+  <div class="grid-floor"></div>
+  <div class="hero-content">
+    <p class="hero-tag">The Future of DJ Promotion</p>
+    <h1>Your Press Kit.<br>Upgraded.</h1>
+    <p>Build a stunning electronic press kit that gets you booked. Share your sound, story, and stats in one retro-futuristic link.</p>
+    <div class="hero-buttons">
+      <a href="#cta" class="btn-neon btn-neon-pink">Build Your EPK</a>
+      <a href="#features" class="btn-neon btn-neon-outline">See Features</a>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="features-section" id="features">
+  <div class="section-inner">
+    <p class="section-tag reveal">Everything You Need</p>
+    <h2 class="section-title reveal">Power Up Your Press Kit</h2>
+    <p class="section-subtitle reveal">One link. All your essentials. Designed for DJs who want to stand out and get booked faster.</p>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <span class="feature-icon">&#127908;</span>
+        <h3>Artist Bio</h3>
+        <p>Tell your story with a rich-text bio. Add photos, pull quotes, and career highlights that promoters want to see.</p>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">&#127925;</span>
+        <h3>Music Embeds</h3>
+        <p>Embed tracks from SoundCloud, Spotify, Mixcloud, and more. Let your sound speak for itself, right on the page.</p>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">&#128197;</span>
+        <h3>Upcoming Events</h3>
+        <p>Display your gig calendar with venue details, dates, and ticket links. Show promoters you are active and in demand.</p>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">&#127899;</span>
+        <h3>Technical Rider</h3>
+        <p>List your equipment needs, stage requirements, and setup preferences. Keep things professional from the start.</p>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">&#128172;</span>
+        <h3>Press Quotes</h3>
+        <p>Showcase reviews, testimonials, and press mentions. Social proof that builds credibility with bookers.</p>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">&#128233;</span>
+        <h3>Contact Form</h3>
+        <p>Built-in booking inquiry form so promoters can reach you directly. No hunting for emails or DMs.</p>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">&#128200;</span>
+        <h3>Analytics</h3>
+        <p>Track views, clicks, and engagement. See who is checking out your EPK and which sections get attention.</p>
+      </div>
+      <div class="feature-card reveal">
+        <span class="feature-icon">&#127760;</span>
+        <h3>Custom Domain</h3>
+        <p>Use your own domain name for a fully branded experience. Look professional with a clean, memorable URL.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section class="pricing-section" id="pricing">
+  <div class="section-inner">
+    <p class="section-tag reveal">Simple Pricing</p>
+    <h2 class="section-title reveal">Choose Your Level</h2>
+    <p class="section-subtitle reveal">Start free. Upgrade when you are ready to go pro.</p>
+    <div class="pricing-grid">
+      <div class="price-card reveal">
+        <h3>Free</h3>
+        <div class="price-amount">$0</div>
+        <div class="price-period">Free forever</div>
+        <ul class="price-features">
+          <li>1 EPK page</li>
+          <li>Bio and photo gallery</li>
+          <li>Music embeds</li>
+          <li>Event listings</li>
+          <li>Contact form</li>
+          <li>EPKDJ subdomain</li>
+        </ul>
+        <a href="#" class="btn-neon btn-neon-outline">Get Started</a>
+      </div>
+      <div class="price-card featured reveal">
+        <div class="price-badge">Most Popular</div>
+        <h3>Pro</h3>
+        <div class="price-amount">$9<span>/mo</span></div>
+        <div class="price-period">Billed monthly</div>
+        <ul class="price-features">
+          <li>Everything in Free</li>
+          <li>Custom domain</li>
+          <li>Technical rider</li>
+          <li>Press quotes section</li>
+          <li>Analytics dashboard</li>
+          <li>Priority support</li>
+          <li>Remove EPKDJ branding</li>
+        </ul>
+        <a href="#" class="btn-neon btn-neon-pink">Go Pro</a>
+      </div>
+      <div class="price-card reveal">
+        <h3>Agency</h3>
+        <div class="price-amount">$29<span>/mo</span></div>
+        <div class="price-period">Billed monthly</div>
+        <ul class="price-features">
+          <li>Everything in Pro</li>
+          <li>Up to 20 artist EPKs</li>
+          <li>Centralized dashboard</li>
+          <li>Aggregated analytics</li>
+          <li>Team member access</li>
+          <li>Bulk management tools</li>
+          <li>Dedicated support</li>
+        </ul>
+        <a href="#" class="btn-neon btn-neon-outline">Contact Us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Final CTA -->
+<section class="cta-section" id="cta">
+  <div class="section-inner">
+    <p class="section-tag reveal">Ready to Launch?</p>
+    <h2 class="section-title reveal">Build Your EPK Tonight</h2>
+    <p class="reveal">Sign up in 30 seconds. Your press kit can be live before your next gig.</p>
+    <a href="#" class="btn-neon btn-neon-pink reveal">Create Your Free EPK</a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p>&copy; 2026 <a href="#">EPKDJ</a>. Built for DJs, by DJs.</p>
+</footer>
+
+<script>
+// Nav scroll effect
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// Mobile menu toggle
+const mobileToggle = document.getElementById('mobileToggle');
+const navLinks = document.getElementById('navLinks');
+mobileToggle.addEventListener('click', () => {
+  navLinks.classList.toggle('open');
+});
+
+// Close mobile menu on link click
+navLinks.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', () => navLinks.classList.remove('open'));
+});
+
+// Scroll reveal
+const revealElements = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+revealElements.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

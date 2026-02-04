@@ -32,7 +32,7 @@ export const Route = createFileRoute('/agency/$orgSlug')({
   loader: ({ params }) => getAgencyPage({ data: params.orgSlug }),
   component: AgencyPage,
   notFoundComponent: () => (
-    <div className="min-h-screen bg-dark-bg flex items-center justify-center">
+    <div className="min-h-screen bg-bg flex items-center justify-center">
       <p className="text-text-secondary">Agency not found.</p>
     </div>
   ),
@@ -45,13 +45,13 @@ function AgencyPage() {
   const { organization: org, profiles } = data
 
   return (
-    <div className="min-h-screen bg-dark-bg text-white">
+    <div className="min-h-screen bg-bg text-text-primary">
       {/* Header */}
-      <header className="py-16 text-center border-b border-white/5">
+      <header className="py-16 text-center border-b border-border">
         {org.logo_url && (
           <img src={org.logo_url} alt={org.name} className="h-16 mx-auto mb-6 object-contain" />
         )}
-        <h1 className="text-4xl font-black uppercase tracking-wider mb-2">{org.name}</h1>
+        <h1 className="text-4xl font-display font-extrabold tracking-tighter uppercase mb-2">{org.name}</h1>
         {org.website_url && (
           <a href={org.website_url} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline text-sm">
             {org.website_url.replace(/^https?:\/\//, '')}
@@ -61,30 +61,30 @@ function AgencyPage() {
 
       {/* Artist Grid */}
       <main className="max-w-6xl mx-auto px-6 py-12">
-        <h2 className="text-sm uppercase tracking-widest font-bold text-text-secondary mb-8">Artists</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-text-secondary mb-8">Artists</h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {profiles.map((profile: { slug: string | null; display_name: string | null; profile_image_url: string | null; tagline: string | null; genres: string[] | null }) => (
             <a
               key={profile.slug}
               href={`/${profile.slug}`}
-              className="group block bg-dark-card border border-white/5 rounded-xl overflow-hidden hover:border-accent/30 transition-all hover:scale-105"
+              className="group block bg-white border border-border overflow-hidden hover:border-accent/30 transition-all hover:scale-105 shadow-card hover:shadow-card-hover"
             >
-              <div className="aspect-square bg-dark-surface overflow-hidden">
+              <div className="aspect-square bg-surface overflow-hidden">
                 {profile.profile_image_url ? (
                   <img src={profile.profile_image_url} alt={profile.display_name || ''} className="w-full h-full object-cover" loading="lazy" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-6xl font-black text-white/10">{(profile.display_name || '?')[0]}</span>
+                    <span className="text-6xl font-display font-semibold text-border">{(profile.display_name || '?')[0]}</span>
                   </div>
                 )}
               </div>
               <div className="p-4">
-                <p className="font-bold truncate">{profile.display_name}</p>
+                <p className="font-semibold truncate">{profile.display_name}</p>
                 {profile.tagline && <p className="text-xs text-text-secondary truncate mt-1">{profile.tagline}</p>}
                 {profile.genres && profile.genres.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {profile.genres.slice(0, 3).map((g: string) => (
-                      <span key={g} className="text-[10px] bg-white/10 rounded px-1.5 py-0.5">{g}</span>
+                      <span key={g} className="text-[10px] bg-surface px-1.5 py-0.5 text-text-secondary">{g}</span>
                     ))}
                   </div>
                 )}

@@ -15,6 +15,7 @@ const ALLOWED_PROFILE_FIELDS = new Set([
   'accent_color',
   'bg_color',
   'font_family',
+  'short_bio',
   'bio',
   'bpm_min',
   'bpm_max',

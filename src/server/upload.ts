@@ -1,6 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 import { withAuth } from './utils'
+import { checkStorageQuota } from './storage'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 const ALLOWED_CONTENT_TYPES = new Set([
@@ -41,6 +42,12 @@ export const uploadFile = createServerFn({ method: 'POST' })
       return { error: 'File exceeds 10MB limit' }
     }
 
+    // Check storage quota
+    const quota = await checkStorageQuota(supabase, user.id)
+    if (quota.used + buffer.byteLength > quota.limit) {
+      return { error: 'Storage limit exceeded. Upgrade to Pro for 100GB storage.' }
+    }
+
     // Sanitize filename — strip path separators and use timestamp prefix
     const safeName = data.fileName.replace(/[^a-zA-Z0-9._-]/g, '_')
     const path = `${user.id}/${data.folder}/${Date.now()}-${safeName}`
@@ -52,5 +59,28 @@ export const uploadFile = createServerFn({ method: 'POST' })
     if (error) return { error: error.message }
 
     const { data: urlData } = supabase.storage.from('uploads').getPublicUrl(path)
-    return { url: urlData.publicUrl }
+
+    const fileType = data.contentType.startsWith('image/') ? 'image'
+      : data.contentType.startsWith('audio/') ? 'audio'
+      : data.contentType.startsWith('video/') ? 'video'
+      : data.contentType === 'application/pdf' ? 'document'
+      : 'other'
+
+    const { data: file, error: dbError } = await supabase
+      .from('files')
+      .insert({
+        profile_id: user.id,
+        name: data.fileName,
+        file_url: urlData.publicUrl,
+        file_type: fileType,
+        file_size: buffer.byteLength,
+        mime_type: data.contentType,
+        source: data.folder,
+      })
+      .select()
+      .single()
+
+    if (dbError) return { error: dbError.message }
+
+    return { url: urlData.publicUrl, fileId: file.id }
   })

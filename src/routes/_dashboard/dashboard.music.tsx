@@ -74,7 +74,7 @@ function MusicEditor() {
 
   return (
     <div>
-      <h1 className="text-2xl font-display font-semibold tracking-tight mb-8">Music / Mixes</h1>
+      <h1 className="text-2xl font-display font-extrabold tracking-tight uppercase mb-8">Music / Mixes</h1>
 
       {/* Add Form */}
       <form onSubmit={onAdd} className={CARD_SECTION}>
@@ -124,7 +124,7 @@ function MusicEditor() {
           {mixes.map((mix, index) => (
             <div
               key={mix.id}
-              className="bg-white border border-border rounded-xl p-4 flex items-center gap-4"
+              className="bg-white border border-border p-4 flex items-center gap-4"
             >
               {/* Reorder Buttons */}
               {handleReorder && <ReorderButtons index={index} total={mixes.length} onReorder={handleReorder} />}

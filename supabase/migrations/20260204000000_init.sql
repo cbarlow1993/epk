@@ -4,8 +4,7 @@ CREATE TABLE profiles (
   slug TEXT UNIQUE NOT NULL,
   display_name TEXT NOT NULL DEFAULT '',
   tagline TEXT DEFAULT '',
-  bio_left TEXT DEFAULT '',
-  bio_right TEXT DEFAULT '',
+  bio JSONB,
   genres TEXT[] DEFAULT '{}',
   profile_image_url TEXT DEFAULT '',
   hero_image_url TEXT DEFAULT '',
@@ -59,8 +58,8 @@ CREATE TABLE events (
 CREATE TABLE technical_rider (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   profile_id UUID NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
-  preferred_setup TEXT DEFAULT '',
-  alternative_setup TEXT DEFAULT '',
+  preferred_setup JSONB,
+  alternative_setup JSONB,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );

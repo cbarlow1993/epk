@@ -36,7 +36,7 @@ async function runMigration() {
     console.log('  - events')
     console.log('  - technical_rider')
     console.log('  - booking_contact')
-    console.log('  - press_assets')
+    console.log('  - files (includes press assets)')
     console.log('  - reserved_slugs')
     console.log('')
     console.log('Also created: RLS policies, triggers, helper functions')

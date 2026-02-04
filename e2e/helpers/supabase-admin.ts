@@ -36,7 +36,7 @@ export async function deleteTestUser(email: string) {
   if (!user) return // Already cleaned up
 
   // Delete child rows (cascade from profile handles most, but be explicit)
-  const tables = ['social_links', 'mixes', 'events', 'press_assets', 'technical_rider', 'booking_contact']
+  const tables = ['social_links', 'mixes', 'events', 'files', 'technical_rider', 'booking_contact']
   for (const table of tables) {
     await admin.from(table).delete().eq('profile_id', user.id)
   }

@@ -23,7 +23,7 @@ export function FormColorInput({ label, value, registration, onChange, error }: 
         <input
           type="text"
           {...registration}
-          className={`flex-1 bg-white border rounded-lg px-3 py-2 text-text-primary text-sm font-mono focus:border-accent focus:outline-none ${
+          className={`flex-1 bg-white border px-3 py-2 text-text-primary text-sm font-mono focus:border-accent focus:outline-none ${
             error ? 'border-red-500' : 'border-border'
           }`}
         />

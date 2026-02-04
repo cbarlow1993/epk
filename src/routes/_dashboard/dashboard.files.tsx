@@ -68,7 +68,7 @@ function DropZone({
       }}
       onDragLeave={() => setDragOver(false)}
       onDrop={handleDrop}
-      className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors mb-6 ${
+      className={`border-2 border-dashed p-8 text-center transition-colors mb-6 ${
         dragOver ? 'border-accent bg-accent/5' : 'border-border hover:border-border'
       }`}
     >
@@ -103,7 +103,7 @@ function FileCard({
   const isImage = file.file_type === 'image'
 
   return (
-    <div className="bg-white border border-border rounded-lg overflow-hidden group">
+    <div className="bg-white border border-border overflow-hidden group">
       {/* Preview area */}
       <div
         className="h-36 flex items-center justify-center bg-border cursor-pointer"
@@ -125,7 +125,14 @@ function FileCard({
       {/* Info */}
       <div className="p-3">
         <p className="text-sm font-bold truncate mb-1">{file.name}</p>
-        <p className="text-xs text-text-secondary mb-2">{formatBytes(file.file_size)}</p>
+        <div className="flex items-center gap-2 mb-2">
+          <p className="text-xs text-text-secondary">{formatBytes(file.file_size)}</p>
+          {file.is_press_asset && (
+            <span className="text-[10px] uppercase tracking-wider bg-accent/20 text-accent px-1.5 py-0.5 rounded font-medium">
+              Press
+            </span>
+          )}
+        </div>
 
         {file.tags && file.tags.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-2">
@@ -172,7 +179,7 @@ function PreviewModal({ file, onClose }: { file: FileRow; onClose: () => void })
         <img
           src={file.file_url}
           alt={file.name}
-          className="max-w-full max-h-[85vh] object-contain rounded-lg"
+          className="max-w-full max-h-[85vh] object-contain"
         />
         <p className="text-center text-sm text-text-secondary mt-2">{file.name}</p>
       </div>
@@ -224,7 +231,7 @@ function FolderSidebar({
           </button>
           <button
             onClick={() => onDeleteFolder(folder.id)}
-            className="text-red-500 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity px-1"
+            className="text-red-500 hover:text-red-600 text-xs opacity-0 group-hover:opacity-100 transition-opacity px-1"
             aria-label={`Delete folder ${folder.name}`}
           >
             x
@@ -362,12 +369,12 @@ function FilesPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-display font-semibold tracking-tight mb-8">File Repository</h1>
+      <h1 className="text-2xl font-display font-extrabold tracking-tight uppercase mb-8">File Repository</h1>
 
       <StorageBar used={storageUsage.used} limit={storageUsage.limit} />
 
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 text-red-500 text-sm rounded-lg px-4 py-3 mb-4">
+        <div className="bg-red-500/10 border border-red-500/30 text-red-500 text-sm px-4 py-3 mb-4">
           {error}
         </div>
       )}

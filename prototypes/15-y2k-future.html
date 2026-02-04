@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EPKDJ - Y2K Future</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --silver: #C0C0C0;
+  --chrome-blue: #4A90D9;
+  --hot-pink: #FF69B4;
+  --white: #FFFFFF;
+  --dark: #1a1a2e;
+  --glass: rgba(255, 255, 255, 0.12);
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  color: var(--white);
+  background: var(--dark);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 { font-family: 'Space Grotesk', sans-serif; }
+
+/* Iridescent animated background */
+.iridescent-bg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: -1;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #1a1a2e 50%, #0f3460 75%, #1a1a2e 100%);
+  background-size: 400% 400%;
+  animation: shiftBg 20s ease infinite;
+}
+
+@keyframes shiftBg {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Sparkle decorations */
+.sparkle {
+  position: absolute;
+  width: 6px; height: 6px;
+  background: var(--hot-pink);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: sparkle 3s ease-in-out infinite;
+}
+
+.sparkle::before, .sparkle::after {
+  content: '';
+  position: absolute;
+  background: inherit;
+  border-radius: 50%;
+}
+
+.sparkle::before { width: 2px; height: 10px; top: -2px; left: 2px; }
+.sparkle::after { width: 10px; height: 2px; top: 2px; left: -2px; }
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0.3; transform: scale(0.8) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
+}
+
+/* Nav */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.4s ease;
+  border-bottom: 2px solid transparent;
+}
+
+nav.scrolled {
+  background: rgba(26, 26, 46, 0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 2px solid var(--hot-pink);
+  padding: 0.75rem 2rem;
+}
+
+.nav-logo {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--chrome-blue), var(--hot-pink), var(--silver));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+
+.nav-links a {
+  color: var(--silver);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.3s;
+  position: relative;
+}
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px; left: 0;
+  width: 0; height: 2px;
+  background: var(--hot-pink);
+  transition: width 0.3s;
+}
+
+.nav-links a:hover { color: var(--white); }
+.nav-links a:hover::after { width: 100%; }
+
+.nav-cta {
+  background: linear-gradient(135deg, var(--hot-pink), var(--chrome-blue));
+  color: var(--white);
+  border: none;
+  padding: 0.6rem 1.4rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(255, 105, 180, 0.35);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.nav-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 28px rgba(255, 105, 180, 0.5);
+}
+
+.mobile-toggle { display: none; background: none; border: none; color: var(--white); font-size: 1.5rem; cursor: pointer; }
+
+/* Glossy card mixin */
+.glossy {
+  background: var(--glass);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+}
+
+.glossy::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent);
+  border-radius: 24px 24px 0 0;
+  pointer-events: none;
+}
+
+/* Hero */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 6rem 2rem 4rem;
+  position: relative;
+}
+
+.hero-content { max-width: 800px; position: relative; z-index: 2; }
+
+.hero-badge {
+  display: inline-block;
+  padding: 0.4rem 1.2rem;
+  border: 2px solid var(--hot-pink);
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--hot-pink);
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.05em;
+}
+
+.hero h1 {
+  font-size: clamp(2.8rem, 7vw, 5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, var(--white) 0%, var(--silver) 30%, var(--hot-pink) 60%, var(--chrome-blue) 100%);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: iridescent 6s ease infinite;
+}
+
+@keyframes iridescent {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.hero p {
+  font-size: 1.15rem;
+  color: var(--silver);
+  max-width: 560px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.7;
+}
+
+.hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9rem 2.2rem;
+  background: linear-gradient(135deg, var(--hot-pink), #c850c0, var(--chrome-blue));
+  color: var(--white);
+  text-decoration: none;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(255, 105, 180, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(255, 105, 180, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9rem 2.2rem;
+  background: var(--glass);
+  color: var(--white);
+  text-decoration: none;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  border: 3px solid var(--silver);
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  border-color: var(--chrome-blue);
+  background: rgba(74, 144, 217, 0.15);
+  transform: translateY(-3px);
+}
+
+/* Orbiting dots */
+.orbit-container {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px; height: 600px;
+  pointer-events: none;
+}
+
+.orbit-ring {
+  position: absolute;
+  top: 50%; left: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.orbit-ring:nth-child(1) { width: 300px; height: 300px; animation: spin 12s linear infinite; }
+.orbit-ring:nth-child(2) { width: 450px; height: 450px; animation: spin 18s linear infinite reverse; }
+.orbit-ring:nth-child(3) { width: 580px; height: 580px; animation: spin 25s linear infinite; }
+
+.orbit-dot {
+  position: absolute;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  top: -5px; left: 50%;
+  box-shadow: 0 0 12px currentColor;
+}
+
+.orbit-dot.pink { background: var(--hot-pink); color: var(--hot-pink); }
+.orbit-dot.blue { background: var(--chrome-blue); color: var(--chrome-blue); }
+.orbit-dot.silver { background: var(--silver); color: var(--silver); }
+
+@keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+/* Section base */
+section { padding: 6rem 2rem; position: relative; }
+
+.section-inner { max-width: 1100px; margin: 0 auto; }
+
+.section-label {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--hot-pink);
+  margin-bottom: 0.75rem;
+}
+
+.section-heading {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--white);
+}
+
+.section-sub {
+  color: var(--silver);
+  font-size: 1.05rem;
+  max-width: 560px;
+  line-height: 1.7;
+  margin-bottom: 3.5rem;
+}
+
+.section-sub.center { margin-left: auto; margin-right: auto; text-align: center; }
+
+/* Features */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.feature-card {
+  padding: 2rem;
+  transition: transform 0.3s, border-color 0.3s;
+}
+
+.feature-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--hot-pink);
+}
+
+.feature-icon {
+  width: 52px; height: 52px;
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 1.2rem;
+  background: linear-gradient(135deg, rgba(255, 105, 180, 0.2), rgba(74, 144, 217, 0.2));
+  border: 2px solid rgba(255, 105, 180, 0.3);
+}
+
+.feature-card h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+  color: var(--white);
+}
+
+.feature-card p {
+  font-size: 0.9rem;
+  color: var(--silver);
+  line-height: 1.6;
+}
+
+/* Blob shapes */
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.blob-pink { background: var(--hot-pink); width: 400px; height: 400px; }
+.blob-blue { background: var(--chrome-blue); width: 350px; height: 350px; }
+
+/* Pricing */
+.pricing-section { text-align: center; }
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.pricing-card {
+  padding: 2.5rem 2rem;
+  text-align: left;
+  transition: transform 0.3s, border-color 0.3s;
+}
+
+.pricing-card.featured {
+  border-color: var(--hot-pink);
+  background: linear-gradient(135deg, rgba(255, 105, 180, 0.08), rgba(74, 144, 217, 0.08));
+}
+
+.pricing-card:hover { transform: translateY(-6px); }
+
+.pricing-tier {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--chrome-blue);
+  margin-bottom: 0.5rem;
+}
+
+.pricing-card.featured .pricing-tier { color: var(--hot-pink); }
+
+.pricing-price {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 0.25rem;
+}
+
+.pricing-price span { font-size: 1rem; font-weight: 400; color: var(--silver); }
+
+.pricing-desc {
+  color: var(--silver);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.pricing-features {
+  list-style: none;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.pricing-features li {
+  font-size: 0.9rem;
+  color: var(--silver);
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.pricing-features li::before {
+  content: '*';
+  position: absolute;
+  left: 0;
+  color: var(--hot-pink);
+  font-weight: 700;
+}
+
+.pricing-btn {
+  display: block;
+  width: 100%;
+  padding: 0.85rem;
+  border-radius: 50px;
+  border: 2px solid var(--silver);
+  background: transparent;
+  color: var(--white);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+  text-decoration: none;
+}
+
+.pricing-btn:hover {
+  border-color: var(--chrome-blue);
+  background: rgba(74, 144, 217, 0.1);
+}
+
+.pricing-card.featured .pricing-btn {
+  background: linear-gradient(135deg, var(--hot-pink), var(--chrome-blue));
+  border-color: transparent;
+  box-shadow: 0 4px 20px rgba(255, 105, 180, 0.3);
+}
+
+.pricing-card.featured .pricing-btn:hover {
+  box-shadow: 0 8px 32px rgba(255, 105, 180, 0.5);
+}
+
+.popular-badge {
+  display: inline-block;
+  background: var(--hot-pink);
+  color: var(--white);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.7rem;
+  border-radius: 50px;
+  margin-bottom: 1rem;
+  letter-spacing: 0.05em;
+}
+
+/* CTA */
+.cta-section { text-align: center; padding: 8rem 2rem; position: relative; }
+
+.cta-inner {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 4rem 3rem;
+  position: relative;
+  z-index: 2;
+}
+
+.cta-inner h2 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, var(--white), var(--hot-pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.cta-inner p {
+  color: var(--silver);
+  font-size: 1.05rem;
+  margin-bottom: 2rem;
+  line-height: 1.7;
+}
+
+/* Footer */
+footer {
+  padding: 3rem 2rem;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--silver);
+  font-size: 0.85rem;
+}
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav-cta { display: none; }
+  .mobile-toggle { display: block; }
+  nav.mobile-open .nav-links {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%; left: 0; right: 0;
+    background: rgba(26, 26, 46, 0.95);
+    backdrop-filter: blur(16px);
+    padding: 1.5rem 2rem;
+    border-bottom: 2px solid var(--hot-pink);
+  }
+  .orbit-container { width: 350px; height: 350px; }
+  .orbit-ring:nth-child(1) { width: 180px; height: 180px; }
+  .orbit-ring:nth-child(2) { width: 270px; height: 270px; }
+  .orbit-ring:nth-child(3) { width: 340px; height: 340px; }
+  .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
+  .cta-inner { padding: 3rem 1.5rem; }
+}
+</style>
+</head>
+<body>
+<div class="iridescent-bg"></div>
+
+<nav id="nav">
+  <div class="nav-logo">EPK.DJ</div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#cta">Get Started</a></li>
+  </ul>
+  <button class="nav-cta">Start Free</button>
+  <button class="mobile-toggle" onclick="document.getElementById('nav').classList.toggle('mobile-open')">&#9776;</button>
+</nav>
+
+<section class="hero">
+  <div class="orbit-container">
+    <div class="orbit-ring"><div class="orbit-dot pink"></div></div>
+    <div class="orbit-ring"><div class="orbit-dot blue"></div></div>
+    <div class="orbit-ring"><div class="orbit-dot silver"></div></div>
+  </div>
+  <!-- Sparkles -->
+  <div class="sparkle" style="top:15%;left:10%;animation-delay:0s"></div>
+  <div class="sparkle" style="top:25%;right:12%;animation-delay:0.8s"></div>
+  <div class="sparkle" style="bottom:30%;left:8%;animation-delay:1.5s"></div>
+  <div class="sparkle" style="top:40%;right:5%;animation-delay:2.2s"></div>
+  <div class="sparkle" style="bottom:15%;right:20%;animation-delay:0.4s"></div>
+  <div class="sparkle" style="top:60%;left:18%;animation-delay:1.8s"></div>
+
+  <div class="hero-content reveal">
+    <div class="hero-badge">THE FUTURE IS NOW *</div>
+    <h1>Your DJ Career, Upgraded</h1>
+    <p>Build a stunning electronic press kit in minutes. Share your music, events, and rider with promoters and venues worldwide.</p>
+    <div class="hero-buttons">
+      <a href="#cta" class="btn-primary">Create Your EPK *</a>
+      <a href="#features" class="btn-secondary">See Features</a>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="section-inner">
+    <div class="blob blob-pink" style="top:-100px;right:-150px"></div>
+    <div class="blob blob-blue" style="bottom:-100px;left:-100px"></div>
+    <div class="reveal">
+      <div class="section-label">* Features</div>
+      <h2 class="section-heading">Everything You Need to Shine</h2>
+      <p class="section-sub">One link. All your info. Built for the way DJs and promoters actually work.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card glossy reveal">
+        <div class="feature-icon">*</div>
+        <h3>Artist Bio</h3>
+        <p>Tell your story with a rich text bio, profile photos, and genre tags that make you discoverable.</p>
+      </div>
+      <div class="feature-card glossy reveal">
+        <div class="feature-icon">~</div>
+        <h3>Music Embeds</h3>
+        <p>Embed tracks from SoundCloud, Spotify, Mixcloud, and Bandcamp. Your sound, front and center.</p>
+      </div>
+      <div class="feature-card glossy reveal">
+        <div class="feature-icon">@</div>
+        <h3>Event Calendar</h3>
+        <p>List upcoming and past gigs with venues, dates, and flyers. Show promoters you're active.</p>
+      </div>
+      <div class="feature-card glossy reveal">
+        <div class="feature-icon">#</div>
+        <h3>Technical Rider</h3>
+        <p>Share your equipment requirements and stage plot. No more emailing PDFs back and forth.</p>
+      </div>
+      <div class="feature-card glossy reveal">
+        <div class="feature-icon">"</div>
+        <h3>Press Quotes</h3>
+        <p>Showcase reviews and testimonials from media outlets, promoters, and fellow artists.</p>
+      </div>
+      <div class="feature-card glossy reveal">
+        <div class="feature-icon">></div>
+        <h3>Contact Form</h3>
+        <p>Booking inquiries go straight to your inbox. No more missed DMs or lost emails.</p>
+      </div>
+      <div class="feature-card glossy reveal">
+        <div class="feature-icon">%</div>
+        <h3>Analytics</h3>
+        <p>See who's viewing your EPK, where they're from, and which sections they care about most.</p>
+      </div>
+      <div class="feature-card glossy reveal">
+        <div class="feature-icon">+</div>
+        <h3>Custom Domain</h3>
+        <p>Use your own domain for a fully branded experience. yourname.com, not some long URL.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing" class="pricing-section">
+  <div class="section-inner">
+    <div class="blob blob-pink" style="top:50%;left:-200px"></div>
+    <div class="blob blob-blue" style="top:20%;right:-200px"></div>
+    <div class="reveal">
+      <div class="section-label">* Pricing</div>
+      <h2 class="section-heading">Simple, Transparent Pricing</h2>
+      <p class="section-sub center">Start free. Upgrade when you're ready. No hidden fees, no contracts.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card glossy reveal">
+        <div class="pricing-tier">Free</div>
+        <div class="pricing-price">$0<span>/mo</span></div>
+        <p class="pricing-desc">Get started with the essentials.</p>
+        <ul class="pricing-features">
+          <li>1 EPK page</li>
+          <li>Bio + photo</li>
+          <li>3 music embeds</li>
+          <li>5 events</li>
+          <li>Contact form</li>
+          <li>EPK.DJ subdomain</li>
+        </ul>
+        <a href="#" class="pricing-btn">Get Started</a>
+      </div>
+      <div class="pricing-card glossy featured reveal">
+        <div class="popular-badge">MOST POPULAR</div>
+        <div class="pricing-tier">Pro</div>
+        <div class="pricing-price">$9<span>/mo</span></div>
+        <p class="pricing-desc">For working DJs who need more.</p>
+        <ul class="pricing-features">
+          <li>Everything in Free</li>
+          <li>Unlimited music embeds</li>
+          <li>Unlimited events</li>
+          <li>Technical rider section</li>
+          <li>Press quotes</li>
+          <li>Analytics dashboard</li>
+          <li>Custom domain</li>
+          <li>Priority support</li>
+        </ul>
+        <a href="#" class="pricing-btn">Start Pro Trial</a>
+      </div>
+      <div class="pricing-card glossy reveal">
+        <div class="pricing-tier">Agency</div>
+        <div class="pricing-price">$29<span>/mo</span></div>
+        <p class="pricing-desc">Manage multiple artists at scale.</p>
+        <ul class="pricing-features">
+          <li>Everything in Pro</li>
+          <li>Up to 20 artist EPKs</li>
+          <li>Agency dashboard</li>
+          <li>Aggregated analytics</li>
+          <li>Team member access</li>
+          <li>Bulk updates</li>
+          <li>White-label option</li>
+          <li>Dedicated support</li>
+        </ul>
+        <a href="#" class="pricing-btn">Contact Sales</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cta" class="cta-section">
+  <div class="blob blob-pink" style="top:30%;left:10%"></div>
+  <div class="blob blob-blue" style="bottom:20%;right:10%"></div>
+  <div class="sparkle" style="top:20%;left:25%;animation-delay:0.3s"></div>
+  <div class="sparkle" style="top:35%;right:20%;animation-delay:1.1s"></div>
+  <div class="sparkle" style="bottom:25%;left:15%;animation-delay:2s"></div>
+  <div class="cta-inner glossy reveal">
+    <h2>Ready to Level Up?</h2>
+    <p>Join thousands of DJs who trust EPK.DJ to land gigs, share their music, and grow their careers.</p>
+    <a href="#" class="btn-primary">Create Your Free EPK *</a>
+  </div>
+</section>
+
+<footer>
+  <p>&copy; 2025 EPK.DJ. Built for DJs, by DJs.</p>
+</footer>
+
+<script>
+// Scroll reveal
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+reveals.forEach(el => observer.observe(el));
+
+// Nav scroll
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+      nav.classList.remove('mobile-open');
+    }
+  });
+});
+</script>
+</body>
+</html>

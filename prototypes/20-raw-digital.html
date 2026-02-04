@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DJEPK - press kits for real artists</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --black: #111111;
+  --cream: #F0EBE3;
+  --rust: #B44D2D;
+  --sage: #7D8471;
+  --warm-gray: #9C9890;
+  --dark-cream: #E0D9CF;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--cream);
+  color: var(--black);
+  overflow-x: hidden;
+  line-height: 1.65;
+}
+
+/* NOISE OVERLAY */
+body::before {
+  content: '';
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none; z-index: 9999; opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+}
+
+/* NAV */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.5rem 2.5rem;
+  transition: all 0.4s ease;
+  mix-blend-mode: normal;
+}
+.nav.scrolled {
+  background: rgba(17, 17, 17, 0.92);
+  backdrop-filter: blur(8px);
+  padding: 1rem 2.5rem;
+}
+.nav-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800; font-size: 1.1rem;
+  color: var(--black); text-decoration: none;
+  letter-spacing: -0.02em;
+  text-transform: lowercase;
+  transition: color 0.4s;
+}
+.nav.scrolled .nav-logo { color: var(--cream); }
+.nav-links { display: flex; gap: 2.5rem; align-items: center; }
+.nav-links a {
+  font-size: 0.85rem; font-weight: 500;
+  color: var(--black); text-decoration: none;
+  text-transform: lowercase; letter-spacing: 0.02em;
+  transition: color 0.3s;
+}
+.nav.scrolled .nav-links a { color: var(--warm-gray); }
+.nav-links a:hover { color: var(--rust); }
+.nav-links .nav-cta {
+  border: 1.5px solid var(--black); padding: 0.45rem 1.25rem;
+  transition: all 0.3s;
+}
+.nav.scrolled .nav-links .nav-cta { border-color: var(--warm-gray); }
+.nav-links .nav-cta:hover { background: var(--rust); color: var(--cream); border-color: var(--rust); }
+
+.nav-toggle { display: none; background: none; border: none; cursor: pointer; }
+.nav-toggle span { display: block; width: 24px; height: 2px; margin: 5px 0; background: var(--black); transition: background 0.3s; }
+.nav.scrolled .nav-toggle span { background: var(--cream); }
+
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 0 2.5rem 6rem;
+  position: relative;
+}
+.hero-top-label {
+  position: absolute; top: 8rem; left: 2.5rem;
+  font-size: 0.75rem; text-transform: uppercase;
+  letter-spacing: 0.15em; color: var(--warm-gray);
+  font-weight: 500;
+}
+.hero-side-text {
+  position: absolute; right: 2.5rem; top: 50%;
+  transform: rotate(90deg) translateX(-50%);
+  transform-origin: right center;
+  font-size: 0.7rem; text-transform: uppercase;
+  letter-spacing: 0.2em; color: var(--warm-gray);
+  white-space: nowrap;
+}
+.hero h1 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(3rem, 9vw, 7.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  max-width: 1000px;
+  margin-bottom: 2rem;
+}
+.hero h1 .rust { color: var(--rust); }
+.hero h1 .offset {
+  display: inline-block;
+  transform: translateX(1.5rem) rotate(-1deg);
+}
+.hero-bottom {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  flex-wrap: wrap; gap: 2rem;
+}
+.hero-desc {
+  max-width: 420px; font-size: 1.05rem;
+  color: #555; line-height: 1.7;
+}
+.hero-desc em { font-style: italic; color: var(--rust); }
+.hero-actions { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+
+/* BUTTONS */
+.btn-raw {
+  font-family: 'Syne', sans-serif; font-weight: 600;
+  font-size: 0.85rem; text-transform: lowercase; letter-spacing: 0.02em;
+  padding: 0.75rem 1.75rem; cursor: pointer;
+  text-decoration: none; display: inline-block;
+  transition: all 0.3s;
+  border: none;
+}
+.btn-fill {
+  background: var(--black); color: var(--cream);
+}
+.btn-fill:hover { background: var(--rust); }
+.btn-border {
+  background: transparent; color: var(--black);
+  border: 1.5px solid var(--black);
+}
+.btn-border:hover { background: var(--black); color: var(--cream); }
+.btn-rust { background: var(--rust); color: var(--cream); }
+.btn-rust:hover { background: #933D1F; }
+.btn-cream-dark { background: var(--cream); color: var(--black); border: 1.5px solid var(--black); }
+.btn-cream-dark:hover { background: var(--black); color: var(--cream); }
+
+/* MARQUEE DIVIDER */
+.marquee-strip {
+  background: var(--black); color: var(--warm-gray);
+  padding: 0.75rem 0; overflow: hidden; white-space: nowrap;
+  font-family: 'Syne', sans-serif; font-weight: 600;
+  font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em;
+}
+.marquee-inner {
+  display: inline-block;
+  animation: marquee 25s linear infinite;
+}
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marquee-inner span { margin: 0 3rem; }
+
+/* FEATURES */
+.features {
+  padding: 6rem 2.5rem;
+  max-width: 1100px; margin: 0 auto;
+}
+.features-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  flex-wrap: wrap; gap: 2rem; margin-bottom: 4rem;
+}
+.features-header h2 {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 1.05; letter-spacing: -0.03em;
+  max-width: 450px;
+}
+.features-header p {
+  max-width: 350px; color: #666;
+  font-size: 0.95rem; padding-top: 0.5rem;
+}
+.feature-list { list-style: none; counter-reset: features; }
+.feature-item {
+  counter-increment: features;
+  display: grid; grid-template-columns: 80px 1fr;
+  gap: 1.5rem;
+  padding: 2.25rem 0;
+  border-bottom: 1px solid var(--dark-cream);
+  transition: transform 0.3s, padding-left 0.3s;
+  align-items: start;
+}
+.feature-item:first-child { border-top: 1px solid var(--dark-cream); }
+.feature-item:hover { padding-left: 1rem; }
+.feature-num {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: 2.5rem; color: var(--dark-cream);
+  line-height: 1; letter-spacing: -0.04em;
+  transition: color 0.3s;
+}
+.feature-item:hover .feature-num { color: var(--rust); }
+.feature-content h3 {
+  font-family: 'Syne', sans-serif; font-weight: 700;
+  font-size: 1.2rem; margin-bottom: 0.4rem;
+  letter-spacing: -0.01em;
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.feature-content h3 .tag {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.6rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  background: var(--rust); color: var(--cream);
+  padding: 0.15rem 0.5rem;
+  display: inline-block;
+}
+.feature-content p {
+  color: #777; font-size: 0.9rem; max-width: 500px; line-height: 1.65;
+}
+
+/* PRICING */
+.pricing {
+  background: var(--black); color: var(--cream);
+  padding: 6rem 2.5rem;
+  position: relative;
+}
+.pricing::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none; opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+}
+.pricing-inner { max-width: 1100px; margin: 0 auto; position: relative; }
+.pricing-header {
+  margin-bottom: 4rem;
+}
+.pricing-header h2 {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 1.05; letter-spacing: -0.03em;
+  margin-bottom: 1rem;
+}
+.pricing-header p { color: var(--warm-gray); max-width: 400px; font-size: 0.95rem; }
+
+.pricing-tiers {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.pricing-tier {
+  padding: 2.5rem;
+  border-right: 1px solid rgba(255,255,255,0.1);
+  position: relative;
+  transition: background 0.3s;
+}
+.pricing-tier:last-child { border-right: none; }
+.pricing-tier:hover { background: rgba(255,255,255,0.03); }
+.pricing-tier.featured { background: rgba(180, 77, 45, 0.08); }
+.pricing-tier .tier-label {
+  font-family: 'Syne', sans-serif; font-weight: 600;
+  font-size: 0.8rem; text-transform: uppercase;
+  letter-spacing: 0.15em; color: var(--warm-gray);
+  margin-bottom: 1.25rem;
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.pricing-tier .tier-label .tag {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.55rem; letter-spacing: 0.08em;
+  background: var(--rust); color: var(--cream);
+  padding: 0.15rem 0.45rem; text-transform: uppercase;
+}
+.pricing-tier .tier-price {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: 3.5rem; letter-spacing: -0.04em;
+  line-height: 1; margin-bottom: 0.25rem;
+}
+.pricing-tier .tier-price-sub {
+  font-size: 0.8rem; color: var(--warm-gray); margin-bottom: 2rem;
+}
+.pricing-tier .tier-features {
+  list-style: none; margin-bottom: 2.5rem;
+}
+.pricing-tier .tier-features li {
+  padding: 0.4rem 0; font-size: 0.88rem;
+  color: rgba(240, 235, 227, 0.65);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.pricing-tier .tier-features li:last-child { border-bottom: none; }
+.pricing-tier .btn-raw { width: 100%; text-align: center; }
+
+/* FINAL CTA */
+.final-cta {
+  padding: 8rem 2.5rem;
+  text-align: center;
+  position: relative;
+}
+.final-cta .line-deco {
+  width: 60px; height: 1.5px; background: var(--rust);
+  margin: 0 auto 2rem;
+}
+.final-cta h2 {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1; letter-spacing: -0.04em;
+  margin-bottom: 1.25rem;
+}
+.final-cta h2 .underline-rough {
+  text-decoration: none;
+  background-image: linear-gradient(120deg, var(--rust) 0%, var(--rust) 100%);
+  background-repeat: no-repeat;
+  background-size: 100% 4px;
+  background-position: 0 92%;
+  padding-bottom: 4px;
+}
+.final-cta p {
+  max-width: 450px; margin: 0 auto 2.5rem;
+  color: #666; font-size: 1rem;
+}
+.final-cta-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+/* FOOTER */
+.footer {
+  border-top: 1px solid var(--dark-cream);
+  padding: 2.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 1rem;
+  font-size: 0.8rem; color: var(--warm-gray);
+}
+.footer a { color: var(--black); text-decoration: none; }
+.footer a:hover { color: var(--rust); }
+.footer-links { display: flex; gap: 2rem; }
+
+/* ANIMATIONS */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-d1 { transition-delay: 0.08s; }
+.reveal-d2 { transition-delay: 0.16s; }
+.reveal-d3 { transition-delay: 0.24s; }
+.reveal-d4 { transition-delay: 0.32s; }
+.reveal-d5 { transition-delay: 0.4s; }
+.reveal-d6 { transition-delay: 0.48s; }
+.reveal-d7 { transition-delay: 0.56s; }
+.reveal-d8 { transition-delay: 0.64s; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav-toggle { display: block; }
+  .nav-links.open {
+    display: flex; flex-direction: column;
+    position: absolute; top: 100%; left: 0; right: 0;
+    background: rgba(17,17,17,0.95); padding: 1.5rem 2.5rem;
+    gap: 1rem;
+  }
+  .nav-links.open a { color: var(--cream); }
+  .hero { padding-bottom: 4rem; }
+  .hero h1 { font-size: 2.8rem; }
+  .hero h1 .offset { transform: none; }
+  .hero-side-text { display: none; }
+  .feature-item { grid-template-columns: 50px 1fr; gap: 1rem; }
+  .feature-num { font-size: 1.8rem; }
+  .pricing-tiers { grid-template-columns: 1fr; }
+  .pricing-tier { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .pricing-tier:last-child { border-bottom: none; }
+  .hero-bottom { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a href="#" class="nav-logo">djepk</a>
+  <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-links">
+    <a href="#features">features</a>
+    <a href="#pricing">pricing</a>
+    <a href="#" class="nav-cta">get started</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-top-label reveal">Electronic Press Kit Platform</div>
+  <div class="hero-side-text">Scroll to explore &darr;</div>
+  <h1 class="reveal reveal-d1">press kits<br>for <span class="rust">real</span><br><span class="offset">artists.</span></h1>
+  <div class="hero-bottom">
+    <p class="hero-desc reveal reveal-d2">Stop sending PDFs that nobody opens. Build a living, breathing press kit that <em>actually gets you booked</em>. Takes five minutes. Looks like you spent weeks.</p>
+    <div class="hero-actions reveal reveal-d3">
+      <a href="#" class="btn-raw btn-fill">start free</a>
+      <a href="#features" class="btn-raw btn-border">learn more</a>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-strip">
+  <div class="marquee-inner">
+    <span>Bio</span><span>&middot;</span>
+    <span>Music</span><span>&middot;</span>
+    <span>Events</span><span>&middot;</span>
+    <span>Rider</span><span>&middot;</span>
+    <span>Press</span><span>&middot;</span>
+    <span>Contact</span><span>&middot;</span>
+    <span>Analytics</span><span>&middot;</span>
+    <span>Custom Domain</span><span>&middot;</span>
+    <span>Bio</span><span>&middot;</span>
+    <span>Music</span><span>&middot;</span>
+    <span>Events</span><span>&middot;</span>
+    <span>Rider</span><span>&middot;</span>
+    <span>Press</span><span>&middot;</span>
+    <span>Contact</span><span>&middot;</span>
+    <span>Analytics</span><span>&middot;</span>
+    <span>Custom Domain</span><span>&middot;</span>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="features-header reveal">
+    <h2>Everything you need.<br>Nothing you don't.</h2>
+    <p>We built the features DJs actually asked for. No bloat, no gimmicks, no feature-creep.</p>
+  </div>
+  <ol class="feature-list">
+    <li class="feature-item reveal reveal-d1">
+      <div class="feature-num">01</div>
+      <div class="feature-content">
+        <h3>Bio & Story</h3>
+        <p>Rich text editor for your artist bio. Your journey, your sound, your words. Formatted beautifully without thinking about design.</p>
+      </div>
+    </li>
+    <li class="feature-item reveal reveal-d2">
+      <div class="feature-num">02</div>
+      <div class="feature-content">
+        <h3>Music Embeds</h3>
+        <p>Spotify, SoundCloud, Mixcloud, Bandcamp, Apple Music. Embed your tracks and mixes. Promoters press play right from your EPK.</p>
+      </div>
+    </li>
+    <li class="feature-item reveal reveal-d3">
+      <div class="feature-num">03</div>
+      <div class="feature-content">
+        <h3>Events & Gigs</h3>
+        <p>Show your upcoming dates and past performances. An active calendar tells promoters you're in demand and available.</p>
+      </div>
+    </li>
+    <li class="feature-item reveal reveal-d4">
+      <div class="feature-num">04</div>
+      <div class="feature-content">
+        <h3>Technical Rider</h3>
+        <p>Your gear requirements, stage plot, and setup preferences in one clean document. No more emailing Word files back and forth.</p>
+      </div>
+    </li>
+    <li class="feature-item reveal reveal-d5">
+      <div class="feature-num">05</div>
+      <div class="feature-content">
+        <h3>Press & Quotes</h3>
+        <p>Showcase your best reviews, media coverage, and testimonials. Social proof does the selling so you don't have to.</p>
+      </div>
+    </li>
+    <li class="feature-item reveal reveal-d6">
+      <div class="feature-num">06</div>
+      <div class="feature-content">
+        <h3>Booking Contact Form</h3>
+        <p>Built-in form that goes straight to your inbox. Structured fields capture the info you actually need from promoters.</p>
+      </div>
+    </li>
+    <li class="feature-item reveal reveal-d7">
+      <div class="feature-num">07</div>
+      <div class="feature-content">
+        <h3>Analytics <span class="tag">Pro</span></h3>
+        <p>See who's viewing your EPK, where they're from, and which sections hold their attention. Real data, not vanity metrics.</p>
+      </div>
+    </li>
+    <li class="feature-item reveal reveal-d8">
+      <div class="feature-num">08</div>
+      <div class="feature-content">
+        <h3>Custom Domain <span class="tag">Pro</span></h3>
+        <p>Use your own domain. press.yourname.com or whatever you want. Full SSL, zero setup headaches.</p>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="pricing-inner">
+    <div class="pricing-header reveal">
+      <h2>Honest pricing.</h2>
+      <p>No trials that expire. No features held hostage. Upgrade when you're ready, not when we guilt you into it.</p>
+    </div>
+    <div class="pricing-tiers">
+      <div class="pricing-tier reveal reveal-d1">
+        <div class="tier-label">Free</div>
+        <div class="tier-price">$0</div>
+        <div class="tier-price-sub">forever, no catch</div>
+        <ul class="tier-features">
+          <li>1 EPK page</li>
+          <li>Bio, music, events</li>
+          <li>Contact form</li>
+          <li>djepk.com/yourname</li>
+          <li>Basic view counts</li>
+        </ul>
+        <a href="#" class="btn-raw btn-cream-dark">start free</a>
+      </div>
+      <div class="pricing-tier featured reveal reveal-d2">
+        <div class="tier-label">Pro <span class="tag">popular</span></div>
+        <div class="tier-price">$9</div>
+        <div class="tier-price-sub">per month</div>
+        <ul class="tier-features">
+          <li>Everything in Free</li>
+          <li>Custom domain</li>
+          <li>Technical rider</li>
+          <li>Press quotes section</li>
+          <li>Full analytics</li>
+          <li>Priority support</li>
+        </ul>
+        <a href="#" class="btn-raw btn-rust">go pro</a>
+      </div>
+      <div class="pricing-tier reveal reveal-d3">
+        <div class="tier-label">Agency</div>
+        <div class="tier-price">$29</div>
+        <div class="tier-price-sub">per month</div>
+        <ul class="tier-features">
+          <li>Everything in Pro</li>
+          <li>Up to 20 artist EPKs</li>
+          <li>Team access</li>
+          <li>Aggregated analytics</li>
+          <li>White-label option</li>
+          <li>Dedicated support</li>
+        </ul>
+        <a href="#" class="btn-raw btn-cream-dark">contact us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="line-deco reveal"></div>
+  <h2 class="reveal reveal-d1">ditch the PDF.<br><span class="underline-rough">go digital.</span></h2>
+  <p class="reveal reveal-d2">Hundreds of DJs have already made the switch. Your next booking is one link away.</p>
+  <div class="final-cta-actions reveal reveal-d3">
+    <a href="#" class="btn-raw btn-fill">create your epk</a>
+    <a href="#" class="btn-raw btn-border">see examples</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div>&copy; 2026 djepk</div>
+  <div class="footer-links">
+    <a href="#">privacy</a>
+    <a href="#">terms</a>
+    <a href="#">twitter</a>
+  </div>
+</footer>
+
+<script>
+// Scroll nav
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// Reveal on scroll
+const revealEls = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+revealEls.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

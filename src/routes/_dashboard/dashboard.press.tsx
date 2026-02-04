@@ -2,12 +2,14 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { getPressAssets, upsertPressAsset, deletePressAsset, reorderPressAssets } from '~/server/press-assets'
-import { pressAssetUpsertSchema, ASSET_TYPES, type PressAssetUpsert } from '~/schemas/press-asset'
+import { ASSET_TYPES } from '~/schemas/press-asset'
 import { uploadFileFromInput } from '~/utils/upload'
 import { FORM_INPUT, BTN_PRIMARY, CARD_SECTION, toSelectOptions } from '~/components/forms'
 import { GridItemOverlay } from '~/components/GridItemOverlay'
 import { useListEditor } from '~/hooks/useListEditor'
+import type { FileRow } from '~/types/database'
 
 export const Route = createFileRoute('/_dashboard/dashboard/press')({
   loader: () => getPressAssets(),
@@ -16,18 +18,25 @@ export const Route = createFileRoute('/_dashboard/dashboard/press')({
 
 const ASSET_TYPE_OPTIONS = toSelectOptions(ASSET_TYPES)
 
+const uploadFormSchema = z.object({
+  press_title: z.string().max(200).optional(),
+  press_type: z.enum(ASSET_TYPES),
+})
+
+type UploadFormValues = z.infer<typeof uploadFormSchema>
+
 function PressEditor() {
   const initialAssets = Route.useLoaderData()
   const { items: assets, handleDelete, handleReorder, addItem } = useListEditor(
-    initialAssets || [],
+    (initialAssets || []) as FileRow[],
     { deleteFn: deletePressAsset, reorderFn: reorderPressAssets }
   )
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const { register, getValues, reset } = useForm<Pick<PressAssetUpsert, 'title' | 'type'>>({
-    resolver: zodResolver(pressAssetUpsertSchema.pick({ title: true, type: true })),
-    defaultValues: { title: '', type: 'photo' },
+  const { register, getValues, reset } = useForm<UploadFormValues>({
+    resolver: zodResolver(uploadFormSchema),
+    defaultValues: { press_title: '', press_type: 'photo' },
   })
 
   const handleUpload = async () => {
@@ -35,20 +44,24 @@ function PressEditor() {
     if (!file) return
     setUploading(true)
 
-    const fileUrl = await uploadFileFromInput(file, 'press')
-    if (!fileUrl) {
+    const uploadResult = await uploadFileFromInput(file, 'press')
+    if (!uploadResult) {
       setUploading(false)
       return
     }
 
     const formValues = getValues()
-    const assetTitle = formValues.title?.trim() || file.name
-    const typeVal = formValues.type
+    const title = formValues.press_title?.trim() || file.name
     const result = await upsertPressAsset({
-      data: { title: assetTitle, file_url: fileUrl, type: typeVal || 'photo', sort_order: assets.length },
+      data: {
+        id: uploadResult.fileId,
+        press_title: title,
+        press_type: formValues.press_type || 'photo',
+        sort_order: assets.length,
+      },
     })
     if ('asset' in result && result.asset) {
-      addItem(result.asset)
+      addItem(result.asset as FileRow)
       reset()
       if (fileInputRef.current) fileInputRef.current.value = ''
     }
@@ -58,7 +71,7 @@ function PressEditor() {
 
   return (
     <div>
-      <h1 className="text-2xl font-display font-semibold tracking-tight mb-8">Press Assets</h1>
+      <h1 className="text-2xl font-display font-extrabold tracking-tight uppercase mb-8">Press Assets</h1>
 
       {/* Upload Form */}
       <div className={CARD_SECTION}>
@@ -67,10 +80,10 @@ function PressEditor() {
           <input
             type="text"
             placeholder="Title (optional, defaults to filename)"
-            {...register('title')}
+            {...register('press_title')}
             className={FORM_INPUT}
           />
-          <select {...register('type')} className={FORM_INPUT}>
+          <select {...register('press_type')} className={FORM_INPUT}>
             {ASSET_TYPE_OPTIONS.map((t) => (
               <option key={t.value} value={t.value}>{t.label}</option>
             ))}
@@ -100,32 +113,32 @@ function PressEditor() {
           {assets.map((asset, index) => (
             <div
               key={asset.id}
-              className="group relative aspect-square bg-white border border-border rounded-xl overflow-hidden"
+              className="group relative aspect-square bg-white border border-border overflow-hidden"
             >
-              {asset.type === 'video' ? (
+              {asset.press_type === 'video' ? (
                 <div className="w-full h-full flex flex-col items-center justify-center text-text-secondary">
                   <span className="text-3xl mb-2">&#9654;</span>
-                  <span className="text-xs uppercase tracking-wider px-2 text-center truncate w-full">
-                    {asset.title}
+                  <span className="text-xs font-medium px-2 text-center truncate w-full">
+                    {asset.press_title || asset.name}
                   </span>
                 </div>
               ) : (
                 <img
                   src={asset.file_url}
-                  alt={asset.title}
+                  alt={asset.press_title || asset.name}
                   className="w-full h-full object-cover"
                 />
               )}
 
               <GridItemOverlay
-                label={asset.title}
+                label={asset.press_title || asset.name}
                 index={index}
                 total={assets.length}
                 onReorder={handleReorder!}
                 onDelete={() => handleDelete(asset.id)}
               >
                 <span className="inline-block bg-bg rounded px-2 py-0.5 text-[10px] text-text-secondary uppercase tracking-wider">
-                  {asset.type}
+                  {asset.press_type}
                 </span>
               </GridItemOverlay>
             </div>

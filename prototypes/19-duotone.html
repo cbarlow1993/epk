@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DJEPK — Your Sound, Your Story</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800;900&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --indigo: #1E1B4B;
+  --violet: #7C3AED;
+  --peach: #FBBF77;
+  --cream: #FEF3E2;
+  --white: #FFFFFF;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Figtree', sans-serif;
+  color: var(--indigo);
+  background: var(--cream);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* NAV */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.25rem 2rem;
+  transition: all 0.4s ease;
+}
+.nav.scrolled {
+  background: var(--indigo);
+  padding: 0.75rem 2rem;
+  box-shadow: 0 4px 30px rgba(30, 27, 75, 0.2);
+}
+.nav-logo {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 900; font-size: 1.5rem;
+  color: var(--indigo);
+  text-decoration: none;
+  transition: color 0.4s;
+}
+.nav.scrolled .nav-logo { color: var(--peach); }
+.nav-links { display: flex; gap: 2rem; align-items: center; }
+.nav-links a {
+  font-weight: 600; font-size: 0.95rem;
+  color: var(--indigo); text-decoration: none;
+  transition: color 0.3s;
+}
+.nav.scrolled .nav-links a { color: var(--cream); }
+.nav-links a:hover { color: var(--violet); }
+.nav-cta {
+  background: var(--violet); color: var(--white) !important;
+  padding: 0.6rem 1.5rem; border-radius: 100px;
+  transition: transform 0.3s, background 0.3s !important;
+}
+.nav-cta:hover { transform: scale(1.05); background: var(--indigo) !important; }
+.nav.scrolled .nav-cta { background: var(--peach) !important; color: var(--indigo) !important; }
+
+/* MOBILE NAV */
+.nav-toggle { display: none; background: none; border: none; cursor: pointer; }
+.nav-toggle span { display: block; width: 26px; height: 3px; margin: 5px 0; background: var(--indigo); border-radius: 3px; transition: background 0.3s; }
+.nav.scrolled .nav-toggle span { background: var(--cream); }
+
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  padding: 8rem 2rem 6rem;
+  background: var(--cream);
+  position: relative; overflow: hidden;
+}
+.hero-blob {
+  position: absolute; border-radius: 50%; opacity: 0.15; pointer-events: none;
+}
+.hero-blob-1 { width: 500px; height: 500px; background: var(--violet); top: -100px; right: -100px; }
+.hero-blob-2 { width: 350px; height: 350px; background: var(--peach); bottom: -50px; left: -80px; }
+.hero-blob-3 { width: 200px; height: 200px; background: var(--violet); bottom: 10%; right: 15%; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: var(--indigo); color: var(--peach);
+  font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 0.75rem;
+  padding: 0.5rem 1.25rem; border-radius: 100px;
+  margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.hero-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--peach); animation: pulse 1.5s ease infinite; }
+
+.hero h1 {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 900; font-size: clamp(2.8rem, 7vw, 6rem);
+  line-height: 1.1; max-width: 900px;
+  margin-bottom: 1.5rem;
+  color: var(--indigo);
+}
+.hero h1 .wave {
+  display: inline-block;
+  background: linear-gradient(90deg, var(--violet), var(--peach));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero p {
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  max-width: 560px; color: #4a4570;
+  margin-bottom: 2.5rem; font-weight: 500;
+}
+.hero-buttons { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+
+/* BUTTONS */
+.btn-pill {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 0.95rem;
+  padding: 1rem 2.25rem; border-radius: 100px; border: none; cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s, box-shadow 0.3s;
+}
+.btn-pill:hover { transform: scale(1.08); }
+.btn-primary { background: var(--violet); color: var(--white); box-shadow: 0 8px 30px rgba(124, 58, 237, 0.35); }
+.btn-primary:hover { background: #6D28D9; box-shadow: 0 12px 40px rgba(124, 58, 237, 0.5); }
+.btn-secondary { background: var(--indigo); color: var(--cream); }
+.btn-secondary:hover { background: #2d2870; }
+.btn-outline { background: transparent; color: var(--indigo); border: 3px solid var(--indigo); }
+.btn-outline:hover { background: var(--indigo); color: var(--cream); }
+.btn-cream { background: var(--cream); color: var(--indigo); }
+.btn-cream:hover { background: var(--peach); }
+
+/* SECTION DIVIDER */
+.divider-wave {
+  width: 100%; height: 80px; position: relative; margin-top: -1px;
+}
+.divider-wave svg { width: 100%; height: 100%; display: block; }
+
+/* FEATURES */
+.features {
+  background: var(--indigo); color: var(--cream);
+  padding: 6rem 2rem;
+}
+.section-label {
+  font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 0.8rem;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--peach); margin-bottom: 1rem;
+}
+.features .section-title {
+  font-family: 'Unbounded', sans-serif; font-weight: 800;
+  font-size: clamp(2rem, 4vw, 3rem); line-height: 1.15;
+  max-width: 650px; margin-bottom: 4rem;
+}
+.features-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem; max-width: 1200px; margin: 0 auto;
+}
+.feature-card {
+  background: rgba(255,255,255,0.05);
+  border: 3px solid rgba(255,255,255,0.1);
+  border-radius: 24px; padding: 2rem;
+  transition: transform 0.3s, border-color 0.3s, background 0.3s;
+  position: relative;
+}
+.feature-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--violet);
+  background: rgba(124, 58, 237, 0.1);
+}
+.feature-card .icon {
+  font-size: 2.5rem; margin-bottom: 1rem;
+  display: block;
+}
+.feature-card h3 {
+  font-family: 'Unbounded', sans-serif; font-weight: 700;
+  font-size: 1.15rem; margin-bottom: 0.75rem;
+}
+.feature-card p { color: #b8b0d4; font-size: 0.95rem; line-height: 1.6; }
+.feature-card .sticker {
+  position: absolute; top: -10px; right: -10px;
+  background: var(--peach); color: var(--indigo);
+  font-family: 'Unbounded', sans-serif; font-weight: 800; font-size: 0.65rem;
+  padding: 0.3rem 0.75rem; border-radius: 100px;
+  transform: rotate(8deg);
+  text-transform: uppercase;
+}
+
+/* PRICING */
+.pricing {
+  background: var(--cream); padding: 6rem 2rem;
+  text-align: center;
+}
+.pricing .section-label { color: var(--violet); }
+.pricing .section-title {
+  font-family: 'Unbounded', sans-serif; font-weight: 800;
+  font-size: clamp(2rem, 4vw, 3rem); line-height: 1.15;
+  margin-bottom: 1rem; color: var(--indigo);
+}
+.pricing .section-sub {
+  font-size: 1.1rem; color: #5b5280; max-width: 500px;
+  margin: 0 auto 3.5rem; font-weight: 500;
+}
+.pricing-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem; max-width: 1050px; margin: 0 auto;
+}
+.price-card {
+  background: var(--white); border-radius: 28px;
+  padding: 2.5rem 2rem; text-align: left;
+  border: 3px solid transparent;
+  transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+  position: relative;
+}
+.price-card:hover { transform: translateY(-6px); }
+.price-card.featured {
+  border-color: var(--violet);
+  box-shadow: 0 20px 60px rgba(124, 58, 237, 0.15);
+}
+.price-card .sticker {
+  position: absolute; top: -12px; right: 20px;
+  background: var(--violet); color: var(--white);
+  font-family: 'Unbounded', sans-serif; font-weight: 800; font-size: 0.65rem;
+  padding: 0.35rem 0.9rem; border-radius: 100px;
+  transform: rotate(-3deg); text-transform: uppercase;
+}
+.price-card .tier {
+  font-family: 'Unbounded', sans-serif; font-weight: 700;
+  font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--indigo);
+}
+.price-card .price {
+  font-family: 'Unbounded', sans-serif; font-weight: 900;
+  font-size: 2.8rem; color: var(--indigo); margin-bottom: 0.25rem;
+}
+.price-card .price span { font-size: 1rem; font-weight: 500; color: #7c7299; }
+.price-card .price-desc { color: #7c7299; font-size: 0.9rem; margin-bottom: 1.5rem; }
+.price-card ul { list-style: none; margin-bottom: 2rem; }
+.price-card ul li {
+  padding: 0.5rem 0; font-size: 0.95rem; color: #4a4570;
+  display: flex; align-items: center; gap: 0.6rem;
+}
+.price-card ul li::before { content: '\2713'; color: var(--violet); font-weight: 700; }
+.price-card .btn-pill { width: 100%; justify-content: center; }
+
+/* FINAL CTA */
+.final-cta {
+  background: var(--violet); color: var(--white);
+  padding: 6rem 2rem; text-align: center;
+  position: relative; overflow: hidden;
+}
+.final-cta .cta-blob {
+  position: absolute; border-radius: 50%; opacity: 0.1; pointer-events: none;
+}
+.final-cta .cta-blob-1 { width: 400px; height: 400px; background: var(--peach); top: -150px; left: -100px; }
+.final-cta .cta-blob-2 { width: 300px; height: 300px; background: var(--cream); bottom: -100px; right: -80px; }
+.final-cta h2 {
+  font-family: 'Unbounded', sans-serif; font-weight: 900;
+  font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.15;
+  margin-bottom: 1.25rem; position: relative;
+}
+.final-cta p {
+  font-size: 1.15rem; max-width: 500px; margin: 0 auto 2.5rem;
+  opacity: 0.85; font-weight: 500;
+}
+.final-cta .btn-pill { position: relative; }
+
+/* FOOTER */
+.footer {
+  background: var(--indigo); color: #9890b8;
+  padding: 3rem 2rem; text-align: center; font-size: 0.9rem;
+}
+.footer a { color: var(--peach); text-decoration: none; }
+
+/* ANIMATIONS */
+.reveal {
+  opacity: 0; transform: translateY(40px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
+.reveal-delay-6 { transition-delay: 0.6s; }
+.reveal-delay-7 { transition-delay: 0.7s; }
+
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+.hero-blob-1 { animation: float 8s ease-in-out infinite; }
+.hero-blob-2 { animation: float 10s ease-in-out infinite 1s; }
+.hero-blob-3 { animation: float 7s ease-in-out infinite 2s; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav-toggle { display: block; }
+  .nav-links.open {
+    display: flex; flex-direction: column;
+    position: absolute; top: 100%; left: 0; right: 0;
+    background: var(--indigo); padding: 1.5rem 2rem;
+    gap: 1rem;
+  }
+  .nav-links.open a { color: var(--cream); }
+  .hero h1 { font-size: 2.4rem; }
+  .features-grid { grid-template-columns: 1fr; }
+  .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
+  .hero-buttons { flex-direction: column; align-items: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a href="#" class="nav-logo">DJEPK</a>
+  <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#" class="nav-cta">Get Started Free</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-blob hero-blob-1"></div>
+  <div class="hero-blob hero-blob-2"></div>
+  <div class="hero-blob hero-blob-3"></div>
+  <div class="hero-badge reveal"><span class="dot"></span> Now in public beta</div>
+  <h1 class="reveal reveal-delay-1">Your press kit,<br><span class="wave">built to move.</span></h1>
+  <p class="reveal reveal-delay-2">Create a professional DJ press kit in minutes. Share your sound, your story, and your rider with promoters and venues worldwide.</p>
+  <div class="hero-buttons reveal reveal-delay-3">
+    <a href="#" class="btn-pill btn-primary">Start for free</a>
+    <a href="#features" class="btn-pill btn-outline">See features</a>
+  </div>
+</section>
+
+<!-- DIVIDER -->
+<div class="divider-wave">
+  <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+    <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,50 1440,40 L1440,80 L0,80 Z" fill="#1E1B4B"/>
+  </svg>
+</div>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div style="max-width:1200px;margin:0 auto;">
+    <p class="section-label reveal">What you get</p>
+    <h2 class="section-title reveal reveal-delay-1">Everything a DJ needs in one link.</h2>
+    <div class="features-grid">
+      <div class="feature-card reveal reveal-delay-1">
+        <span class="icon">&#127908;</span>
+        <h3>Bio & Story</h3>
+        <p>Tell your story with a rich bio editor. Add your journey, achievements, and what makes your sound unique.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <span class="icon">&#127925;</span>
+        <h3>Music Embeds</h3>
+        <p>Embed tracks from Spotify, SoundCloud, Mixcloud, or Bandcamp. Let promoters hear your sound instantly.</p>
+        <span class="sticker">Popular</span>
+      </div>
+      <div class="feature-card reveal reveal-delay-3">
+        <span class="icon">&#128197;</span>
+        <h3>Upcoming Events</h3>
+        <p>List your gigs, tours, and residencies. Show promoters you're active and booked.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-4">
+        <span class="icon">&#128221;</span>
+        <h3>Technical Rider</h3>
+        <p>Publish your technical requirements, preferred equipment, and stage setup so venues know exactly what you need.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-5">
+        <span class="icon">&#128172;</span>
+        <h3>Press Quotes</h3>
+        <p>Showcase reviews, testimonials, and press coverage. Social proof that gets you booked.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-6">
+        <span class="icon">&#128232;</span>
+        <h3>Contact & Booking</h3>
+        <p>Built-in contact form for booking inquiries. No more missed emails or DMs.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-7">
+        <span class="icon">&#128202;</span>
+        <h3>Analytics</h3>
+        <p>Track who's viewing your EPK, which sections get the most attention, and where traffic comes from.</p>
+        <span class="sticker">Pro</span>
+      </div>
+      <div class="feature-card reveal reveal-delay-7">
+        <span class="icon">&#127760;</span>
+        <h3>Custom Domain</h3>
+        <p>Use your own domain for a fully branded experience. Look professional from the first click.</p>
+        <span class="sticker">Pro</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIVIDER -->
+<div class="divider-wave" style="transform:rotate(180deg);">
+  <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+    <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,50 1440,40 L1440,80 L0,80 Z" fill="#1E1B4B"/>
+  </svg>
+</div>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <p class="section-label reveal">Simple pricing</p>
+  <h2 class="section-title reveal reveal-delay-1">Pick your plan, start today.</h2>
+  <p class="section-sub reveal reveal-delay-2">No hidden fees. Upgrade or cancel anytime.</p>
+  <div class="pricing-grid">
+    <!-- FREE -->
+    <div class="price-card reveal reveal-delay-1">
+      <div class="tier">Free</div>
+      <div class="price">$0<span> /mo</span></div>
+      <div class="price-desc">Perfect for getting started</div>
+      <ul>
+        <li>1 EPK page</li>
+        <li>Bio, music, events</li>
+        <li>Contact form</li>
+        <li>DJEPK.com subdomain</li>
+        <li>Basic analytics</li>
+      </ul>
+      <a href="#" class="btn-pill btn-outline">Start free</a>
+    </div>
+    <!-- PRO -->
+    <div class="price-card featured reveal reveal-delay-2">
+      <span class="sticker">Most Popular</span>
+      <div class="tier">Pro</div>
+      <div class="price">$9<span> /mo</span></div>
+      <div class="price-desc">For working DJs</div>
+      <ul>
+        <li>Everything in Free</li>
+        <li>Custom domain</li>
+        <li>Technical rider</li>
+        <li>Press quotes</li>
+        <li>Advanced analytics</li>
+        <li>Priority support</li>
+      </ul>
+      <a href="#" class="btn-pill btn-primary">Go Pro</a>
+    </div>
+    <!-- AGENCY -->
+    <div class="price-card reveal reveal-delay-3">
+      <div class="tier">Agency</div>
+      <div class="price">$29<span> /mo</span></div>
+      <div class="price-desc">For labels & managers</div>
+      <ul>
+        <li>Everything in Pro</li>
+        <li>Up to 20 artist EPKs</li>
+        <li>Team collaboration</li>
+        <li>Aggregated analytics</li>
+        <li>White-label branding</li>
+        <li>Dedicated support</li>
+      </ul>
+      <a href="#" class="btn-pill btn-secondary">Contact sales</a>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="cta-blob cta-blob-1"></div>
+  <div class="cta-blob cta-blob-2"></div>
+  <h2 class="reveal">Ready to level up<br>your press kit?</h2>
+  <p class="reveal reveal-delay-1">Join hundreds of DJs who've ditched the PDF and gone digital. It takes less than 5 minutes.</p>
+  <a href="#" class="btn-pill btn-cream reveal reveal-delay-2">Create your EPK free</a>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>&copy; 2026 DJEPK. Built for DJs, by people who love music. <a href="#">Privacy</a> &middot; <a href="#">Terms</a></p>
+</footer>
+
+<script>
+// Scroll-aware nav
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// Reveal on scroll
+const revealEls = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+revealEls.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

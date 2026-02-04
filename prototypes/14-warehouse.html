@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRESS.KIT // Warehouse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --concrete: #2A2A2A;
+    --steel: #8C8C8C;
+    --hazard: #FFD600;
+    --white: #F5F5F5;
+    --dark: #1A1A1A;
+    --mid: #3A3A3A;
+    --line: rgba(140, 140, 140, 0.15);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Work Sans', sans-serif;
+    background: var(--concrete);
+    color: var(--white);
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+
+  /* Nav */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+    padding: 16px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: background 0.3s, box-shadow 0.3s;
+    border-bottom: 3px solid transparent;
+  }
+  .nav.scrolled {
+    background: rgba(26, 26, 26, 0.97);
+    border-bottom-color: var(--hazard);
+    backdrop-filter: blur(8px);
+  }
+  .nav-logo {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 22px; letter-spacing: 2px;
+    color: var(--white); text-decoration: none;
+    text-transform: uppercase;
+  }
+  .nav-logo span { color: var(--hazard); }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a {
+    color: var(--steel); text-decoration: none;
+    font-size: 13px; text-transform: uppercase;
+    font-weight: 600; letter-spacing: 2px;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+  .nav-cta {
+    background: var(--hazard); color: var(--dark);
+    border: none; padding: 10px 24px;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 12px; letter-spacing: 2px;
+    text-transform: uppercase; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nav-cta:hover { background: var(--white); }
+
+  /* Shared */
+  section { position: relative; z-index: 10; padding: 120px 24px; }
+  .container { max-width: 1140px; margin: 0 auto; }
+
+  .reveal {
+    opacity: 0; transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* Hazard stripe divider */
+  .hazard-divider {
+    height: 24px;
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--hazard),
+      var(--hazard) 16px,
+      var(--dark) 16px,
+      var(--dark) 32px
+    );
+    position: relative; z-index: 10;
+  }
+
+  /* Section headers */
+  .section-number {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 72px; color: rgba(255, 214, 0, 0.08);
+    line-height: 1; margin-bottom: -20px;
+    letter-spacing: -4px;
+  }
+  .section-label {
+    font-size: 12px; color: var(--hazard);
+    text-transform: uppercase; letter-spacing: 4px;
+    font-weight: 700; margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(28px, 5vw, 52px);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .section-desc {
+    font-size: 16px; color: var(--steel);
+    max-width: 560px; font-weight: 300;
+  }
+  .text-center { text-align: center; }
+  .section-desc.center { margin: 0 auto; }
+
+  /* Hero */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding-top: 80px;
+    position: relative;
+  }
+  .hero::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 200px;
+    background: linear-gradient(transparent, var(--concrete));
+    z-index: 1;
+  }
+  .hero .container { position: relative; z-index: 2; }
+  .hero-overline {
+    font-size: 13px; text-transform: uppercase;
+    letter-spacing: 6px; color: var(--hazard);
+    font-weight: 700; margin-bottom: 20px;
+    display: inline-block;
+    border-left: 4px solid var(--hazard);
+    padding-left: 16px;
+  }
+  .hero h1 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(40px, 8vw, 88px);
+    text-transform: uppercase;
+    line-height: 0.95;
+    letter-spacing: -1px;
+    margin-bottom: 28px;
+  }
+  .hero h1 .highlight {
+    color: var(--hazard);
+    display: block;
+  }
+  .hero-sub {
+    font-size: 18px; color: var(--steel);
+    max-width: 520px; font-weight: 300;
+    margin-bottom: 40px;
+    line-height: 1.8;
+  }
+  .hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; }
+
+  .btn-primary {
+    background: var(--hazard); color: var(--dark);
+    border: none; padding: 16px 36px;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 13px; letter-spacing: 2px;
+    text-transform: uppercase; cursor: pointer;
+    transition: all 0.2s; text-decoration: none;
+    display: inline-block;
+    position: relative;
+  }
+  .btn-primary:hover { background: var(--white); transform: translateY(-2px); }
+  /* Stencil cutout effect */
+  .btn-primary::before {
+    content: '';
+    position: absolute; top: -3px; left: -3px; right: -3px; bottom: -3px;
+    border: 3px solid var(--hazard);
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .btn-primary:hover::before { opacity: 1; }
+
+  .btn-secondary {
+    background: transparent; color: var(--white);
+    border: 3px solid var(--steel); padding: 13px 33px;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 13px; letter-spacing: 2px;
+    text-transform: uppercase; cursor: pointer;
+    transition: all 0.2s; text-decoration: none;
+    display: inline-block;
+  }
+  .btn-secondary:hover { border-color: var(--white); }
+
+  /* Features */
+  .features-section { background: var(--dark); }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 28px; margin-top: 56px;
+  }
+  .feature-card {
+    border: 3px solid var(--mid);
+    background: var(--concrete);
+    padding: 0; position: relative;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .feature-card:hover { border-color: var(--hazard); transform: translateY(-4px); }
+
+  /* Bolt corners */
+  .feature-card::before,
+  .feature-card::after {
+    content: '';
+    position: absolute;
+    width: 12px; height: 12px;
+    border: 2px solid var(--steel);
+    border-radius: 50%;
+    background: var(--mid);
+    z-index: 2;
+  }
+  .feature-card::before { top: 10px; left: 10px; }
+  .feature-card::after { top: 10px; right: 10px; }
+  .feature-card .bolt-bl,
+  .feature-card .bolt-br {
+    position: absolute;
+    width: 12px; height: 12px;
+    border: 2px solid var(--steel);
+    border-radius: 50%;
+    background: var(--mid);
+    z-index: 2;
+  }
+  .feature-card .bolt-bl { bottom: 10px; left: 10px; }
+  .feature-card .bolt-br { bottom: 10px; right: 10px; }
+
+  .feature-number {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 11px; letter-spacing: 3px;
+    color: var(--hazard); padding: 16px 24px 0;
+  }
+  .feature-body { padding: 12px 24px 28px; }
+  .feature-body h3 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 17px; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 8px;
+    color: var(--white);
+  }
+  .feature-body p {
+    font-size: 14px; color: var(--steel);
+    line-height: 1.8; font-weight: 300;
+  }
+
+  /* Pricing */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 28px; margin-top: 56px;
+  }
+  .pricing-card {
+    border: 3px solid var(--mid);
+    background: var(--dark);
+    transition: border-color 0.3s, transform 0.3s;
+    position: relative;
+  }
+  .pricing-card:hover { transform: translateY(-4px); }
+  .pricing-card.featured { border-color: var(--hazard); }
+  .pricing-card.featured::after {
+    content: 'RECOMMENDED';
+    position: absolute; top: -14px; left: 24px;
+    background: var(--hazard); color: var(--dark);
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 10px; letter-spacing: 2px;
+    padding: 4px 12px;
+  }
+  .pricing-header {
+    padding: 32px 28px;
+    border-bottom: 3px solid var(--mid);
+  }
+  .pricing-card.featured .pricing-header { border-bottom-color: rgba(255, 214, 0, 0.3); }
+  .pricing-name {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 14px; text-transform: uppercase;
+    letter-spacing: 3px; color: var(--steel);
+    margin-bottom: 12px;
+  }
+  .pricing-price {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 48px; color: var(--white);
+    line-height: 1;
+  }
+  .pricing-card.featured .pricing-price { color: var(--hazard); }
+  .pricing-price .period {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 16px; color: var(--steel);
+    font-weight: 300;
+  }
+  .pricing-desc {
+    font-size: 13px; color: var(--steel);
+    margin-top: 8px; font-weight: 300;
+  }
+  .pricing-body { padding: 28px; }
+  .pricing-body ul { list-style: none; }
+  .pricing-body li {
+    padding: 8px 0;
+    font-size: 14px;
+    color: rgba(245, 245, 245, 0.8);
+    border-bottom: 1px solid var(--mid);
+    font-weight: 300;
+  }
+  .pricing-body li:last-child { border-bottom: none; }
+  .pricing-body li::before {
+    content: '';
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--hazard);
+    margin-right: 12px;
+    vertical-align: middle;
+  }
+  .pricing-body .btn-primary,
+  .pricing-body .btn-secondary {
+    display: block; width: 100%;
+    text-align: center; margin-top: 24px;
+    padding: 14px;
+  }
+
+  /* Final CTA */
+  .cta-section { background: var(--dark); }
+  .final-cta {
+    text-align: center;
+    border: 3px solid var(--mid);
+    padding: 72px 40px;
+    max-width: 860px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .final-cta::before,
+  .final-cta::after {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    border: 2px solid var(--steel);
+    border-radius: 50%;
+    background: var(--mid);
+  }
+  .final-cta::before { top: 16px; left: 16px; }
+  .final-cta::after { top: 16px; right: 16px; }
+  .final-cta h2 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(28px, 5vw, 48px);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+  .final-cta h2 .highlight { color: var(--hazard); }
+  .final-cta p {
+    color: var(--steel);
+    font-size: 16px;
+    margin-bottom: 36px;
+    max-width: 480px;
+    margin-left: auto; margin-right: auto;
+    font-weight: 300;
+  }
+  .final-cta .hero-buttons { justify-content: center; }
+
+  /* Footer */
+  footer {
+    position: relative; z-index: 10;
+    text-align: center;
+    padding: 40px 24px;
+    font-size: 13px;
+    color: var(--steel);
+    border-top: 3px solid var(--mid);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 300;
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    section { padding: 80px 16px; }
+    .features-grid, .pricing-grid { grid-template-columns: 1fr; }
+    .hero { padding-top: 100px; }
+    .section-number { font-size: 48px; }
+    .hazard-divider { height: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <a href="#" class="nav-logo">PRESS<span>.</span>KIT</a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#start">Start</a></li>
+  </ul>
+  <button class="nav-cta" onclick="document.getElementById('start').scrollIntoView({behavior:'smooth'})">GET STARTED</button>
+</nav>
+
+<section class="hero" id="top">
+  <div class="container">
+    <div class="reveal">
+      <p class="hero-overline">DJ PRESS KIT PLATFORM</p>
+      <h1>
+        BUILD YOUR<br>
+        <span class="highlight">PRESS KIT.</span><br>
+        BOOK MORE GIGS.
+      </h1>
+      <p class="hero-sub">
+        The no-nonsense EPK builder for working DJs. Raw, functional, and built to get you booked.
+      </p>
+      <div class="hero-buttons">
+        <a href="#pricing" class="btn-primary">START BUILDING</a>
+        <a href="#features" class="btn-secondary">SEE FEATURES</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="hazard-divider"></div>
+
+<section class="features-section" id="features">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-number">FEAT</div>
+      <p class="section-label">What You Get</p>
+      <h2 class="section-title">EVERY TOOL<br>YOU NEED</h2>
+      <p class="section-desc">No fluff. Just the essentials to put together a press kit that promoters actually want to read.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <span class="bolt-bl"></span><span class="bolt-br"></span>
+        <div class="feature-number">001</div>
+        <div class="feature-body">
+          <h3>ARTIST BIO</h3>
+          <p>Rich text editor for your story. Format it how you want, keep it real. No word limit, no templates.</p>
+        </div>
+      </div>
+      <div class="feature-card reveal">
+        <span class="bolt-bl"></span><span class="bolt-br"></span>
+        <div class="feature-number">002</div>
+        <div class="feature-body">
+          <h3>MUSIC EMBEDS</h3>
+          <p>Drop in links from SoundCloud, Spotify, Mixcloud, or Bandcamp. We handle the embeds automatically.</p>
+        </div>
+      </div>
+      <div class="feature-card reveal">
+        <span class="bolt-bl"></span><span class="bolt-br"></span>
+        <div class="feature-number">003</div>
+        <div class="feature-body">
+          <h3>EVENTS &amp; GIGS</h3>
+          <p>List upcoming shows with dates, venues, and ticket links. Past events auto-archive to build your history.</p>
+        </div>
+      </div>
+      <div class="feature-card reveal">
+        <span class="bolt-bl"></span><span class="bolt-br"></span>
+        <div class="feature-number">004</div>
+        <div class="feature-body">
+          <h3>TECHNICAL RIDER</h3>
+          <p>Equipment specs, stage plot, hospitality needs. Downloadable PDF that promoters can hand to the venue.</p>
+        </div>
+      </div>
+      <div class="feature-card reveal">
+        <span class="bolt-bl"></span><span class="bolt-br"></span>
+        <div class="feature-number">005</div>
+        <div class="feature-body">
+          <h3>PRESS QUOTES</h3>
+          <p>Showcase reviews and media mentions. Social proof that makes the difference when a promoter is deciding.</p>
+        </div>
+      </div>
+      <div class="feature-card reveal">
+        <span class="bolt-bl"></span><span class="bolt-br"></span>
+        <div class="feature-number">006</div>
+        <div class="feature-body">
+          <h3>CONTACT FORM</h3>
+          <p>Built-in booking enquiry form. Submissions go straight to your email. No third-party tools required.</p>
+        </div>
+      </div>
+      <div class="feature-card reveal">
+        <span class="bolt-bl"></span><span class="bolt-br"></span>
+        <div class="feature-number">007</div>
+        <div class="feature-body">
+          <h3>ANALYTICS</h3>
+          <p>See who is viewing your EPK, where they come from, and what they click. Data that helps you improve.</p>
+        </div>
+      </div>
+      <div class="feature-card reveal">
+        <span class="bolt-bl"></span><span class="bolt-br"></span>
+        <div class="feature-number">008</div>
+        <div class="feature-body">
+          <h3>CUSTOM DOMAINS</h3>
+          <p>Connect your own domain for a fully branded experience. SSL included, no config headaches.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="hazard-divider"></div>
+
+<section id="pricing">
+  <div class="container">
+    <div class="reveal text-center">
+      <div class="section-number" style="text-align:center;">COST</div>
+      <p class="section-label" style="text-align:center;">Pricing</p>
+      <h2 class="section-title" style="text-align:center;">STRAIGHT UP<br>PRICING</h2>
+      <p class="section-desc center">No hidden fees. No surprise charges. Pick a plan, start building.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card reveal">
+        <div class="pricing-header">
+          <div class="pricing-name">FREE</div>
+          <div class="pricing-price">$0</div>
+          <div class="pricing-desc">Free forever. No card required.</div>
+        </div>
+        <div class="pricing-body">
+          <ul>
+            <li>1 EPK page</li>
+            <li>Bio + photo gallery</li>
+            <li>Music embeds</li>
+            <li>Event listings</li>
+            <li>Contact form</li>
+            <li>press.kit subdomain</li>
+          </ul>
+          <a href="#" class="btn-secondary">SIGN UP FREE</a>
+        </div>
+      </div>
+      <div class="pricing-card featured reveal">
+        <div class="pricing-header">
+          <div class="pricing-name">PRO</div>
+          <div class="pricing-price">$9 <span class="period">/mo</span></div>
+          <div class="pricing-desc">Everything you need to go pro.</div>
+        </div>
+        <div class="pricing-body">
+          <ul>
+            <li>Everything in Free</li>
+            <li>Custom domain</li>
+            <li>Technical rider PDF</li>
+            <li>Press quotes section</li>
+            <li>Analytics dashboard</li>
+            <li>Priority support</li>
+            <li>Remove branding</li>
+          </ul>
+          <a href="#" class="btn-primary">GET PRO</a>
+        </div>
+      </div>
+      <div class="pricing-card reveal">
+        <div class="pricing-header">
+          <div class="pricing-name">AGENCY</div>
+          <div class="pricing-price">$29 <span class="period">/mo</span></div>
+          <div class="pricing-desc">Manage your whole roster.</div>
+        </div>
+        <div class="pricing-body">
+          <ul>
+            <li>Everything in Pro</li>
+            <li>Up to 20 artist EPKs</li>
+            <li>Agency dashboard</li>
+            <li>Aggregated analytics</li>
+            <li>Team collaboration</li>
+            <li>Bulk export</li>
+            <li>Dedicated support</li>
+          </ul>
+          <a href="#" class="btn-secondary">GET AGENCY</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="hazard-divider"></div>
+
+<section class="cta-section" id="start">
+  <div class="container">
+    <div class="final-cta reveal">
+      <p class="section-label">READY TO BUILD?</p>
+      <h2>STOP WAITING.<br><span class="highlight">START SHIPPING.</span></h2>
+      <p>Your next booking is one press kit away. Get set up in minutes, not days.</p>
+      <div class="hero-buttons" style="justify-content:center;">
+        <a href="#" class="btn-primary">BUILD YOUR EPK</a>
+        <a href="#" class="btn-secondary">LEARN MORE</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>&copy; 2026 PRESS.KIT &mdash; Built for DJs</p>
+</footer>
+
+<script>
+// Nav scroll
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// Reveal on scroll
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      // Stagger the animations slightly for grid items
+      const card = entry.target;
+      const parent = card.parentElement;
+      if (parent && parent.classList.contains('features-grid') || parent && parent.classList.contains('pricing-grid')) {
+        const siblings = Array.from(parent.querySelectorAll('.reveal'));
+        const idx = siblings.indexOf(card);
+        card.style.transitionDelay = (idx * 0.08) + 's';
+      }
+      card.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

@@ -26,7 +26,7 @@ function AnalyticsOverviewPage() {
   if (!org || (org.userRole !== 'owner' && org.userRole !== 'admin')) {
     return (
       <div>
-        <h1 className="text-2xl font-display font-semibold tracking-tight mb-8">Analytics Overview</h1>
+        <h1 className="text-2xl font-display font-extrabold tracking-tight uppercase mb-8">Analytics Overview</h1>
         <p className="text-text-secondary">Agency analytics is available to organization owners and admins.</p>
       </div>
     )
@@ -47,14 +47,14 @@ function AnalyticsOverviewPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-display font-semibold tracking-tight">Analytics Overview</h1>
+        <h1 className="text-2xl font-display font-extrabold tracking-tight uppercase">Analytics Overview</h1>
         <div className="flex gap-2">
           {[7, 30, 90].map((d) => (
             <button
               key={d}
               onClick={() => { setDays(d); fetchData(d) }}
-              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
-                days === d ? 'bg-accent text-white' : 'bg-bg text-text-secondary hover:text-text-primary'
+              className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                days === d ? 'bg-text-primary text-white' : 'bg-bg text-text-secondary hover:text-text-primary'
               }`}
             >
               {d}d
@@ -81,11 +81,11 @@ function AnalyticsOverviewPage() {
           <div className={CARD_SECTION}>
             <div className="grid grid-cols-2 gap-4 text-center">
               <div>
-                <p className="text-3xl font-black text-accent">{data.totalViews.toLocaleString()}</p>
+                <p className="text-3xl font-display font-extrabold text-accent">{data.totalViews.toLocaleString()}</p>
                 <p className="text-xs font-medium text-text-secondary mt-1">Total Page Views</p>
               </div>
               <div>
-                <p className="text-3xl font-black">{data.totalVisitors.toLocaleString()}</p>
+                <p className="text-3xl font-display font-extrabold">{data.totalVisitors.toLocaleString()}</p>
                 <p className="text-xs font-medium text-text-secondary mt-1">Unique Visitors</p>
               </div>
             </div>
@@ -98,7 +98,7 @@ function AnalyticsOverviewPage() {
               const maxViews = data.profiles[0]?.views || 1
               const barWidth = Math.max((profile.views / maxViews) * 100, 2)
               return (
-                <div key={profile.slug} className="bg-white border border-border rounded-xl p-4">
+                <div key={profile.slug} className="bg-white border border-border p-4">
                   <div className="flex items-center gap-4 mb-2">
                     <span className="text-xs text-text-secondary font-bold w-6">#{i + 1}</span>
                     <div className="flex-1">

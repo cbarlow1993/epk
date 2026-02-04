@@ -24,7 +24,7 @@ function ProfileEditor() {
   const heroInputRef = useRef<HTMLInputElement>(null)
 
   const { register, handleSubmit, watch, formState: { errors, isDirty }, setValue, getValues } = useForm<ProfileUpdate>({
-    resolver: zodResolver(profileUpdateSchema.partial()),
+    resolver: zodResolver(profileUpdateSchema.partial()) as never,
     defaultValues: {
       display_name: initialProfile?.display_name || '',
       slug: initialProfile?.slug || '',
@@ -42,16 +42,16 @@ function ProfileEditor() {
 
   const handleProfileImage = async (file: File) => {
     setUploadingProfile(true)
-    const url = await uploadFileFromInput(file, 'profile')
+    const result = await uploadFileFromInput(file, 'profile')
     setUploadingProfile(false)
-    if (url) setValue('profile_image_url', url, { shouldDirty: true })
+    if (result) setValue('profile_image_url', result.url, { shouldDirty: true })
   }
 
   const handleHeroImage = async (file: File) => {
     setUploadingHero(true)
-    const url = await uploadFileFromInput(file, 'hero')
+    const result = await uploadFileFromInput(file, 'hero')
     setUploadingHero(false)
-    if (url) setValue('hero_image_url', url, { shouldDirty: true })
+    if (result) setValue('hero_image_url', result.url, { shouldDirty: true })
   }
 
   const profileImageUrl = watch('profile_image_url')
@@ -83,7 +83,7 @@ function ProfileEditor() {
                   setValue('slug', cleaned, { shouldDirty: true })
                 },
               })}
-              className={`flex-1 bg-white border rounded-lg px-4 py-3 text-text-primary focus:border-accent focus:outline-none transition-colors ${
+              className={`flex-1 bg-white border  px-4 py-3 text-text-primary focus:border-accent focus:outline-none transition-colors ${
                 errors.slug ? 'border-red-500' : 'border-border'
               }`}
             />
@@ -218,7 +218,7 @@ function ProfileEditor() {
         <div>
           <label className={FORM_LABEL}>Hero Image</label>
           {heroImageUrl && (
-            <img src={heroImageUrl} alt="Hero" className="w-full h-32 rounded-lg object-cover border border-border mb-3" />
+            <img src={heroImageUrl} alt="Hero" className="w-full h-32  object-cover border border-border mb-3" />
           )}
           <input
             ref={heroInputRef}

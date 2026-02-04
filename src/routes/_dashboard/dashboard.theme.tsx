@@ -14,6 +14,8 @@ export const Route = createFileRoute('/_dashboard/dashboard/theme')({
 })
 
 const FONT_OPTIONS = [
+  'Instrument Sans',
+  'Bricolage Grotesque',
   'Inter',
   'Poppins',
   'Montserrat',
@@ -65,7 +67,7 @@ function ThemeEditor() {
                 setValue('bg_color', tpl.defaults.bg_color, { shouldDirty: true })
                 setValue('font_family', tpl.defaults.font_family, { shouldDirty: true })
               }}
-              className={`relative rounded-lg border p-4 text-left transition-all ${
+              className={`relative border p-4 text-left transition-all ${
                 selectedTemplate === tpl.id
                   ? 'border-accent bg-accent/10 ring-1 ring-accent'
                   : 'border-border hover:border-border bg-white'
@@ -108,7 +110,7 @@ function ThemeEditor() {
             <label className={FORM_LABEL}>Font</label>
             <select
               {...register('font_family')}
-              className="w-full bg-white border border-border rounded-lg px-4 py-3 text-text-primary focus:border-accent focus:outline-none"
+              className="w-full bg-white border border-border  px-4 py-3 text-text-primary focus:border-accent focus:outline-none"
             >
               {FONT_OPTIONS.map((font) => (
                 <option key={font} value={font} style={{ fontFamily: font }}>{font}</option>
@@ -117,7 +119,7 @@ function ThemeEditor() {
           </div>
 
           {/* Preview swatch */}
-          <div className="rounded-lg border border-border overflow-hidden">
+          <div className="border border-border overflow-hidden">
             <div className="p-4" style={{ backgroundColor: bgColor }}>
               <p className="font-bold text-sm" style={{ fontFamily, color: '#fff' }}>Preview Swatch</p>
               <p className="text-xs mt-1" style={{ color: accentColor }}>Accent colour</p>
@@ -130,7 +132,7 @@ function ThemeEditor() {
         <div className="hidden lg:block">
           <label className={FORM_LABEL}>Live Preview</label>
           {previewUrl ? (
-            <div className="border border-border rounded-lg overflow-hidden bg-white h-[70vh]">
+            <div className="border border-border overflow-hidden bg-white h-[70vh]">
               <iframe
                 src={`${previewUrl}?preview=true&accent=${encodeURIComponent(accentColor)}&bg=${encodeURIComponent(bgColor)}&font=${encodeURIComponent(fontFamily)}`}
                 className="w-full h-full"
@@ -138,7 +140,7 @@ function ThemeEditor() {
               />
             </div>
           ) : (
-            <div className="border border-border rounded-lg p-8 text-center text-text-secondary text-sm">
+            <div className="border border-border p-8 text-center text-text-secondary text-sm">
               Set a URL slug on the Profile page to enable live preview.
             </div>
           )}

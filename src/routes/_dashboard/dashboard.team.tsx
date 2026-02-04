@@ -54,7 +54,7 @@ function TeamPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-display font-semibold tracking-tight mb-8">Team</h1>
+      <h1 className="text-2xl font-display font-extrabold tracking-tight uppercase mb-8">Team</h1>
 
       {/* Invite Form */}
       {isAdmin && (
@@ -88,7 +88,7 @@ function TeamPage() {
       {/* Members List */}
       <div className="space-y-3">
         {members.map((member: { id: string; role: string; user_id: string }) => (
-          <div key={member.id} className="bg-white border border-border rounded-xl p-4 flex items-center gap-4">
+          <div key={member.id} className="bg-white border border-border p-4 flex items-center gap-4">
             <div className="flex-1">
               <p className="font-bold text-sm">{member.user_id.slice(0, 8)}...</p>
             </div>

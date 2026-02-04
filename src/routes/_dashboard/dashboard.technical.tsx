@@ -1,9 +1,7 @@
+import { useRef } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { getTechnicalRider, updateTechnicalRider } from '~/server/technical-rider'
-import { technicalRiderUpdateSchema, type TechnicalRiderUpdate } from '~/schemas/technical-rider'
-import { TiptapEditor } from '~/components/forms'
+import { BlockEditor, type BlockEditorHandle } from '~/components/forms'
 import { useDashboardSave } from '~/hooks/useDashboardSave'
 import { DashboardHeader } from '~/components/DashboardHeader'
 
@@ -14,46 +12,35 @@ export const Route = createFileRoute('/_dashboard/dashboard/technical')({
 
 function TechnicalRiderEditor() {
   const initialData = Route.useLoaderData()
-  const { saving, saved, error, onSave: save } = useDashboardSave(updateTechnicalRider)
+  const { saving, saved, error, onSave } = useDashboardSave(updateTechnicalRider)
+  const preferredRef = useRef<BlockEditorHandle>(null)
+  const alternativeRef = useRef<BlockEditorHandle>(null)
 
-  const { control, handleSubmit, formState: { errors, isDirty } } = useForm<TechnicalRiderUpdate>({
-    resolver: zodResolver(technicalRiderUpdateSchema),
-    defaultValues: {
-      preferred_setup: initialData?.preferred_setup || '',
-      alternative_setup: initialData?.alternative_setup || '',
-    },
-  })
-
-  const onSave = handleSubmit(save)
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const [preferred_setup, alternative_setup] = await Promise.all([
+      preferredRef.current?.save() ?? null,
+      alternativeRef.current?.save() ?? null,
+    ])
+    await onSave({ preferred_setup, alternative_setup } as Record<string, unknown>)
+  }
 
   return (
-    <form onSubmit={onSave}>
-      <DashboardHeader title="Technical Rider" saving={saving} saved={saved} error={error} isDirty={isDirty} />
+    <form onSubmit={handleSave}>
+      <DashboardHeader title="Technical Rider" saving={saving} saved={saved} error={error} isDirty={true} />
 
       <div className="space-y-6">
-        <Controller
-          name="preferred_setup"
-          control={control}
-          render={({ field }) => (
-            <TiptapEditor
-              label="Preferred Setup"
-              content={field.value || ''}
-              onChange={field.onChange}
-              placeholder="e.g. 2 x CDJ-3000, 1 x DJM-900NXS2..."
-            />
-          )}
+        <BlockEditor
+          ref={preferredRef}
+          label="Preferred Setup"
+          defaultData={initialData?.preferred_setup || null}
+          placeholder="e.g. 2 x CDJ-3000, 1 x DJM-900NXS2..."
         />
-        <Controller
-          name="alternative_setup"
-          control={control}
-          render={({ field }) => (
-            <TiptapEditor
-              label="Alternative Setup"
-              content={field.value || ''}
-              onChange={field.onChange}
-              placeholder="e.g. 2 x CDJ-2000NXS2..."
-            />
-          )}
+        <BlockEditor
+          ref={alternativeRef}
+          label="Alternative Setup"
+          defaultData={initialData?.alternative_setup || null}
+          placeholder="e.g. 2 x CDJ-2000NXS2..."
         />
       </div>
     </form>

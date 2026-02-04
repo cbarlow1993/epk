@@ -34,19 +34,19 @@ function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark-bg flex items-center justify-center px-4">
+    <div className="min-h-screen bg-bg flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <h1 className="text-3xl font-black uppercase tracking-wider text-center mb-8">Reset Password</h1>
+        <h1 className="text-3xl font-display font-extrabold tracking-tight uppercase text-center mb-8">Reset Password</h1>
 
         {sent ? (
-          <div className="bg-accent/10 border border-accent/20 rounded-lg px-4 py-6 text-center">
-            <p className="text-accent font-bold mb-2">Check your email</p>
-            <p className="text-text-secondary text-sm">We've sent a password reset link to <strong className="text-white">{email}</strong></p>
+          <div className="bg-accent/10 border border-accent/20 px-4 py-6 text-center">
+            <p className="text-accent font-semibold mb-2">Check your email</p>
+            <p className="text-text-secondary text-sm">We've sent a password reset link to <strong className="text-text-primary">{email}</strong></p>
           </div>
         ) : (
           <>
             {error && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 mb-6 text-red-400 text-sm">{error}</div>
+              <div className="border border-red-500 px-4 py-3 mb-6 text-red-500 text-sm">{error}</div>
             )}
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
@@ -64,7 +64,7 @@ function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-accent hover:bg-accent/80 disabled:opacity-50 text-white font-bold uppercase tracking-widest py-3 rounded-lg transition-colors"
+                className="w-full bg-text-primary text-white hover:bg-accent disabled:opacity-50 font-semibold py-3 transition-colors uppercase tracking-wider text-sm"
               >
                 {loading ? 'Sending...' : 'Send Reset Link'}
               </button>

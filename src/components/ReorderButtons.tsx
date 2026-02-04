@@ -10,7 +10,7 @@ export function ReorderButtons({ index, total, onReorder }: ReorderButtonsProps)
       <button
         onClick={() => onReorder(index, 'up')}
         disabled={index === 0}
-        className="text-xs text-text-secondary hover:text-white disabled:opacity-20 transition-colors"
+        className="text-xs text-text-secondary hover:text-text-primary disabled:opacity-20 transition-colors"
         title="Move up"
       >
         &#9650;
@@ -18,7 +18,7 @@ export function ReorderButtons({ index, total, onReorder }: ReorderButtonsProps)
       <button
         onClick={() => onReorder(index, 'down')}
         disabled={index === total - 1}
-        className="text-xs text-text-secondary hover:text-white disabled:opacity-20 transition-colors"
+        className="text-xs text-text-secondary hover:text-text-primary disabled:opacity-20 transition-colors"
         title="Move down"
       >
         &#9660;

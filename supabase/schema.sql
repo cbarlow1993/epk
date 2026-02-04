@@ -4,8 +4,8 @@ CREATE TABLE profiles (
   slug TEXT UNIQUE NOT NULL,
   display_name TEXT NOT NULL DEFAULT '',
   tagline TEXT DEFAULT '',
-  bio_left TEXT DEFAULT '',
-  bio_right TEXT DEFAULT '',
+  short_bio TEXT DEFAULT '',
+  bio JSONB,
   genres TEXT[] DEFAULT '{}',
   profile_image_url TEXT DEFAULT '',
   hero_image_url TEXT DEFAULT '',
@@ -59,8 +59,8 @@ CREATE TABLE events (
 CREATE TABLE technical_rider (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   profile_id UUID NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
-  preferred_setup TEXT DEFAULT '',
-  alternative_setup TEXT DEFAULT '',
+  preferred_setup JSONB,
+  alternative_setup JSONB,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
@@ -77,17 +77,6 @@ CREATE TABLE booking_contact (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Press assets
-CREATE TABLE press_assets (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  title TEXT DEFAULT '',
-  file_url TEXT DEFAULT '',
-  type TEXT DEFAULT 'photo' CHECK (type IN ('photo', 'video', 'logo')),
-  sort_order INTEGER DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
 -- Enable Row Level Security on all tables
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE social_links ENABLE ROW LEVEL SECURITY;
@@ -95,7 +84,6 @@ ALTER TABLE mixes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE technical_rider ENABLE ROW LEVEL SECURITY;
 ALTER TABLE booking_contact ENABLE ROW LEVEL SECURITY;
-ALTER TABLE press_assets ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies: users can read/write their own data
 -- Profiles: owner can do everything
@@ -117,7 +105,7 @@ DO $$
 DECLARE
   tbl TEXT;
 BEGIN
-  FOR tbl IN SELECT unnest(ARRAY['social_links', 'mixes', 'events', 'technical_rider', 'booking_contact', 'press_assets'])
+  FOR tbl IN SELECT unnest(ARRAY['social_links', 'mixes', 'events', 'technical_rider', 'booking_contact'])
   LOOP
     EXECUTE format('CREATE POLICY "Owner select on %I" ON %I FOR SELECT USING (is_profile_owner(profile_id))', tbl, tbl);
     EXECUTE format('CREATE POLICY "Owner insert on %I" ON %I FOR INSERT WITH CHECK (is_profile_owner(profile_id))', tbl, tbl);
@@ -260,6 +248,11 @@ CREATE TABLE files (
   file_type TEXT NOT NULL,
   file_size BIGINT NOT NULL DEFAULT 0,
   mime_type TEXT,
+  is_press_asset BOOLEAN NOT NULL DEFAULT false,
+  press_title TEXT,
+  press_type TEXT CHECK (press_type IN ('photo', 'video', 'logo')),
+  sort_order INTEGER DEFAULT 0,
+  source TEXT NOT NULL DEFAULT 'repo',
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
@@ -275,6 +268,10 @@ ALTER TABLE file_tags ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Owner CRUD on folders" ON folders FOR ALL USING (is_profile_owner(profile_id));
 CREATE POLICY "Owner CRUD on files" ON files FOR ALL USING (is_profile_owner(profile_id));
+CREATE POLICY "Public read press files" ON files FOR SELECT
+  USING (is_press_asset = true AND EXISTS (
+    SELECT 1 FROM profiles WHERE id = files.profile_id AND published = true
+  ));
 CREATE POLICY "Owner CRUD on file_tags" ON file_tags FOR ALL USING (
   EXISTS (SELECT 1 FROM files WHERE files.id = file_tags.file_id AND is_profile_owner(files.profile_id))
 );

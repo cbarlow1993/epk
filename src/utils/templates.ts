@@ -15,9 +15,9 @@ export interface TemplateConfig {
 export const TEMPLATES: TemplateConfig[] = [
   {
     id: 'default',
-    name: 'Gallery',
-    description: 'Warm cream background with burnt sienna accent',
-    defaults: { accent_color: '#B85C38', bg_color: '#FAF9F6', font_family: 'DM Sans' },
+    name: 'Swiss',
+    description: 'Clean black and white with red accent',
+    defaults: { accent_color: '#FF0000', bg_color: '#FFFFFF', font_family: 'Instrument Sans' },
     sectionOrder: ['bio', 'music', 'events', 'technical', 'press', 'contact'],
     heroStyle: 'fullbleed',
     bioLayout: 'two-column',
@@ -26,7 +26,7 @@ export const TEMPLATES: TemplateConfig[] = [
     id: 'minimal',
     name: 'Minimal',
     description: 'Clean, centered single-column layout',
-    defaults: { accent_color: '#2D2D2D', bg_color: '#FFFFFF', font_family: 'DM Sans' },
+    defaults: { accent_color: '#000000', bg_color: '#FFFFFF', font_family: 'Instrument Sans' },
     sectionOrder: ['bio', 'music', 'events', 'press', 'technical', 'contact'],
     heroStyle: 'minimal',
     bioLayout: 'single-column',
@@ -34,7 +34,7 @@ export const TEMPLATES: TemplateConfig[] = [
   {
     id: 'festival',
     name: 'Editorial',
-    description: 'Warm paper tones with terracotta accent',
+    description: 'Warm paper tones with serif typography',
     defaults: { accent_color: '#C4553A', bg_color: '#F5F0EB', font_family: 'Playfair Display' },
     sectionOrder: ['music', 'bio', 'events', 'press', 'technical', 'contact'],
     heroStyle: 'fullbleed',

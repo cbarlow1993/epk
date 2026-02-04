@@ -21,7 +21,7 @@ function RosterPage() {
   if (!org) {
     return (
       <div>
-        <h1 className="text-2xl font-display font-semibold tracking-tight mb-8">Artist Roster</h1>
+        <h1 className="text-2xl font-display font-extrabold tracking-tight uppercase mb-8">Artist Roster</h1>
         <p className="text-text-secondary">
           You are not part of an agency.{' '}
           <Link to="/onboarding" className="text-accent hover:underline">
@@ -48,7 +48,7 @@ function RosterPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-display font-semibold tracking-tight mb-8">Artist Roster</h1>
+      <h1 className="text-2xl font-display font-extrabold tracking-tight uppercase mb-8">Artist Roster</h1>
 
       {/* Add Artist Form */}
       {isAdmin && (
@@ -97,12 +97,12 @@ function RosterPage() {
             tier: string
             published: boolean
           }) => (
-            <div key={profile.id} className="bg-white border border-border rounded-xl overflow-hidden">
+            <div key={profile.id} className="bg-white border border-text-primary/20 overflow-hidden">
               <div className="aspect-video bg-white flex items-center justify-center">
                 {profile.profile_image_url ? (
                   <img src={profile.profile_image_url} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-4xl font-black text-border">
+                  <span className="text-4xl font-display font-extrabold text-border">
                     {(profile.display_name || '?')[0]}
                   </span>
                 )}
@@ -125,7 +125,7 @@ function RosterPage() {
                   <Link
                     to="/dashboard"
                     search={{ profile: profile.id }}
-                    className={`${BTN_BASE} text-xs bg-accent text-white hover:bg-accent/80`}
+                    className={`${BTN_BASE} text-xs bg-text-primary text-white hover:bg-accent`}
                   >
                     Edit
                   </Link>

@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DJ EPK — Your Sound, One Link</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400&family=Karla:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --sage: #A8C5A0;
+    --forest: #2D4A3E;
+    --forest-deep: #1E332B;
+    --sand: #E8DCC8;
+    --terra: #C4553A;
+    --warm-base: #FAF7F2;
+    --warm-off: #F3EDE3;
+    --text-dark: #2A2A25;
+    --text-mid: #5A5A50;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Karla', sans-serif;
+    background: var(--warm-base);
+    color: var(--text-dark);
+    overflow-x: hidden;
+    line-height: 1.75;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  /* ── Scroll reveal ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                transform 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Stagger children */
+  .reveal-stagger .reveal:nth-child(2) { transition-delay: 0.1s; }
+  .reveal-stagger .reveal:nth-child(3) { transition-delay: 0.2s; }
+  .reveal-stagger .reveal:nth-child(4) { transition-delay: 0.3s; }
+  .reveal-stagger .reveal:nth-child(5) { transition-delay: 0.35s; }
+  .reveal-stagger .reveal:nth-child(6) { transition-delay: 0.4s; }
+  .reveal-stagger .reveal:nth-child(7) { transition-delay: 0.45s; }
+  .reveal-stagger .reveal:nth-child(8) { transition-delay: 0.5s; }
+
+  /* ── Navigation ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 3rem;
+    background: rgba(250, 247, 242, 0.9);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(45, 74, 62, 0.06);
+    transition: box-shadow 0.3s;
+  }
+  nav.scrolled { box-shadow: 0 2px 20px rgba(45, 74, 62, 0.08); }
+
+  .nav-logo {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--forest);
+  }
+  .nav-logo span { color: var(--terra); }
+
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; align-items: center; }
+  .nav-links a {
+    color: var(--text-mid);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--forest); }
+
+  .nav-cta {
+    display: inline-block;
+    padding: 0.6rem 1.6rem;
+    background: var(--forest);
+    color: var(--warm-base) !important;
+    border-radius: 50px;
+    font-size: 0.85rem !important;
+    font-weight: 600;
+    transition: all 0.3s;
+  }
+  .nav-cta:hover {
+    background: var(--forest-deep);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(45, 74, 62, 0.2);
+  }
+
+  /* ── Wave Dividers ── */
+  .wave-divider {
+    width: 100%;
+    line-height: 0;
+    overflow: hidden;
+  }
+  .wave-divider svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .wave-divider.flip { transform: scaleY(-1); }
+
+  /* ── Hero ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8rem 2rem 2rem;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--warm-base) 0%, var(--warm-off) 100%);
+  }
+
+  /* Organic blob shapes */
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.25;
+    pointer-events: none;
+  }
+  .blob-1 {
+    width: 500px; height: 500px;
+    background: var(--sage);
+    top: -100px; right: -100px;
+    animation: blobFloat 12s ease-in-out infinite;
+  }
+  .blob-2 {
+    width: 400px; height: 400px;
+    background: var(--sand);
+    bottom: 0; left: -100px;
+    animation: blobFloat 15s ease-in-out infinite reverse;
+  }
+  .blob-3 {
+    width: 250px; height: 250px;
+    background: var(--terra);
+    opacity: 0.1;
+    top: 30%; left: 20%;
+    animation: blobFloat 18s ease-in-out infinite;
+  }
+
+  @keyframes blobFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(20px, -30px) scale(1.05); }
+    66% { transform: translate(-15px, 15px) scale(0.97); }
+  }
+
+  /* Sound wave visualizer */
+  .sound-wave {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 3rem;
+    height: 60px;
+  }
+  .sound-wave .bar {
+    width: 4px;
+    border-radius: 4px;
+    background: var(--forest);
+    animation: waveBar 1.4s ease-in-out infinite;
+  }
+  .sound-wave .bar:nth-child(1)  { height: 18px; animation-delay: 0s; }
+  .sound-wave .bar:nth-child(2)  { height: 28px; animation-delay: 0.1s; }
+  .sound-wave .bar:nth-child(3)  { height: 42px; animation-delay: 0.15s; }
+  .sound-wave .bar:nth-child(4)  { height: 55px; animation-delay: 0.2s; background: var(--terra); }
+  .sound-wave .bar:nth-child(5)  { height: 38px; animation-delay: 0.25s; }
+  .sound-wave .bar:nth-child(6)  { height: 50px; animation-delay: 0.3s; }
+  .sound-wave .bar:nth-child(7)  { height: 60px; animation-delay: 0.35s; background: var(--terra); }
+  .sound-wave .bar:nth-child(8)  { height: 45px; animation-delay: 0.4s; }
+  .sound-wave .bar:nth-child(9)  { height: 30px; animation-delay: 0.45s; }
+  .sound-wave .bar:nth-child(10) { height: 50px; animation-delay: 0.5s; background: var(--sage); }
+  .sound-wave .bar:nth-child(11) { height: 35px; animation-delay: 0.55s; }
+  .sound-wave .bar:nth-child(12) { height: 55px; animation-delay: 0.6s; }
+  .sound-wave .bar:nth-child(13) { height: 40px; animation-delay: 0.65s; background: var(--terra); }
+  .sound-wave .bar:nth-child(14) { height: 25px; animation-delay: 0.7s; }
+  .sound-wave .bar:nth-child(15) { height: 45px; animation-delay: 0.75s; }
+  .sound-wave .bar:nth-child(16) { height: 20px; animation-delay: 0.8s; }
+
+  @keyframes waveBar {
+    0%, 100% { transform: scaleY(0.4); opacity: 0.4; }
+    50% { transform: scaleY(1); opacity: 1; }
+  }
+
+  .hero h1 {
+    font-size: clamp(2.8rem, 6vw, 5rem);
+    font-weight: 900;
+    color: var(--forest);
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--terra);
+    font-weight: 700;
+  }
+
+  .hero-sub {
+    font-size: 1.15rem;
+    color: var(--text-mid);
+    max-width: 520px;
+    margin: 0 auto 2.5rem;
+    font-weight: 400;
+  }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1rem 2.5rem;
+    background: var(--terra);
+    color: #fff;
+    font-family: 'Karla', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.4s;
+    box-shadow: 0 4px 16px rgba(196, 85, 58, 0.25);
+  }
+  .hero-cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(196, 85, 58, 0.35);
+    background: #B14A32;
+  }
+  .hero-cta .arrow {
+    display: inline-block;
+    transition: transform 0.3s;
+  }
+  .hero-cta:hover .arrow { transform: translateX(4px); }
+
+  .hero-note {
+    margin-top: 1.25rem;
+    font-size: 0.85rem;
+    color: var(--text-mid);
+    opacity: 0.7;
+  }
+
+  /* ── Features ── */
+  .features {
+    background: var(--forest);
+    color: var(--warm-base);
+    padding: 5rem 2rem 6rem;
+    position: relative;
+  }
+
+  .features .section-title {
+    text-align: center;
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin-bottom: 0.75rem;
+    color: var(--warm-base);
+  }
+  .features .section-subtitle {
+    text-align: center;
+    color: var(--sage);
+    font-size: 1.05rem;
+    max-width: 480px;
+    margin: 0 auto 4rem;
+    font-weight: 400;
+  }
+
+  .features-flow {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem 3rem;
+  }
+
+  .feature-item {
+    padding: 2rem 2rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(168, 197, 160, 0.1);
+    transition: all 0.4s;
+  }
+  .feature-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-4px);
+    border-color: rgba(168, 197, 160, 0.25);
+  }
+
+  /* Staggered layout — odd items push down */
+  .feature-item:nth-child(even) {
+    transform: translateY(1.5rem);
+  }
+  .feature-item:nth-child(even):hover {
+    transform: translateY(calc(1.5rem - 4px));
+  }
+
+  .feature-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+  }
+  .feature-item:nth-child(1) .feature-dot { background: var(--terra); }
+  .feature-item:nth-child(2) .feature-dot { background: var(--sage); }
+  .feature-item:nth-child(3) .feature-dot { background: var(--sand); }
+  .feature-item:nth-child(4) .feature-dot { background: var(--terra); }
+  .feature-item:nth-child(5) .feature-dot { background: var(--sage); }
+  .feature-item:nth-child(6) .feature-dot { background: var(--sand); }
+  .feature-item:nth-child(7) .feature-dot { background: var(--terra); }
+  .feature-item:nth-child(8) .feature-dot { background: var(--sage); }
+
+  .feature-item h3 {
+    font-size: 1.15rem;
+    margin-bottom: 0.5rem;
+    color: var(--warm-base);
+    font-weight: 700;
+  }
+  .feature-item p {
+    font-size: 0.9rem;
+    color: var(--sage);
+    line-height: 1.65;
+    font-weight: 400;
+  }
+
+  /* ── Pricing ── */
+  .pricing {
+    padding: 6rem 2rem;
+    background: var(--warm-base);
+  }
+
+  .pricing .section-title {
+    text-align: center;
+    font-size: clamp(2rem, 4vw, 3rem);
+    color: var(--forest);
+    margin-bottom: 0.75rem;
+  }
+  .pricing .section-subtitle {
+    text-align: center;
+    color: var(--text-mid);
+    font-size: 1.05rem;
+    max-width: 440px;
+    margin: 0 auto 3.5rem;
+  }
+
+  .pricing-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .pricing-card {
+    background: #fff;
+    border-radius: 24px;
+    padding: 2.5rem 2.25rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s;
+    box-shadow: 0 2px 16px rgba(45, 74, 62, 0.06);
+  }
+  .pricing-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 40px rgba(45, 74, 62, 0.1);
+  }
+
+  /* Organic wave decoration on pro card */
+  .pricing-card.pro::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--sage), var(--terra), var(--sage));
+    border-radius: 24px 24px 0 0;
+  }
+
+  .pricing-card.pro {
+    border: 2px solid var(--sage);
+  }
+
+  .pricing-badge {
+    display: inline-block;
+    padding: 0.3rem 1rem;
+    background: var(--warm-off);
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--forest);
+    margin-bottom: 1.25rem;
+  }
+  .pricing-card.pro .pricing-badge {
+    background: var(--forest);
+    color: var(--warm-base);
+  }
+
+  .pricing-price {
+    font-family: 'Fraunces', serif;
+    font-size: 3.2rem;
+    font-weight: 900;
+    color: var(--forest);
+    margin-bottom: 0.15rem;
+  }
+  .pricing-price .currency {
+    font-size: 1.4rem;
+    vertical-align: super;
+    opacity: 0.6;
+  }
+  .pricing-period {
+    font-size: 0.88rem;
+    color: var(--text-mid);
+    margin-bottom: 2rem;
+  }
+
+  .pricing-features {
+    list-style: none;
+    margin-bottom: 2rem;
+  }
+  .pricing-features li {
+    padding: 0.55rem 0;
+    font-size: 0.92rem;
+    color: var(--text-mid);
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  .pricing-features li::before {
+    content: '';
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--sage);
+    flex-shrink: 0;
+  }
+  .pricing-card.pro .pricing-features li::before {
+    background: var(--terra);
+  }
+
+  .pricing-btn {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    font-family: 'Karla', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border: 2px solid var(--forest);
+    border-radius: 50px;
+    text-decoration: none;
+    text-align: center;
+    color: var(--forest);
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .pricing-btn:hover {
+    background: var(--forest);
+    color: var(--warm-base);
+  }
+  .pricing-card.pro .pricing-btn {
+    background: var(--terra);
+    border-color: var(--terra);
+    color: #fff;
+  }
+  .pricing-card.pro .pricing-btn:hover {
+    background: #B14A32;
+    border-color: #B14A32;
+    box-shadow: 0 4px 16px rgba(196, 85, 58, 0.3);
+  }
+
+  /* ── CTA Section ── */
+  .cta-section {
+    background: var(--warm-off);
+    padding: 6rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Background organic shapes */
+  .cta-section .cta-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    pointer-events: none;
+  }
+  .cta-blob-1 {
+    width: 300px; height: 300px;
+    background: var(--sage);
+    opacity: 0.15;
+    top: -80px; right: 10%;
+  }
+  .cta-blob-2 {
+    width: 200px; height: 200px;
+    background: var(--terra);
+    opacity: 0.08;
+    bottom: -60px; left: 15%;
+  }
+
+  .cta-section h2 {
+    font-size: clamp(2rem, 4.5vw, 3.2rem);
+    color: var(--forest);
+    margin-bottom: 1rem;
+    position: relative;
+  }
+  .cta-section h2 em {
+    font-style: italic;
+    color: var(--terra);
+  }
+  .cta-section p {
+    color: var(--text-mid);
+    font-size: 1.1rem;
+    max-width: 460px;
+    margin: 0 auto 2.5rem;
+  }
+
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1.1rem 3rem;
+    background: var(--forest);
+    color: var(--warm-base);
+    font-family: 'Karla', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.4s;
+    box-shadow: 0 4px 16px rgba(45, 74, 62, 0.2);
+    position: relative;
+  }
+  .cta-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(45, 74, 62, 0.3);
+    background: var(--forest-deep);
+  }
+
+  .cta-note {
+    margin-top: 1.25rem;
+    font-size: 0.83rem;
+    color: var(--text-mid);
+    opacity: 0.65;
+  }
+
+  /* ── Footer ── */
+  footer {
+    background: var(--forest);
+    color: var(--sage);
+    padding: 3.5rem 2rem;
+    text-align: center;
+  }
+
+  .footer-logo {
+    font-family: 'Fraunces', serif;
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: var(--warm-base);
+    margin-bottom: 1.25rem;
+  }
+  .footer-logo span { color: var(--terra); }
+
+  .footer-links {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .footer-links a {
+    color: var(--sage);
+    text-decoration: none;
+    font-size: 0.88rem;
+    transition: color 0.3s;
+  }
+  .footer-links a:hover { color: var(--warm-base); }
+
+  .footer-copy {
+    font-size: 0.78rem;
+    opacity: 0.5;
+    color: var(--sage);
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .features-flow {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    .feature-item:nth-child(even) { transform: none; }
+    .feature-item:nth-child(even):hover { transform: translateY(-4px); }
+    .pricing-cards { grid-template-columns: 1fr; max-width: 400px; }
+    .hero { padding-top: 6rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav>
+  <div class="nav-logo">DJ <span>EPK</span></div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#cta" class="nav-cta">Get Started</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <div class="sound-wave reveal">
+    <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+    <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+    <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+    <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+  </div>
+
+  <h1 class="reveal">Your sound.<br>One <em>beautiful</em> link.</h1>
+  <p class="hero-sub reveal">
+    Bio, mixes, events, tech rider, press assets and booking contact — everything promoters need, flowing together naturally.
+  </p>
+  <a href="#pricing" class="hero-cta reveal">
+    Create Your EPK <span class="arrow">&rarr;</span>
+  </a>
+  <p class="hero-note reveal">Free forever. No credit card needed.</p>
+</section>
+
+<!-- Wave divider: warm-base to forest -->
+<div class="wave-divider">
+  <svg viewBox="0 0 1440 100" preserveAspectRatio="none" fill="none">
+    <path d="M0,40 C320,100 440,0 720,50 C1000,100 1120,10 1440,60 L1440,0 L0,0 Z" fill="#FAF7F2"/>
+  </svg>
+</div>
+
+<!-- Features -->
+<section class="features" id="features">
+  <h2 class="section-title reveal">Everything you need,<br>nothing you don't.</h2>
+  <p class="section-subtitle reveal">Eight purposeful sections that let your music do the talking.</p>
+
+  <div class="features-flow reveal-stagger">
+
+    <div class="feature-item reveal">
+      <div class="feature-dot"></div>
+      <h3>Bio &amp; Profile</h3>
+      <p>Tell your story with warmth and authenticity. Your journey, your influences, your sound.</p>
+    </div>
+
+    <div class="feature-item reveal">
+      <div class="feature-dot"></div>
+      <h3>Music &amp; Mixes</h3>
+      <p>Embed from SoundCloud, Mixcloud, Spotify and more. Let your tracks breathe.</p>
+    </div>
+
+    <div class="feature-item reveal">
+      <div class="feature-dot"></div>
+      <h3>Events &amp; Brands</h3>
+      <p>Past gigs, residencies, and brand partnerships displayed with quiet confidence.</p>
+    </div>
+
+    <div class="feature-item reveal">
+      <div class="feature-dot"></div>
+      <h3>Technical Rider</h3>
+      <p>Equipment needs, stage setup, and tech specs — clear and easy for promoters.</p>
+    </div>
+
+    <div class="feature-item reveal">
+      <div class="feature-dot"></div>
+      <h3>Press Assets</h3>
+      <p>High-res photos, logos, and promo materials ready for download in one click.</p>
+    </div>
+
+    <div class="feature-item reveal">
+      <div class="feature-dot"></div>
+      <h3>Booking Contact</h3>
+      <p>A simple, elegant form that makes it effortless for promoters to reach you.</p>
+    </div>
+
+    <div class="feature-item reveal">
+      <div class="feature-dot"></div>
+      <h3>Social Links</h3>
+      <p>Instagram, SoundCloud, Spotify, Resident Advisor — all connected in one place.</p>
+    </div>
+
+    <div class="feature-item reveal">
+      <div class="feature-dot"></div>
+      <h3>Custom Themes</h3>
+      <p>Colours, typography, and layout that feel like you. Make it personal.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- Wave divider: forest to warm-base -->
+<div class="wave-divider">
+  <svg viewBox="0 0 1440 100" preserveAspectRatio="none" fill="none">
+    <path d="M0,30 C360,90 540,0 900,60 C1100,90 1300,20 1440,50 L1440,100 L0,100 Z" fill="#FAF7F2"/>
+    <path d="M0,30 C360,90 540,0 900,60 C1100,90 1300,20 1440,50 L1440,0 L0,0 Z" fill="#2D4A3E"/>
+  </svg>
+</div>
+
+<!-- Pricing -->
+<section class="pricing" id="pricing">
+  <h2 class="section-title reveal">Simple, honest pricing.</h2>
+  <p class="section-subtitle reveal">Start free. Grow when you're ready.</p>
+
+  <div class="pricing-cards">
+
+    <div class="pricing-card reveal">
+      <div class="pricing-badge">Free</div>
+      <div class="pricing-price"><span class="currency">&pound;</span>0</div>
+      <div class="pricing-period">Free forever</div>
+      <ul class="pricing-features">
+        <li>Full EPK page</li>
+        <li>All sections included</li>
+        <li>yourname.djepk.com URL</li>
+        <li>Social links integration</li>
+        <li>Platform branding</li>
+      </ul>
+      <a href="#" class="pricing-btn">Get Started Free</a>
+    </div>
+
+    <div class="pricing-card pro reveal">
+      <div class="pricing-badge">Pro</div>
+      <div class="pricing-price"><span class="currency">&pound;</span>9</div>
+      <div class="pricing-period">per month</div>
+      <ul class="pricing-features">
+        <li>Everything in Free</li>
+        <li>Custom domain</li>
+        <li>Remove branding</li>
+        <li>Priority support</li>
+        <li>Full theme customisation</li>
+      </ul>
+      <a href="#" class="pricing-btn">Upgrade to Pro</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- Wave divider: warm-base to warm-off -->
+<div class="wave-divider">
+  <svg viewBox="0 0 1440 80" preserveAspectRatio="none" fill="none">
+    <path d="M0,20 C240,70 480,0 720,40 C960,80 1200,10 1440,30 L1440,80 L0,80 Z" fill="#F3EDE3"/>
+    <path d="M0,20 C240,70 480,0 720,40 C960,80 1200,10 1440,30 L1440,0 L0,0 Z" fill="#FAF7F2"/>
+  </svg>
+</div>
+
+<!-- CTA -->
+<section class="cta-section" id="cta">
+  <div class="cta-blob cta-blob-1"></div>
+  <div class="cta-blob cta-blob-2"></div>
+  <h2 class="reveal">Let your music<br><em>flow forward.</em></h2>
+  <p class="reveal">Join DJs who present themselves with calm confidence. Your EPK is waiting to grow with you.</p>
+  <a href="#" class="cta-btn reveal">Create Your EPK &rarr;</a>
+  <p class="cta-note reveal">No credit card required</p>
+</section>
+
+<!-- Wave divider: warm-off to forest -->
+<div class="wave-divider">
+  <svg viewBox="0 0 1440 60" preserveAspectRatio="none" fill="none">
+    <path d="M0,30 C480,60 960,0 1440,30 L1440,60 L0,60 Z" fill="#2D4A3E"/>
+    <path d="M0,30 C480,60 960,0 1440,30 L1440,0 L0,0 Z" fill="#F3EDE3"/>
+  </svg>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-logo">DJ <span>EPK</span></div>
+  <ul class="footer-links">
+    <li><a href="#">Features</a></li>
+    <li><a href="#">Pricing</a></li>
+    <li><a href="#">Privacy</a></li>
+    <li><a href="#">Terms</a></li>
+  </ul>
+  <p class="footer-copy">&copy; 2026 DJ EPK. All rights reserved.</p>
+</footer>
+
+<script>
+  // ── Scroll reveal ──
+  const revealEls = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  revealEls.forEach(el => observer.observe(el));
+
+  // ── Nav shadow on scroll ──
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // ── Gentle parallax on blobs ──
+  const blobs = document.querySelectorAll('.blob');
+  window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY;
+    blobs.forEach((blob, i) => {
+      const speed = 0.03 + i * 0.015;
+      blob.style.transform = `translateY(${scrollY * speed}px)`;
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DJ EPK — Your Digital Press Kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cyan: #00F0FF;
+    --magenta: #FF00E5;
+    --black: #000000;
+    --dark: #0a0a0a;
+    --card-bg: rgba(255, 255, 255, 0.04);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --text: #e0e0e0;
+    --text-dim: #888;
+    --glow-cyan: 0 0 10px rgba(0, 240, 255, 0.5), 0 0 40px rgba(0, 240, 255, 0.15);
+    --glow-magenta: 0 0 10px rgba(255, 0, 229, 0.5), 0 0 40px rgba(255, 0, 229, 0.15);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--black);
+    color: var(--text);
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* Scanline overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.06) 2px,
+      rgba(0, 0, 0, 0.06) 4px
+    );
+  }
+
+  /* Animated mesh background */
+  .mesh-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse 600px 600px at 20% 30%, rgba(0, 240, 255, 0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 500px 500px at 80% 70%, rgba(255, 0, 229, 0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 400px 400px at 60% 20%, rgba(0, 240, 255, 0.04) 0%, transparent 70%),
+      radial-gradient(ellipse 300px 300px at 30% 80%, rgba(255, 0, 229, 0.04) 0%, transparent 70%);
+    animation: meshMove 20s ease-in-out infinite alternate;
+  }
+
+  @keyframes meshMove {
+    0%   { background-position: 0% 0%, 100% 100%, 50% 0%, 0% 100%; }
+    25%  { background-position: 10% 20%, 90% 80%, 40% 10%, 10% 90%; }
+    50%  { background-position: 20% 10%, 80% 90%, 60% 20%, 20% 80%; }
+    75%  { background-position: 5% 30%, 95% 70%, 45% 5%, 5% 95%; }
+    100% { background-position: 15% 5%, 85% 95%, 55% 15%, 15% 85%; }
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 20px 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--card-border);
+    transition: background 0.3s;
+  }
+
+  nav .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    color: #fff;
+    text-decoration: none;
+  }
+
+  .logo span:first-child { color: var(--cyan); text-shadow: var(--glow-cyan); }
+  .logo span:last-child { color: var(--magenta); text-shadow: var(--glow-magenta); }
+
+  .nav-links { display: flex; gap: 32px; align-items: center; }
+
+  .nav-links a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: color 0.3s, text-shadow 0.3s;
+  }
+
+  .nav-links a:hover {
+    color: var(--cyan);
+    text-shadow: var(--glow-cyan);
+  }
+
+  .nav-cta {
+    padding: 8px 24px !important;
+    border: 1px solid var(--cyan) !important;
+    border-radius: 4px;
+    color: var(--cyan) !important;
+    transition: all 0.3s !important;
+  }
+
+  .nav-cta:hover {
+    background: var(--cyan) !important;
+    color: var(--black) !important;
+    box-shadow: var(--glow-cyan) !important;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+    position: relative;
+  }
+
+  .hero-content { max-width: 800px; }
+
+  .hero-badge {
+    display: inline-block;
+    padding: 6px 20px;
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    border-radius: 100px;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 32px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.8s 0.2s ease forwards;
+  }
+
+  .hero h1 {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: clamp(2.5rem, 7vw, 5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 24px;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeUp 0.8s 0.5s ease forwards;
+  }
+
+  .hero h1 .neon-cyan {
+    color: var(--cyan);
+    text-shadow: var(--glow-cyan);
+  }
+
+  .hero h1 .neon-magenta {
+    color: var(--magenta);
+    text-shadow: var(--glow-magenta);
+  }
+
+  .hero p {
+    font-size: 1.2rem;
+    color: var(--text-dim);
+    max-width: 550px;
+    margin: 0 auto 48px;
+    font-weight: 300;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeUp 0.8s 0.8s ease forwards;
+  }
+
+  .hero-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeUp 0.8s 1.1s ease forwards;
+  }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-block;
+    padding: 14px 36px;
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+  }
+
+  .btn-primary {
+    background: var(--cyan);
+    color: var(--black);
+    box-shadow: var(--glow-cyan);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .btn-primary:hover {
+    background: #fff;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.8), 0 0 60px rgba(0, 240, 255, 0.3);
+    transform: translateY(-2px);
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(0, 240, 255, 0.4), 0 0 40px rgba(0, 240, 255, 0.1); }
+    50%      { box-shadow: 0 0 20px rgba(0, 240, 255, 0.7), 0 0 60px rgba(0, 240, 255, 0.25); }
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--magenta);
+    border: 1px solid var(--magenta);
+  }
+
+  .btn-outline:hover {
+    background: var(--magenta);
+    color: var(--black);
+    box-shadow: var(--glow-magenta);
+    transform: translateY(-2px);
+  }
+
+  /* SECTIONS */
+  section { padding: 100px 0; position: relative; z-index: 1; }
+
+  .section-label {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--magenta);
+    text-shadow: var(--glow-magenta);
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 16px;
+  }
+
+  .section-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-dim);
+    max-width: 600px;
+    font-weight: 300;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 64px;
+  }
+
+  .section-header .section-subtitle { margin: 0 auto; }
+
+  /* FEATURES */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+  }
+
+  .feature-card {
+    position: relative;
+    padding: 36px 28px;
+    border-radius: 8px;
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--card-border);
+    transition: all 0.4s;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  .feature-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Animated gradient border on hover */
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 9px;
+    padding: 1px;
+    background: linear-gradient(135deg, var(--cyan), var(--magenta), var(--cyan));
+    background-size: 300% 300%;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.4s;
+    animation: borderGlow 3s linear infinite;
+  }
+
+  .feature-card:hover::before { opacity: 1; }
+
+  @keyframes borderGlow {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .feature-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 40px rgba(0, 240, 255, 0.06);
+  }
+
+  .feature-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    background: rgba(0, 240, 255, 0.08);
+    border: 1px solid rgba(0, 240, 255, 0.15);
+    color: var(--cyan);
+    text-shadow: var(--glow-cyan);
+  }
+
+  .feature-card:nth-child(even) .feature-icon {
+    background: rgba(255, 0, 229, 0.08);
+    border-color: rgba(255, 0, 229, 0.15);
+    color: var(--magenta);
+    text-shadow: var(--glow-magenta);
+  }
+
+  .feature-card h3 {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .feature-card p {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* PRICING */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 32px;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .pricing-card {
+    position: relative;
+    padding: 44px 36px;
+    border-radius: 12px;
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--card-border);
+    text-align: center;
+    transition: all 0.4s;
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  .pricing-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .pricing-card.featured {
+    border-color: rgba(255, 0, 229, 0.3);
+    background: rgba(255, 0, 229, 0.04);
+  }
+
+  .pricing-card.featured::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 13px;
+    padding: 1px;
+    background: linear-gradient(135deg, var(--magenta), var(--cyan), var(--magenta));
+    background-size: 300% 300%;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: borderGlow 3s linear infinite;
+  }
+
+  .pricing-badge {
+    display: inline-block;
+    padding: 4px 16px;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: var(--magenta);
+    color: #fff;
+    margin-bottom: 20px;
+  }
+
+  .pricing-card h3 {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .pricing-amount {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 3rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .pricing-amount span { font-size: 1rem; color: var(--text-dim); font-weight: 400; }
+
+  .pricing-period {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-bottom: 32px;
+  }
+
+  .pricing-features {
+    list-style: none;
+    text-align: left;
+    margin-bottom: 36px;
+  }
+
+  .pricing-features li {
+    padding: 10px 0;
+    font-size: 0.9rem;
+    color: var(--text);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .pricing-features li::before {
+    content: '✓';
+    color: var(--cyan);
+    font-weight: 700;
+    text-shadow: var(--glow-cyan);
+    flex-shrink: 0;
+  }
+
+  .pricing-card.featured .pricing-features li::before {
+    color: var(--magenta);
+    text-shadow: var(--glow-magenta);
+  }
+
+  .pricing-card .btn { width: 100%; text-align: center; }
+
+  /* CTA */
+  .cta-section {
+    text-align: center;
+    padding: 120px 0;
+    position: relative;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 800px 400px at 50% 50%, rgba(0, 240, 255, 0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 600px 300px at 50% 60%, rgba(255, 0, 229, 0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-section h2 {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 16px;
+  }
+
+  .cta-section p {
+    font-size: 1.1rem;
+    color: var(--text-dim);
+    max-width: 500px;
+    margin: 0 auto 40px;
+    font-weight: 300;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--card-border);
+    padding: 48px 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .footer-links { display: flex; gap: 24px; }
+
+  .footer-links a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.3s;
+  }
+
+  .footer-links a:hover { color: var(--cyan); }
+
+  .footer-copy {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+
+  /* Divider line */
+  .neon-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), var(--magenta), transparent);
+    margin: 0 auto;
+    max-width: 600px;
+    opacity: 0.4;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .nav-links a:not(.nav-cta) { display: none; }
+    .features-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
+    .footer-inner { flex-direction: column; text-align: center; }
+    section { padding: 64px 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="mesh-bg"></div>
+
+<nav>
+  <div class="container">
+    <a href="#" class="logo"><span>DJ</span> <span>EPK</span></a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#" class="nav-cta">Get Started</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">The DJ press kit platform</div>
+    <h1>
+      Your sound.<br>
+      <span class="neon-cyan">One link.</span><br>
+      <span class="neon-magenta">Infinite reach.</span>
+    </h1>
+    <p>Bio, mixes, events, rider, press assets and booking contact — everything promoters need, in one stunning page.</p>
+    <div class="hero-buttons">
+      <a href="#" class="btn btn-primary">Create Your EPK</a>
+      <a href="#features" class="btn btn-outline">See Features</a>
+    </div>
+  </div>
+</section>
+
+<div class="neon-divider"></div>
+
+<section id="features">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Features</div>
+      <h2 class="section-title">Everything you need to get booked</h2>
+      <p class="section-subtitle">Build a professional press kit in minutes. Share it everywhere. Land more gigs.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card" data-reveal>
+        <div class="feature-icon">♫</div>
+        <h3>Bio &amp; Profile</h3>
+        <p>Tell your story with a rich artist biography, profile photo, and genre tags that define your sound.</p>
+      </div>
+      <div class="feature-card" data-reveal>
+        <div class="feature-icon">▶</div>
+        <h3>Music &amp; Mixes</h3>
+        <p>Embed your SoundCloud, Mixcloud, or Spotify directly. Let promoters hear what you bring to the decks.</p>
+      </div>
+      <div class="feature-card" data-reveal>
+        <div class="feature-icon">★</div>
+        <h3>Events &amp; Brands</h3>
+        <p>Showcase past events, venues, and brand collaborations that prove your track record.</p>
+      </div>
+      <div class="feature-card" data-reveal>
+        <div class="feature-icon">⚡</div>
+        <h3>Technical Rider</h3>
+        <p>Specify your equipment requirements, stage setup, and technical needs in a clear format.</p>
+      </div>
+      <div class="feature-card" data-reveal>
+        <div class="feature-icon">◈</div>
+        <h3>Press Assets</h3>
+        <p>High-res photos, logos, and promotional materials — one-click download for press and promoters.</p>
+      </div>
+      <div class="feature-card" data-reveal>
+        <div class="feature-icon">✉</div>
+        <h3>Booking Contact</h3>
+        <p>A clean contact form so promoters, agencies, and venues can reach you directly.</p>
+      </div>
+      <div class="feature-card" data-reveal>
+        <div class="feature-icon">◎</div>
+        <h3>Social Links</h3>
+        <p>Connect all your socials — Instagram, SoundCloud, Spotify, YouTube — in one unified hub.</p>
+      </div>
+      <div class="feature-card" data-reveal>
+        <div class="feature-icon">◆</div>
+        <h3>Custom Themes</h3>
+        <p>Match your EPK to your brand with custom colours, layouts, and visual styles.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="neon-divider"></div>
+
+<section id="pricing">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Pricing</div>
+      <h2 class="section-title">Start free. Go pro when you're ready.</h2>
+      <p class="section-subtitle">No credit card required. Build your EPK now and upgrade later.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card" data-reveal>
+        <h3>Free</h3>
+        <div class="pricing-amount">£0</div>
+        <div class="pricing-period">Free forever</div>
+        <ul class="pricing-features">
+          <li>Full EPK page</li>
+          <li>All sections included</li>
+          <li>yourname.djepk.com URL</li>
+          <li>Social links</li>
+          <li>Platform branding</li>
+        </ul>
+        <a href="#" class="btn btn-outline">Get Started</a>
+      </div>
+      <div class="pricing-card featured" data-reveal>
+        <div class="pricing-badge">Most Popular</div>
+        <h3>Pro</h3>
+        <div class="pricing-amount">£9<span>/mo</span></div>
+        <div class="pricing-period">Billed monthly</div>
+        <ul class="pricing-features">
+          <li>Everything in Free</li>
+          <li>Custom domain</li>
+          <li>Remove branding</li>
+          <li>Priority support</li>
+          <li>Full theme customisation</li>
+        </ul>
+        <a href="#" class="btn btn-primary">Upgrade to Pro</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="neon-divider"></div>
+
+<section class="cta-section">
+  <div class="container">
+    <h2>Ready to get <span class="neon-cyan">noticed</span>?</h2>
+    <p>Join DJs worldwide who use DJ EPK to land more gigs and grow their careers.</p>
+    <a href="#" class="btn btn-primary">Create Your EPK — Free</a>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <a href="#" class="logo"><span>DJ</span> <span>EPK</span></a>
+      <div class="footer-links">
+        <a href="#">Features</a>
+        <a href="#">Pricing</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+      </div>
+      <div class="footer-copy">&copy; 2026 DJ EPK. All rights reserved.</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function() {
+  // Scroll-triggered reveal
+  const revealEls = document.querySelectorAll('[data-reveal]');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const siblings = Array.from(el.parentElement.querySelectorAll('[data-reveal]'));
+        const index = siblings.indexOf(el);
+        setTimeout(() => {
+          el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+          el.classList.add('visible');
+        }, index * 100);
+        observer.unobserve(el);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  revealEls.forEach(el => observer.observe(el));
+
+  // Nav scroll effect
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 60) {
+      nav.style.background = 'rgba(0, 0, 0, 0.85)';
+    } else {
+      nav.style.background = 'rgba(0, 0, 0, 0.6)';
+    }
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRESSKIT - DJ Electronic Press Kit Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --space: #0F0F1A;
+    --space-light: #1A1A2E;
+    --green: #00D68F;
+    --purple: #7B61FF;
+    --blue: #00B4D8;
+    --white: #F0F0F5;
+    --white-dim: rgba(240, 240, 245, 0.7);
+    --glass: rgba(255, 255, 255, 0.06);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-strong: rgba(255, 255, 255, 0.1);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--space);
+    color: var(--white);
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* ---- Noise overlay ---- */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 256px 256px;
+  }
+
+  /* ---- Aurora background ---- */
+  .aurora-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .aurora-bg .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.3;
+    animation: float 20s ease-in-out infinite;
+  }
+
+  .aurora-bg .blob:nth-child(1) {
+    width: 600px; height: 600px;
+    background: var(--green);
+    top: -10%; left: -10%;
+    animation-delay: 0s;
+  }
+  .aurora-bg .blob:nth-child(2) {
+    width: 500px; height: 500px;
+    background: var(--purple);
+    top: 20%; right: -10%;
+    animation-delay: -7s;
+    animation-duration: 25s;
+  }
+  .aurora-bg .blob:nth-child(3) {
+    width: 450px; height: 450px;
+    background: var(--blue);
+    bottom: -5%; left: 30%;
+    animation-delay: -14s;
+    animation-duration: 22s;
+  }
+  .aurora-bg .blob:nth-child(4) {
+    width: 300px; height: 300px;
+    background: var(--green);
+    top: 50%; right: 20%;
+    animation-delay: -4s;
+    animation-duration: 18s;
+    opacity: 0.15;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(60px, -40px) scale(1.1); }
+    50% { transform: translate(-30px, 50px) scale(0.95); }
+    75% { transform: translate(40px, 20px) scale(1.05); }
+  }
+
+  /* ---- Floating orbs ---- */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
+    animation: orb-drift linear infinite;
+  }
+
+  @keyframes orb-drift {
+    0% { transform: translateY(0) translateX(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-100vh) translateX(40px); opacity: 0; }
+  }
+
+  /* ---- Glass utility ---- */
+  .glass {
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+  }
+
+  .glass-strong {
+    background: var(--glass-strong);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
+  }
+
+  /* ---- Layout ---- */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 2;
+  }
+
+  section { padding: 100px 0; }
+
+  /* ---- Nav ---- */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px 0;
+    transition: all 0.4s ease;
+  }
+
+  nav.scrolled {
+    background: rgba(15, 15, 26, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 12px 0;
+  }
+
+  nav .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--green), var(--blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+  .nav-links a {
+    color: var(--white-dim);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--white); }
+
+  .nav-cta {
+    padding: 8px 20px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--green), var(--blue));
+    color: var(--space) !important;
+    font-weight: 600 !important;
+    -webkit-text-fill-color: var(--space) !important;
+    transition: opacity 0.3s !important;
+  }
+  .nav-cta:hover { opacity: 0.85; }
+
+  .mobile-toggle {
+    display: none;
+    background: none; border: none; cursor: pointer;
+    flex-direction: column; gap: 5px;
+  }
+  .mobile-toggle span {
+    display: block; width: 24px; height: 2px;
+    background: var(--white); border-radius: 2px;
+    transition: 0.3s;
+  }
+
+  /* ---- Hero ---- */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding-top: 100px;
+    text-align: center;
+  }
+
+  .hero .container { width: 100%; }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--green);
+    margin-bottom: 32px;
+  }
+
+  .hero h1 {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(2.8rem, 6vw, 5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: 24px;
+  }
+
+  .hero h1 .gradient-text {
+    background: linear-gradient(135deg, var(--green), var(--purple), var(--blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-size: 200% 200%;
+    animation: gradient-shift 6s ease infinite;
+  }
+
+  @keyframes gradient-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .hero p {
+    font-size: 1.2rem;
+    color: var(--white-dim);
+    max-width: 560px;
+    margin: 0 auto 40px;
+    line-height: 1.7;
+  }
+
+  .hero-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 32px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--green), var(--blue));
+    color: var(--space);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.3s;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 214, 143, 0.25);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 32px;
+    border-radius: 12px;
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    border: 1px solid var(--glass-border);
+    background: var(--glass);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .btn-secondary:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.2);
+  }
+
+  /* ---- Features ---- */
+  .features { position: relative; }
+
+  .section-label {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--green);
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+
+  .section-desc {
+    color: var(--white-dim);
+    font-size: 1.1rem;
+    max-width: 540px;
+    margin-bottom: 60px;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .feature-card {
+    padding: 32px;
+    border-left: 3px solid var(--green);
+    transition: transform 0.3s, border-color 0.3s;
+  }
+  .feature-card:nth-child(2) { border-left-color: var(--purple); }
+  .feature-card:nth-child(3) { border-left-color: var(--blue); }
+  .feature-card:nth-child(4) { border-left-color: var(--purple); }
+  .feature-card:nth-child(5) { border-left-color: var(--green); }
+  .feature-card:nth-child(6) { border-left-color: var(--blue); }
+  .feature-card:nth-child(7) { border-left-color: var(--purple); }
+  .feature-card:nth-child(8) { border-left-color: var(--green); }
+
+  .feature-card:hover { transform: translateY(-4px); }
+
+  .feature-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    background: rgba(0, 214, 143, 0.1);
+  }
+  .feature-card:nth-child(2) .feature-icon,
+  .feature-card:nth-child(4) .feature-icon,
+  .feature-card:nth-child(7) .feature-icon { background: rgba(123, 97, 255, 0.1); }
+  .feature-card:nth-child(3) .feature-icon,
+  .feature-card:nth-child(6) .feature-icon { background: rgba(0, 180, 216, 0.1); }
+
+  .feature-card h3 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 1.15rem;
+    margin-bottom: 8px;
+  }
+
+  .feature-card p {
+    color: var(--white-dim);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  /* ---- Pricing ---- */
+  .pricing { text-align: center; }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .pricing-card {
+    padding: 40px 32px;
+    text-align: left;
+    position: relative;
+    transition: transform 0.3s;
+  }
+  .pricing-card:hover { transform: translateY(-4px); }
+
+  .pricing-card.featured {
+    background: rgba(255,255,255,0.08);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+  }
+
+  .pricing-card.featured::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--green), var(--purple), var(--blue));
+    z-index: -1;
+    background-size: 200% 200%;
+    animation: gradient-shift 6s ease infinite;
+  }
+
+  .pricing-card.featured::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    background: var(--space-light);
+    z-index: -1;
+  }
+
+  .plan-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .plan-desc {
+    font-size: 0.85rem;
+    color: var(--white-dim);
+    margin-bottom: 20px;
+  }
+
+  .plan-price {
+    font-family: 'Outfit', sans-serif;
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .plan-price span { font-size: 1rem; font-weight: 400; color: var(--white-dim); }
+
+  .plan-period {
+    font-size: 0.85rem;
+    color: var(--white-dim);
+    margin-bottom: 28px;
+  }
+
+  .plan-features {
+    list-style: none;
+    margin-bottom: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .plan-features li {
+    font-size: 0.95rem;
+    color: var(--white-dim);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .plan-features li::before {
+    content: '';
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: rgba(0, 214, 143, 0.15);
+    border: 1.5px solid var(--green);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .plan-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    text-align: center;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .plan-btn-outline {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    color: var(--white);
+  }
+  .plan-btn-outline:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.2); }
+
+  .plan-btn-fill {
+    background: linear-gradient(135deg, var(--green), var(--blue));
+    border: none;
+    color: var(--space);
+  }
+  .plan-btn-fill:hover { box-shadow: 0 6px 24px rgba(0, 214, 143, 0.3); }
+
+  /* ---- Final CTA ---- */
+  .final-cta {
+    text-align: center;
+    padding: 120px 0;
+  }
+  .final-cta h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+  .final-cta p {
+    color: var(--white-dim);
+    font-size: 1.1rem;
+    max-width: 480px;
+    margin: 0 auto 36px;
+  }
+
+  /* ---- Footer ---- */
+  footer {
+    border-top: 1px solid var(--glass-border);
+    padding: 40px 0;
+    position: relative;
+    z-index: 2;
+  }
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .footer-inner p { color: var(--white-dim); font-size: 0.85rem; }
+  .footer-links { display: flex; gap: 24px; list-style: none; }
+  .footer-links a { color: var(--white-dim); font-size: 0.85rem; text-decoration: none; transition: color 0.3s; }
+  .footer-links a:hover { color: var(--white); }
+
+  /* ---- Scroll reveal ---- */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 768px) {
+    section { padding: 70px 0; }
+    .nav-links { display: none; }
+    .mobile-toggle { display: flex; }
+    .nav-links.open {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0; right: 0;
+      background: rgba(15,15,26,0.95);
+      backdrop-filter: blur(20px);
+      padding: 24px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .features-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; max-width: 380px; }
+    .hero-buttons { flex-direction: column; align-items: center; }
+    .btn-primary, .btn-secondary { width: 100%; max-width: 300px; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Aurora background -->
+<div class="aurora-bg">
+  <div class="blob"></div>
+  <div class="blob"></div>
+  <div class="blob"></div>
+  <div class="blob"></div>
+</div>
+
+<!-- Floating orbs (generated by JS) -->
+<div id="orbs"></div>
+
+<!-- Nav -->
+<nav id="nav">
+  <div class="container">
+    <div class="logo">PRESSKIT</div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#cta">Get Started</a></li>
+      <li><a href="#cta" class="nav-cta">Sign Up Free</a></li>
+    </ul>
+    <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <div class="reveal">
+      <div class="glass hero-badge">Built for DJs who mean business</div>
+      <h1>Your Music.<br><span class="gradient-text">One Perfect Link.</span></h1>
+      <p>Create a professional electronic press kit in minutes. Share your bio, mixes, upcoming gigs, and tech rider with promoters and venues worldwide.</p>
+      <div class="hero-buttons">
+        <a href="#cta" class="btn-primary">Build Your EPK &rarr;</a>
+        <a href="#features" class="btn-secondary">See How It Works</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Everything You Need</div>
+      <h2 class="section-title">One kit. Every detail covered.</h2>
+      <p class="section-desc">Stop sending scattered links and PDFs. PRESSKIT gives you a single, always-updated page that makes promoters say yes.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card glass reveal">
+        <div class="feature-icon">&#127908;</div>
+        <h3>Artist Bio</h3>
+        <p>Write once, share everywhere. Rich text editor with formatting that looks great on any device.</p>
+      </div>
+      <div class="feature-card glass reveal">
+        <div class="feature-icon">&#127911;</div>
+        <h3>Music Embeds</h3>
+        <p>Embed tracks from SoundCloud, Mixcloud, Spotify, and Bandcamp. Reorder your best work to the top.</p>
+      </div>
+      <div class="feature-card glass reveal">
+        <div class="feature-icon">&#128197;</div>
+        <h3>Upcoming Events</h3>
+        <p>Display your gig calendar with dates, venues, and ticket links. Past shows build your credibility.</p>
+      </div>
+      <div class="feature-card glass reveal">
+        <div class="feature-icon">&#9881;&#65039;</div>
+        <h3>Technical Rider</h3>
+        <p>Detail your equipment needs, stage setup, and technical requirements so venues know exactly what you need.</p>
+      </div>
+      <div class="feature-card glass reveal">
+        <div class="feature-icon">&#128172;</div>
+        <h3>Press Quotes</h3>
+        <p>Showcase reviews and testimonials from media, venues, and fellow artists in a polished format.</p>
+      </div>
+      <div class="feature-card glass reveal">
+        <div class="feature-icon">&#128236;</div>
+        <h3>Contact Form</h3>
+        <p>Built-in booking inquiry form so promoters can reach you directly. No email scraping, no spam.</p>
+      </div>
+      <div class="feature-card glass reveal">
+        <div class="feature-icon">&#128200;</div>
+        <h3>Analytics</h3>
+        <p>See who is viewing your EPK, which sections get attention, and where your traffic comes from.</p>
+      </div>
+      <div class="feature-card glass reveal">
+        <div class="feature-icon">&#127760;</div>
+        <h3>Custom Domains</h3>
+        <p>Use your own domain name for a fully branded experience. HTTPS included automatically.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section class="pricing" id="pricing">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Simple Pricing</div>
+      <h2 class="section-title">Start free. Scale when you're ready.</h2>
+      <p class="section-desc" style="margin-left:auto;margin-right:auto;">No hidden fees, no contracts. Upgrade or cancel anytime.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card glass reveal">
+        <div class="plan-name">Free</div>
+        <div class="plan-desc">Get started with the basics</div>
+        <div class="plan-price">$0</div>
+        <div class="plan-period">Free forever</div>
+        <ul class="plan-features">
+          <li>1 EPK page</li>
+          <li>Bio + photo</li>
+          <li>Up to 3 music embeds</li>
+          <li>Contact form</li>
+          <li>PRESSKIT subdomain</li>
+        </ul>
+        <a href="#" class="plan-btn plan-btn-outline">Get Started</a>
+      </div>
+      <div class="pricing-card featured reveal">
+        <div class="plan-name" style="color:var(--green)">Pro</div>
+        <div class="plan-desc">For working DJs</div>
+        <div class="plan-price">$9<span>/mo</span></div>
+        <div class="plan-period">Billed monthly</div>
+        <ul class="plan-features">
+          <li>Everything in Free</li>
+          <li>Unlimited music embeds</li>
+          <li>Events calendar</li>
+          <li>Technical rider</li>
+          <li>Press quotes</li>
+          <li>Analytics dashboard</li>
+          <li>Custom domain</li>
+        </ul>
+        <a href="#" class="plan-btn plan-btn-fill">Start Free Trial</a>
+      </div>
+      <div class="pricing-card glass reveal">
+        <div class="plan-name">Agency</div>
+        <div class="plan-desc">Manage multiple artists</div>
+        <div class="plan-price">$29<span>/mo</span></div>
+        <div class="plan-period">Billed monthly</div>
+        <ul class="plan-features">
+          <li>Everything in Pro</li>
+          <li>Up to 10 artist EPKs</li>
+          <li>Team access</li>
+          <li>Aggregated analytics</li>
+          <li>Priority support</li>
+          <li>Bulk export</li>
+        </ul>
+        <a href="#" class="plan-btn plan-btn-outline">Contact Sales</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Final CTA -->
+<section class="final-cta" id="cta">
+  <div class="container reveal">
+    <h2>Ready to stand out?</h2>
+    <p>Join thousands of DJs who book more gigs with a professional press kit.</p>
+    <a href="#" class="btn-primary">Create Your EPK &mdash; It's Free &rarr;</a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <p>&copy; 2025 PRESSKIT. All rights reserved.</p>
+      <ul class="footer-links">
+        <li><a href="#">Privacy</a></li>
+        <li><a href="#">Terms</a></li>
+        <li><a href="#">Support</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Mobile nav toggle
+  const toggle = document.getElementById('mobileToggle');
+  const navLinks = document.getElementById('navLinks');
+  toggle.addEventListener('click', () => navLinks.classList.toggle('open'));
+
+  // Scrolled nav
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Floating orbs
+  const orbContainer = document.getElementById('orbs');
+  const colors = ['rgba(0,214,143,0.25)', 'rgba(123,97,255,0.2)', 'rgba(0,180,216,0.2)'];
+  function spawnOrb() {
+    const orb = document.createElement('div');
+    orb.className = 'orb';
+    const size = Math.random() * 6 + 3;
+    const dur = Math.random() * 15 + 12;
+    orb.style.cssText = `
+      width:${size}px;height:${size}px;
+      left:${Math.random()*100}%;
+      bottom:-20px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      filter:blur(${size/3}px);
+      animation-duration:${dur}s;
+    `;
+    orbContainer.appendChild(orb);
+    setTimeout(() => orb.remove(), dur * 1000);
+  }
+  setInterval(spawnOrb, 2000);
+  for (let i = 0; i < 8; i++) setTimeout(spawnOrb, i * 600);
+</script>
+</body>
+</html>

@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DJ EPK — Your Story. Your Stage.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0A0A0A;
+    --bg-elevated: #111111;
+    --text: #B8B0A8;
+    --text-bright: #E8E0D8;
+    --accent: #E8A838;
+    --accent-dim: rgba(232, 168, 56, 0.15);
+    --accent-glow: rgba(232, 168, 56, 0.4);
+    --line: rgba(232, 168, 56, 0.25);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter Tight', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* Film grain overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.035;
+    background: repeating-conic-gradient(#B8B0A8 0.00001%, transparent 0.0002%, transparent 0.0004%, #B8B0A8 0.0005%) 50% 50% / 600px 600px;
+    animation: grain 0.4s steps(4) infinite;
+  }
+
+  @keyframes grain {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(-2px, 3px); }
+    50% { transform: translate(3px, -1px); }
+    75% { transform: translate(-1px, -3px); }
+  }
+
+  /* Utility */
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+  .amber-line { width: 100%; height: 1px; background: var(--line); }
+
+  /* Nav */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 1.5rem 0;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  nav .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    color: var(--text-bright);
+    letter-spacing: 0.15em;
+    text-decoration: none;
+  }
+
+  .nav-logo span { color: var(--accent); }
+
+  .nav-links { display: flex; gap: 2.5rem; align-items: center; }
+
+  .nav-links a {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    transition: color 0.3s;
+  }
+
+  .nav-links a:hover { color: var(--accent); }
+
+  .nav-cta {
+    border: 1px solid var(--accent) !important;
+    color: var(--accent) !important;
+    padding: 0.5rem 1.5rem;
+    transition: all 0.3s !important;
+  }
+
+  .nav-cta:hover {
+    background: var(--accent) !important;
+    color: var(--bg) !important;
+  }
+
+  /* Hero */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 8rem 2rem 4rem;
+  }
+
+  .hero-content {
+    text-align: center;
+    max-width: 900px;
+  }
+
+  .hero-subtitle {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4em;
+    color: var(--accent);
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: creditFadeUp 1s 0.5s ease forwards;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4rem, 12vw, 10rem);
+    line-height: 0.9;
+    color: var(--text-bright);
+    letter-spacing: 0.05em;
+    margin-bottom: 2rem;
+  }
+
+  .hero-title .word {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(40px);
+    animation: wordReveal 0.8s ease forwards;
+  }
+
+  .hero-title .word:nth-child(1) { animation-delay: 0.8s; }
+  .hero-title .word:nth-child(2) { animation-delay: 1.0s; }
+  .hero-title .word:nth-child(3) { animation-delay: 1.2s; }
+  .hero-title .word:nth-child(4) { animation-delay: 1.4s; }
+
+  @keyframes wordReveal {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-tagline {
+    font-size: 1.15rem;
+    color: var(--text);
+    max-width: 550px;
+    margin: 0 auto 3rem;
+    opacity: 0;
+    animation: creditFadeUp 1s 1.8s ease forwards;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    opacity: 0;
+    animation: creditFadeUp 1s 2.2s ease forwards;
+  }
+
+  @keyframes creditFadeUp {
+    to { opacity: 1; }
+  }
+
+  .btn-primary {
+    display: inline-block;
+    padding: 1rem 3rem;
+    background: var(--accent);
+    color: var(--bg);
+    text-decoration: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.15em;
+    transition: all 0.3s;
+    border: 1px solid var(--accent);
+  }
+
+  .btn-primary:hover {
+    background: transparent;
+    color: var(--accent);
+    box-shadow: 0 0 30px var(--accent-glow);
+  }
+
+  .btn-secondary {
+    display: inline-block;
+    padding: 1rem 3rem;
+    background: transparent;
+    color: var(--text-bright);
+    text-decoration: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.15em;
+    border: 1px solid rgba(184, 176, 168, 0.3);
+    transition: all 0.3s;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--text-bright);
+    box-shadow: 0 0 20px rgba(232, 224, 216, 0.1);
+  }
+
+  /* Letterbox bars */
+  .hero::before, .hero::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 60px;
+    background: var(--bg);
+    z-index: 2;
+  }
+  .hero::before { top: 0; }
+  .hero::after { bottom: 0; }
+
+  /* Section titles */
+  .section-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5em;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    color: var(--text-bright);
+    letter-spacing: 0.05em;
+    line-height: 1;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-desc {
+    max-width: 500px;
+    font-size: 1rem;
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  /* Features */
+  .features { padding: 8rem 0; }
+
+  .features-header {
+    margin-bottom: 5rem;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .feature-item {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 1.5rem;
+    padding: 3rem 2rem;
+    border-bottom: 1px solid var(--line);
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+    position: relative;
+  }
+
+  .feature-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .feature-item:nth-child(odd) {
+    border-right: 1px solid var(--line);
+  }
+
+  .feature-item:hover {
+    background: var(--accent-dim);
+  }
+
+  .feature-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    color: rgba(232, 168, 56, 0.3);
+    line-height: 1;
+  }
+
+  .feature-content h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    color: var(--text-bright);
+    letter-spacing: 0.08em;
+    margin-bottom: 0.5rem;
+  }
+
+  .feature-content p {
+    font-size: 0.9rem;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* Pricing */
+  .pricing {
+    padding: 8rem 0;
+  }
+
+  .pricing-header {
+    text-align: center;
+    margin-bottom: 5rem;
+  }
+
+  .pricing-header .section-desc {
+    margin: 0 auto;
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .pricing-card {
+    border: 1px solid var(--line);
+    padding: 3rem;
+    position: relative;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+    background: var(--bg);
+  }
+
+  .pricing-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .pricing-card.featured {
+    border-color: var(--accent);
+    background: var(--bg-elevated);
+  }
+
+  .pricing-card.featured::before {
+    content: 'PREMIERE';
+    position: absolute;
+    top: -1px; right: 2rem;
+    background: var(--accent);
+    color: var(--bg);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    padding: 0.4rem 1rem;
+  }
+
+  .pricing-tier {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4em;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+  }
+
+  .pricing-amount {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 4rem;
+    color: var(--text-bright);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+
+  .pricing-period {
+    font-size: 0.85rem;
+    color: var(--text);
+    margin-bottom: 2.5rem;
+  }
+
+  .pricing-divider {
+    width: 40px;
+    height: 1px;
+    background: var(--line);
+    margin-bottom: 2rem;
+  }
+
+  .pricing-features {
+    list-style: none;
+    margin-bottom: 3rem;
+  }
+
+  .pricing-features li {
+    padding: 0.6rem 0;
+    font-size: 0.9rem;
+    color: var(--text);
+    border-bottom: 1px solid rgba(184, 176, 168, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .pricing-features li::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .pricing-card .btn-primary,
+  .pricing-card .btn-secondary {
+    display: block;
+    text-align: center;
+    width: 100%;
+  }
+
+  /* CTA */
+  .cta {
+    padding: 10rem 0;
+    text-align: center;
+    position: relative;
+  }
+
+  .cta::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, var(--accent-dim) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 8vw, 7rem);
+    color: var(--text-bright);
+    letter-spacing: 0.05em;
+    line-height: 0.95;
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .cta-desc {
+    font-size: 1.1rem;
+    color: var(--text);
+    max-width: 480px;
+    margin: 0 auto 3rem;
+    position: relative;
+  }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 3rem 0;
+  }
+
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    color: var(--text-bright);
+    letter-spacing: 0.15em;
+  }
+
+  .footer-logo span { color: var(--accent); }
+
+  .footer-links {
+    display: flex;
+    gap: 2rem;
+  }
+
+  .footer-links a {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+
+  .footer-links a:hover { color: var(--accent); }
+
+  .footer-copy {
+    font-size: 0.75rem;
+    color: rgba(184, 176, 168, 0.4);
+    letter-spacing: 0.05em;
+  }
+
+  /* Scroll reveal base */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .features-grid { grid-template-columns: 1fr; }
+    .feature-item:nth-child(odd) { border-right: none; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .hero-actions { flex-direction: column; align-items: center; }
+    .footer-inner { flex-direction: column; gap: 1.5rem; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <div class="container">
+    <a href="#" class="nav-logo">DJ <span>EPK</span></a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#" class="nav-cta">Get Started</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-content">
+    <p class="hero-subtitle">The Electronic Press Kit Platform</p>
+    <h1 class="hero-title">
+      <span class="word">Your</span>
+      <span class="word">Story.</span>
+      <span class="word">Your</span>
+      <span class="word">Stage.</span>
+    </h1>
+    <p class="hero-tagline">
+      Bio, mixes, events, rider, press assets, booking — everything a promoter needs, in one cinematic link.
+    </p>
+    <div class="hero-actions">
+      <a href="#" class="btn-primary">Create Your EPK</a>
+      <a href="#features" class="btn-secondary">See Features</a>
+    </div>
+  </div>
+</section>
+
+<div class="amber-line"></div>
+
+<!-- Features -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="features-header reveal">
+      <p class="section-label">What You Get</p>
+      <h2 class="section-title">Every Detail,<br>Perfectly Presented</h2>
+      <p class="section-desc">Everything a DJ needs to look professional, land gigs, and tell their story.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-item">
+        <div class="feature-number">01</div>
+        <div class="feature-content">
+          <h3>Bio &amp; Profile</h3>
+          <p>Tell your story with a rich artist biography, profile photo, and genre tags that define your sound.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-number">02</div>
+        <div class="feature-content">
+          <h3>Music &amp; Mixes</h3>
+          <p>Embed your best sets from SoundCloud, Mixcloud, or any platform. Let your music speak first.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-number">03</div>
+        <div class="feature-content">
+          <h3>Events &amp; Brands</h3>
+          <p>Showcase past and upcoming gigs, residencies, and the brands you have worked with.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-number">04</div>
+        <div class="feature-content">
+          <h3>Technical Rider</h3>
+          <p>Equipment requirements, stage setup, and technical specifications in a clean, printable format.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-number">05</div>
+        <div class="feature-content">
+          <h3>Press Assets</h3>
+          <p>High-resolution photos, logos, and promotional materials ready for download by press and promoters.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-number">06</div>
+        <div class="feature-content">
+          <h3>Booking Contact</h3>
+          <p>A dedicated booking form and contact details so promoters can reach you directly.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-number">07</div>
+        <div class="feature-content">
+          <h3>Social Links</h3>
+          <p>Connect all your platforms in one place — Instagram, SoundCloud, Spotify, Beatport, and more.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-number">08</div>
+        <div class="feature-content">
+          <h3>Custom Themes</h3>
+          <p>Make your EPK unmistakably yours with custom colours, fonts, and layout options.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="amber-line"></div>
+
+<!-- Pricing -->
+<section class="pricing" id="pricing">
+  <div class="container">
+    <div class="pricing-header reveal">
+      <p class="section-label">Admission</p>
+      <h2 class="section-title">Choose Your Ticket</h2>
+      <p class="section-desc">Start free. Upgrade when you are ready to own the stage.</p>
+    </div>
+
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <p class="pricing-tier">General Admission</p>
+        <p class="pricing-amount">&pound;0</p>
+        <p class="pricing-period">Free forever</p>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li>Full EPK page</li>
+          <li>All sections included</li>
+          <li>yourname.djepk.com URL</li>
+          <li>Social links</li>
+          <li>Platform branding</li>
+        </ul>
+        <a href="#" class="btn-secondary">Get Started</a>
+      </div>
+
+      <div class="pricing-card featured">
+        <p class="pricing-tier">VIP Premiere</p>
+        <p class="pricing-amount">&pound;9<span style="font-size:1.5rem;color:var(--text)">/mo</span></p>
+        <p class="pricing-period">Billed monthly</p>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li>Everything in Free</li>
+          <li>Custom domain</li>
+          <li>Remove branding</li>
+          <li>Priority support</li>
+          <li>Full theme customisation</li>
+        </ul>
+        <a href="#" class="btn-primary">Go Pro</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="amber-line"></div>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="container reveal">
+    <h2 class="cta-title">Roll Credits.<br>Start Yours.</h2>
+    <p class="cta-desc">Your press kit is waiting. Build it in minutes, share it everywhere, get booked.</p>
+    <a href="#" class="btn-primary">Create Your EPK</a>
+  </div>
+</section>
+
+<div class="amber-line"></div>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">DJ <span>EPK</span></div>
+      <div class="footer-links">
+        <a href="#">Features</a>
+        <a href="#">Pricing</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+      </div>
+      <p class="footer-copy">&copy; 2026 DJ EPK. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Intersection Observer for scroll reveals
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        // Stagger siblings
+        const siblings = entry.target.parentElement.querySelectorAll('.feature-item, .pricing-card');
+        if (siblings.length > 1) {
+          const idx = Array.from(siblings).indexOf(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, idx * 120);
+        } else {
+          entry.target.classList.add('visible');
+        }
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.feature-item, .pricing-card, .reveal').forEach(el => {
+    observer.observe(el);
+  });
+
+  // Tracking animation on hero subtitle
+  const subtitle = document.querySelector('.hero-subtitle');
+  if (subtitle) {
+    subtitle.style.letterSpacing = '1em';
+    setTimeout(() => {
+      subtitle.style.transition = 'letter-spacing 1.5s ease';
+      subtitle.style.letterSpacing = '0.4em';
+    }, 500);
+  }
+
+  // Parallax-like subtle movement on scroll for the CTA glow
+  window.addEventListener('scroll', () => {
+    const cta = document.querySelector('.cta');
+    if (!cta) return;
+    const rect = cta.getBoundingClientRect();
+    const center = rect.top + rect.height / 2;
+    const viewCenter = window.innerHeight / 2;
+    const offset = (center - viewCenter) * 0.05;
+    const glow = cta.querySelector('::before');
+    cta.style.setProperty('--glow-offset', offset + 'px');
+  });
+
+  // Smooth nav background on scroll
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 100) {
+      nav.style.background = 'rgba(10, 10, 10, 0.95)';
+    } else {
+      nav.style.background = 'rgba(10, 10, 10, 0.85)';
+    }
+  });
+</script>
+</body>
+</html>

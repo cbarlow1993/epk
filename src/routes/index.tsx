@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { useEffect, useRef } from 'react'
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
@@ -13,138 +14,233 @@ export const Route = createFileRoute('/')({
 })
 
 const FEATURES = [
-  { title: 'Bio & Profile', desc: 'Two-column bio, profile photo, hero image, tagline, genres.' },
-  { title: 'Music & Mixes', desc: 'Showcase your sets with SoundCloud/Mixcloud links, categorised by genre.' },
-  { title: 'Events & Brands', desc: 'Display event flyers and brand logos in a visual grid.' },
-  { title: 'Technical Rider', desc: 'Share your preferred and alternative DJ setup requirements.' },
-  { title: 'Press Assets', desc: 'Upload photos, videos, and logos for promoters to download.' },
-  { title: 'Booking Contact', desc: 'Manager name, email, phone — easy for promoters to reach you.' },
-  { title: 'Social Links', desc: 'Connect all your social profiles in one place.' },
-  { title: 'Custom Themes', desc: 'Pick your colours, font, and make it match your brand.' },
+  { title: 'Bio & Profile', desc: 'Tell your story. Photo, biography, genre tags, and location — everything a promoter needs at a glance.' },
+  { title: 'Music & Mixes', desc: 'Embed your SoundCloud, Mixcloud, or direct links. Let your sound speak before you do.' },
+  { title: 'Events & Brands', desc: 'Showcase past and upcoming gigs. Display the brands and venues you have worked with.' },
+  { title: 'Technical Rider', desc: 'Specify your equipment requirements and setup preferences. No more back-and-forth emails.' },
+  { title: 'Press Assets', desc: 'High-resolution photos, logos, and promotional material ready for download.' },
+  { title: 'Booking Contact', desc: 'A clean contact form so promoters and agents can reach you directly.' },
+  { title: 'Social Links', desc: 'Connect all your platforms in one place. Instagram, SoundCloud, Spotify, and more.' },
+  { title: 'Custom Themes', desc: 'Match your EPK to your brand identity. Colours, layout, and typography — your rules.' },
 ]
 
-const PRICING = [
-  {
-    name: 'Free',
-    price: '£0',
-    period: 'forever',
-    features: ['Full EPK page', 'All content sections', 'yourname.djepk.com URL', 'Social links', 'Platform branding in footer'],
-    cta: 'Get Started Free',
-    highlight: false,
-  },
-  {
-    name: 'Pro',
-    price: '£9',
-    period: '/month',
-    features: ['Everything in Free', 'Custom domain', 'Remove platform branding', 'Priority support', 'Full theme customisation'],
-    cta: 'Upgrade to Pro',
-    highlight: true,
-  },
+const PRICING_ROWS = [
+  { feature: 'Full EPK page', free: true, pro: true },
+  { feature: 'All sections (bio, mixes, events, rider, press, contact)', free: true, pro: true },
+  { feature: 'yourname.djepk.com URL', free: true, pro: true },
+  { feature: 'Social links', free: true, pro: true },
+  { feature: 'Platform branding', free: true, pro: false, proLabel: 'Removed' },
+  { feature: 'Custom domain', free: false, pro: true },
+  { feature: 'Full theme customisation', free: false, pro: true },
+  { feature: 'Priority support', free: false, pro: true },
 ]
+
+function useScrollReveal(ref: React.RefObject<HTMLElement | null>) {
+  useEffect(() => {
+    if (!ref.current) return
+    const items = ref.current.querySelectorAll('[data-reveal]')
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const parent = entry.target.parentElement
+            if (!parent) continue
+            const siblings = parent.querySelectorAll('[data-reveal]')
+            const index = Array.from(siblings).indexOf(entry.target as Element)
+            setTimeout(() => {
+              (entry.target as HTMLElement).style.opacity = '1';
+              (entry.target as HTMLElement).style.transform = 'translateX(0)'
+            }, index * 80)
+            observer.unobserve(entry.target)
+          }
+        }
+      },
+      { rootMargin: '0px 0px -60px 0px', threshold: 0.1 }
+    )
+    items.forEach((item) => observer.observe(item))
+    return () => observer.disconnect()
+  }, [ref])
+}
 
 function LandingPage() {
+  const mainRef = useRef<HTMLDivElement>(null)
+  useScrollReveal(mainRef)
+
   return (
-    <div className="min-h-screen bg-bg">
+    <div ref={mainRef} className="min-h-screen bg-bg">
       {/* Nav */}
-      <nav className="max-w-6xl mx-auto px-4 py-6 flex items-center justify-between">
-        <span className="text-lg font-display font-semibold tracking-tight">DJ EPK</span>
-        <div className="flex gap-4 items-center">
-          <Link to="/login" className="text-sm text-text-secondary hover:text-text-primary transition-colors">Log in</Link>
-          <Link to="/signup" className="text-sm bg-accent hover:bg-accent/80 text-white px-4 py-2 rounded-lg transition-colors font-semibold">Sign up free</Link>
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-text-primary">
+        <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,4vw,4rem)] h-16 flex items-center justify-between">
+          <Link to="/" className="font-display font-extrabold text-xl tracking-tight flex items-center gap-2">
+            DJ EPK <span className="inline-block w-2 h-2 bg-accent rounded-full" />
+          </Link>
+          <div className="flex items-center gap-8">
+            <a href="#features" className="hidden sm:inline text-xs font-medium uppercase tracking-wider hover:text-accent transition-colors">Features</a>
+            <a href="#pricing" className="hidden sm:inline text-xs font-medium uppercase tracking-wider hover:text-accent transition-colors">Pricing</a>
+            <Link to="/login" className="text-xs font-medium uppercase tracking-wider hover:text-accent transition-colors">Log in</Link>
+            <Link to="/signup" className="text-xs font-semibold uppercase tracking-wider bg-text-primary text-white px-5 py-2 hover:bg-accent transition-colors">
+              Get Started
+            </Link>
+          </div>
         </div>
       </nav>
 
       {/* Hero */}
-      <section className="max-w-4xl mx-auto px-4 py-24 md:py-32 text-center">
-        <h1 className="text-5xl md:text-7xl font-display font-semibold tracking-tight mb-6">
-          Your DJ Press Kit,<br />Online.
-        </h1>
-        <p className="text-xl text-text-secondary mb-12 max-w-2xl mx-auto leading-relaxed">
-          Create a professional Electronic Press Kit in minutes. Share your bio, mixes, events, technical rider and booking info — all in one link.
-        </p>
-        <Link
-          to="/signup"
-          className="inline-block bg-accent hover:bg-accent/80 text-white font-semibold px-8 py-4 rounded-lg transition-colors text-lg"
-        >
-          Get Started Free
-        </Link>
+      <section className="min-h-screen flex flex-col justify-end pt-16 pb-16 border-b border-text-primary">
+        <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,4vw,4rem)] w-full">
+          <div className="grid md:grid-cols-2 gap-6 items-end">
+            <h1 className="font-display font-extrabold text-[clamp(3.5rem,10vw,9rem)] leading-[0.9] tracking-tighter uppercase">
+              Your<br />
+              Press<br />
+              <span className="text-accent">Kit.</span>
+            </h1>
+            <div className="flex flex-col gap-8 pb-2">
+              <p className="text-[clamp(1rem,1.5vw,1.25rem)] leading-relaxed text-text-secondary max-w-[400px]">
+                One link for your bio, mixes, events, rider, and booking contact. Built for DJs who take their career seriously.
+              </p>
+              <div className="flex gap-12 text-xs font-semibold uppercase tracking-widest text-text-secondary">
+                <div>
+                  <span className="block font-display font-extrabold text-3xl tracking-tight text-text-primary normal-case mb-1">8</span>
+                  Sections
+                </div>
+                <div>
+                  <span className="block font-display font-extrabold text-3xl tracking-tight text-text-primary normal-case mb-1">1</span>
+                  Link
+                </div>
+                <div>
+                  <span className="block font-display font-extrabold text-3xl tracking-tight text-text-primary normal-case mb-1">&pound;0</span>
+                  To Start
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
+      {/* Red divider */}
+      <div className="h-[3px] bg-accent" />
+
       {/* Features */}
-      <section className="max-w-6xl mx-auto px-4 py-20">
-        <div className="text-center mb-16">
-          <div className="w-12 h-0.5 bg-accent mx-auto mb-8" />
-          <h2 className="text-3xl md:text-4xl font-display font-semibold tracking-tight">Everything You Need</h2>
-        </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {FEATURES.map((f) => (
-            <div key={f.title} className="bg-white border border-border rounded-lg p-6 shadow-card hover:shadow-card-hover transition-shadow">
-              <h3 className="font-semibold text-sm text-text-primary mb-2">{f.title}</h3>
-              <p className="text-text-secondary text-sm leading-relaxed">{f.desc}</p>
-            </div>
-          ))}
+      <section id="features" className="border-b border-text-primary">
+        <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,4vw,4rem)]">
+          <div className="flex items-baseline gap-8 pt-16 pb-8">
+            <span className="font-display font-bold text-sm tracking-wider text-text-secondary">01</span>
+            <h2 className="font-display font-extrabold text-[clamp(2rem,5vw,4rem)] tracking-tighter uppercase leading-none">Features</h2>
+          </div>
+          <div className="grid md:grid-cols-2">
+            {FEATURES.map((f, i) => (
+              <div
+                key={f.title}
+                data-reveal
+                className="grid grid-cols-[2rem_1fr] gap-6 py-8 pr-8 border-t border-border md:even:pl-8 md:even:border-l md:even:border-l-border"
+                style={{ opacity: 0, transform: 'translateX(-30px)', transition: 'opacity 0.6s ease, transform 0.6s ease' }}
+              >
+                <span className="font-display font-bold text-xs text-text-secondary pt-0.5">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <div>
+                  <h3 className="font-display font-bold text-xl tracking-tight mb-2">{f.title}</h3>
+                  <p className="text-sm text-text-secondary leading-relaxed max-w-[320px]">{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Pricing */}
-      <section className="max-w-4xl mx-auto px-4 py-20">
-        <div className="text-center mb-16">
-          <div className="w-12 h-0.5 bg-accent mx-auto mb-8" />
-          <h2 className="text-3xl md:text-4xl font-display font-semibold tracking-tight">Simple Pricing</h2>
-        </div>
-        <div className="grid md:grid-cols-2 gap-8">
-          {PRICING.map((plan) => (
-            <div
-              key={plan.name}
-              className={`rounded-xl p-8 border ${plan.highlight ? 'border-accent bg-accent/5' : 'border-border bg-white shadow-card'}`}
-            >
-              <h3 className="text-lg font-display font-semibold tracking-tight mb-2">{plan.name}</h3>
-              <div className="mb-6">
-                <span className="text-4xl font-display font-semibold">{plan.price}</span>
-                <span className="text-text-secondary text-sm ml-1">{plan.period}</span>
-              </div>
-              <ul className="space-y-3 mb-8">
-                {plan.features.map((f) => (
-                  <li key={f} className="text-sm text-text-secondary flex items-start gap-2">
-                    <span className="text-accent mt-0.5">&#10003;</span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                to="/signup"
-                className={`block text-center py-3 rounded-lg font-semibold text-sm transition-colors ${
-                  plan.highlight
-                    ? 'bg-accent hover:bg-accent/80 text-white'
-                    : 'bg-bg hover:bg-border text-text-primary'
-                }`}
-              >
-                {plan.cta}
-              </Link>
-            </div>
-          ))}
+      <section id="pricing" className="border-b border-text-primary">
+        <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,4vw,4rem)]">
+          <div className="flex items-baseline gap-8 pt-16 pb-8">
+            <span className="font-display font-bold text-sm tracking-wider text-text-secondary">02</span>
+            <h2 className="font-display font-extrabold text-[clamp(2rem,5vw,4rem)] tracking-tighter uppercase leading-none">Pricing</h2>
+          </div>
+
+          <table className="w-full border-collapse mt-4">
+            <thead>
+              <tr>
+                <th className="w-1/2 text-left font-display font-bold text-sm uppercase tracking-wider p-4 border-b-2 border-text-primary align-bottom" />
+                <th className="text-left font-display font-bold text-sm uppercase tracking-wider p-4 border-b-2 border-text-primary align-bottom">
+                  Free
+                  <span className="block font-display font-extrabold text-4xl tracking-tighter mt-1 leading-none">&pound;0</span>
+                  <span className="font-normal text-xs text-text-secondary tracking-wider">Forever</span>
+                </th>
+                <th className="text-left font-display font-bold text-sm uppercase tracking-wider p-4 border-b-2 border-text-primary bg-text-primary text-white align-bottom">
+                  Pro
+                  <span className="block font-display font-extrabold text-4xl tracking-tighter mt-1 leading-none">&pound;9</span>
+                  <span className="font-normal text-xs text-white/60 tracking-wider">Per Month</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {PRICING_ROWS.map((row, i) => (
+                <tr
+                  key={row.feature}
+                  data-reveal
+                  style={{ opacity: 0, transform: 'translateX(-20px)', transition: `opacity 0.4s ease, transform 0.4s ease` }}
+                >
+                  <td className="p-3.5 border-b border-border text-sm font-medium text-text-secondary">{row.feature}</td>
+                  <td className="p-3.5 border-b border-border text-center text-sm font-semibold">
+                    {row.free ? <span>&#10003;</span> : <span className="text-border">&#8212;</span>}
+                  </td>
+                  <td className="p-3.5 border-b border-text-primary/10 text-center text-sm font-semibold bg-text-primary text-white">
+                    {row.pro ? (
+                      <span>&#10003;</span>
+                    ) : (
+                      <span className="text-white/40">&#8212; {row.proLabel}</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td className="p-4" />
+                <td className="p-4 text-center">
+                  <Link
+                    to="/signup"
+                    className="inline-block px-8 py-3 border border-text-primary text-text-primary text-xs font-semibold uppercase tracking-wider hover:bg-text-primary hover:text-white transition-colors"
+                  >
+                    Start Free
+                  </Link>
+                </td>
+                <td className="p-4 text-center bg-text-primary">
+                  <Link
+                    to="/signup"
+                    className="inline-block px-8 py-3 bg-accent text-white text-xs font-semibold uppercase tracking-wider border border-accent hover:bg-red-600 transition-colors"
+                  >
+                    Go Pro
+                  </Link>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="max-w-4xl mx-auto px-4 py-20 text-center">
-        <h2 className="text-3xl md:text-4xl font-display font-semibold tracking-tight mb-6">
-          Ready to stand out?
-        </h2>
-        <p className="text-text-secondary text-lg mb-8">Join DJs and artists who are taking their press kit online.</p>
-        <Link
-          to="/signup"
-          className="inline-block bg-accent hover:bg-accent/80 text-white font-semibold px-8 py-4 rounded-lg transition-colors text-lg"
-        >
-          Create Your EPK
-        </Link>
+      <section className="py-32 text-center">
+        <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,4vw,4rem)]">
+          <h2 className="font-display font-extrabold text-[clamp(2.5rem,7vw,6rem)] tracking-tighter uppercase leading-[0.95] mb-8">
+            Stop<br />Sending<br /><span className="text-accent">PDFs.</span>
+          </h2>
+          <p className="text-lg text-text-secondary max-w-[500px] mx-auto mb-12 leading-relaxed">
+            Build your electronic press kit in minutes. Share one link with every promoter, venue, and agent.
+          </p>
+          <Link
+            to="/signup"
+            className="inline-block px-12 py-4 bg-accent text-white font-bold text-sm uppercase tracking-widest hover:translate-y-[-2px] hover:shadow-[0_4px_0_0_black] transition-all"
+          >
+            Create Your EPK
+          </Link>
+        </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border py-8">
-        <div className="max-w-6xl mx-auto px-4 flex items-center justify-between text-xs text-text-secondary">
-          <span>DJ EPK</span>
-          <span>&copy; {new Date().getFullYear()}</span>
+      <footer className="border-t border-text-primary py-6">
+        <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,4vw,4rem)] flex items-center justify-between">
+          <span className="font-display font-bold text-sm">DJ EPK <span className="text-accent">&#9679;</span></span>
+          <span className="text-xs text-text-secondary">&copy; {new Date().getFullYear()} DJ EPK</span>
         </div>
       </footer>
     </div>

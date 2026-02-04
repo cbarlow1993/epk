@@ -1,11 +1,22 @@
+import { useRef, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { getProfile, updateProfile } from '~/server/profile'
-import { profileUpdateSchema, type ProfileUpdate } from '~/schemas/profile'
-import { TiptapEditor } from '~/components/forms'
+import { BlockEditor, type BlockEditorHandle, FORM_LABEL, FORM_INPUT, FORM_ERROR_MSG, FORM_FILE_INPUT } from '~/components/forms'
+import { BlockRenderer } from '~/components/BlockRenderer'
 import { useDashboardSave } from '~/hooks/useDashboardSave'
 import { DashboardHeader } from '~/components/DashboardHeader'
+import { uploadFileFromInput } from '~/utils/upload'
+import type { OutputData } from '@editorjs/editorjs'
+
+const bioFormSchema = z.object({
+  short_bio: z.string().max(200, 'Max 200 characters').optional(),
+  profile_image_url: z.string().url('Invalid URL').optional().or(z.literal('')),
+})
+
+type BioFormValues = z.infer<typeof bioFormSchema>
 
 export const Route = createFileRoute('/_dashboard/dashboard/bio')({
   loader: () => getProfile(),
@@ -14,47 +25,126 @@ export const Route = createFileRoute('/_dashboard/dashboard/bio')({
 
 function BioEditor() {
   const initialProfile = Route.useLoaderData()
-  const { saving, saved, error, onSave: save } = useDashboardSave(updateProfile)
+  const { saving, saved, error, onSave } = useDashboardSave(updateProfile)
+  const editorRef = useRef<BlockEditorHandle>(null)
+  const [wordCount, setWordCount] = useState(0)
+  const [previewing, setPreviewing] = useState(false)
+  const [previewData, setPreviewData] = useState<OutputData | null>(null)
+  const [uploadingPhoto, setUploadingPhoto] = useState(false)
 
-  const { control, handleSubmit, formState: { errors, isDirty } } = useForm<Pick<ProfileUpdate, 'bio_left' | 'bio_right'>>({
-    resolver: zodResolver(profileUpdateSchema.pick({ bio_left: true, bio_right: true }).partial()),
+  const { register, handleSubmit, watch, formState: { errors, isDirty }, setValue } = useForm<BioFormValues>({
+    resolver: zodResolver(bioFormSchema) as never,
     defaultValues: {
-      bio_left: initialProfile?.bio_left || '',
-      bio_right: initialProfile?.bio_right || '',
+      short_bio: initialProfile?.short_bio || '',
+      profile_image_url: initialProfile?.profile_image_url || '',
     },
   })
 
-  const onSave = handleSubmit(save)
+  const shortBio = watch('short_bio') || ''
+  const profileImageUrl = watch('profile_image_url')
+
+  const handleSave = handleSubmit(async (formData) => {
+    if (!editorRef.current) return
+    const bio = await editorRef.current.save()
+    await onSave({ ...formData, bio } as Record<string, unknown>)
+  })
+
+  const handleProfileImage = async (file: File) => {
+    setUploadingPhoto(true)
+    const result = await uploadFileFromInput(file, 'profile')
+    setUploadingPhoto(false)
+    if (result) setValue('profile_image_url', result.url, { shouldDirty: true })
+  }
+
+  const handlePreviewToggle = async () => {
+    if (!previewing && editorRef.current) {
+      const data = await editorRef.current.save()
+      setPreviewData(data)
+    }
+    setPreviewing(!previewing)
+  }
 
   return (
-    <form onSubmit={onSave}>
-      <DashboardHeader title="Bio" saving={saving} saved={saved} error={error} isDirty={isDirty} />
+    <form onSubmit={handleSave}>
+      <DashboardHeader title="Bio" saving={saving} saved={saved} error={error} isDirty={isDirty || true} />
 
-      <div className="grid md:grid-cols-2 gap-6">
-        <Controller
-          name="bio_left"
-          control={control}
-          render={({ field }) => (
-            <TiptapEditor
-              label="Left Column"
-              content={field.value || ''}
-              onChange={field.onChange}
-              placeholder="First half of your bio..."
+      <div className="space-y-6 max-w-2xl">
+        {/* Profile Photo */}
+        <div>
+          <label className={FORM_LABEL}>Profile Photo</label>
+          <div className="flex items-center gap-4">
+            {profileImageUrl ? (
+              <img src={profileImageUrl} alt="Profile" className="w-20 h-20 rounded-full object-cover border border-border" />
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-surface border border-border flex items-center justify-center text-text-secondary text-xs">
+                No photo
+              </div>
+            )}
+            <div>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) handleProfileImage(file)
+                }}
+                className={FORM_FILE_INPUT}
+              />
+              {uploadingPhoto && <p className="text-xs text-accent mt-1">Uploading...</p>}
+            </div>
+          </div>
+        </div>
+
+        {/* Short Bio */}
+        <div>
+          <label className={FORM_LABEL}>Short Bio</label>
+          <textarea
+            rows={3}
+            placeholder="A brief introduction (max 200 characters)"
+            {...register('short_bio')}
+            className={`${errors.short_bio ? FORM_INPUT + ' border-red-500' : FORM_INPUT} resize-none leading-relaxed`}
+            maxLength={200}
+          />
+          <div className="flex justify-between mt-1">
+            {errors.short_bio && <p className={FORM_ERROR_MSG}>{errors.short_bio.message}</p>}
+            <p className={`text-xs ml-auto ${shortBio.length > 180 ? 'text-red-500' : 'text-text-secondary'}`}>
+              {shortBio.length}/200
+            </p>
+          </div>
+        </div>
+
+        {/* Full Bio Editor */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <span className={FORM_LABEL + ' mb-0'}>Full Bio</span>
+            <div className="flex items-center gap-3">
+              {wordCount > 0 && (
+                <span className="text-xs text-text-secondary">{wordCount} word{wordCount !== 1 ? 's' : ''}</span>
+              )}
+              <button
+                type="button"
+                onClick={handlePreviewToggle}
+                className="text-xs font-semibold uppercase tracking-wider text-accent hover:underline"
+              >
+                {previewing ? 'Edit' : 'Preview'}
+              </button>
+            </div>
+          </div>
+
+          {previewing ? (
+            <div className="border border-text-primary/20 bg-white min-h-[200px] px-6 py-4 prose prose-sm max-w-none">
+              <BlockRenderer data={previewData} />
+            </div>
+          ) : (
+            <BlockEditor
+              ref={editorRef}
+              label=""
+              defaultData={initialProfile?.bio || null}
+              placeholder="Write your bio..."
+              onWordCount={setWordCount}
             />
           )}
-        />
-        <Controller
-          name="bio_right"
-          control={control}
-          render={({ field }) => (
-            <TiptapEditor
-              label="Right Column"
-              content={field.value || ''}
-              onChange={field.onChange}
-              placeholder="Second half of your bio..."
-            />
-          )}
-        />
+        </div>
       </div>
     </form>
   )

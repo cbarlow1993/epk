@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { RESERVED_SLUGS } from '~/utils/constants'
+import { editorDataSchema } from './editorData'
 
 export const profileUpdateSchema = z.object({
   display_name: z.string().max(100, 'Max 100 characters').optional(),
@@ -32,8 +33,8 @@ export const profileUpdateSchema = z.object({
     .regex(/^#[0-9a-fA-F]{6}$/, 'Must be a valid hex colour (e.g. #0a0a0f)')
     .optional(),
   font_family: z.string().max(50).optional(),
-  bio_left: z.string().max(10000, 'Max 10000 characters').optional(),
-  bio_right: z.string().max(10000, 'Max 10000 characters').optional(),
+  short_bio: z.string().max(200, 'Max 200 characters').optional(),
+  bio: editorDataSchema.optional(),
   favicon_url: z.string().url().optional().or(z.literal('')),
   hide_platform_branding: z.boolean().optional(),
   meta_description: z.string().max(300).optional(),

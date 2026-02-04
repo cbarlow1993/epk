@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EPKDJ - Festival Poster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --cream: #FFF8E7;
+  --ink: #1A1A1A;
+  --orange: #E85D26;
+  --teal: #1B8A7A;
+  --red: #D94040;
+  --warm-gray: #c8c0b0;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--ink);
+  background: var(--cream);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Noise overlay for texture */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+h1, h2, h3, h4, h5, h6 { font-family: 'Syne', sans-serif; }
+
+/* Halftone pattern utility */
+.halftone {
+  position: relative;
+}
+
+.halftone::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  background-image: radial-gradient(circle, var(--ink) 1px, transparent 1px);
+  background-size: 6px 6px;
+  opacity: 0.06;
+}
+
+/* Nav */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 1.2rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.4s ease;
+  border-bottom: 3px solid transparent;
+}
+
+nav.scrolled {
+  background: rgba(255, 248, 231, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 3px solid var(--ink);
+  padding: 0.8rem 2rem;
+}
+
+.nav-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.nav-logo span { color: var(--orange); }
+
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+
+.nav-links a {
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover { color: var(--orange); }
+
+.nav-cta {
+  background: var(--ink);
+  color: var(--cream);
+  border: 3px solid var(--ink);
+  padding: 0.6rem 1.4rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-cta:hover {
+  background: var(--orange);
+  border-color: var(--orange);
+}
+
+.mobile-toggle { display: none; background: none; border: none; color: var(--ink); font-size: 1.6rem; cursor: pointer; font-weight: 800; }
+
+/* Hero */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 8rem 2rem 6rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Large background text */
+.hero-bg-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(8rem, 18vw, 16rem);
+  font-weight: 800;
+  color: var(--ink);
+  opacity: 0.04;
+  white-space: nowrap;
+  pointer-events: none;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.hero-content {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+/* Stamp decorative element */
+.stamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px; height: 80px;
+  border: 3px solid var(--orange);
+  border-radius: 50%;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--orange);
+  transform: rotate(-15deg);
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.stamp::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 2px dashed var(--orange);
+  border-radius: 50%;
+}
+
+.hero h1 {
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  color: var(--ink);
+}
+
+.hero h1 .accent { color: var(--orange); }
+.hero h1 .teal-accent { color: var(--teal); }
+
+.hero-sub {
+  font-size: 1.15rem;
+  max-width: 520px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.7;
+  color: #555;
+}
+
+.hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+.btn-fill {
+  display: inline-block;
+  padding: 1rem 2.5rem;
+  background: var(--ink);
+  color: var(--cream);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 3px solid var(--ink);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.btn-fill:hover {
+  background: var(--orange);
+  border-color: var(--orange);
+}
+
+.btn-outline {
+  display: inline-block;
+  padding: 1rem 2.5rem;
+  background: transparent;
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 3px solid var(--ink);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.btn-outline:hover {
+  background: var(--ink);
+  color: var(--cream);
+}
+
+/* Halftone bar */
+.halftone-bar {
+  width: 100%;
+  height: 40px;
+  background-image: radial-gradient(circle, var(--ink) 1.5px, transparent 1.5px);
+  background-size: 8px 8px;
+  opacity: 0.08;
+}
+
+/* Section base */
+section { padding: 6rem 2rem; position: relative; }
+
+.section-inner { max-width: 1100px; margin: 0 auto; }
+
+.section-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 0.75rem;
+}
+
+.section-heading {
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  color: var(--ink);
+}
+
+.section-sub {
+  color: #555;
+  font-size: 1.05rem;
+  max-width: 520px;
+  line-height: 1.7;
+  margin-bottom: 3.5rem;
+}
+
+.section-sub.center { margin-left: auto; margin-right: auto; text-align: center; }
+
+/* Features */
+.features-section { background: var(--ink); color: var(--cream); }
+.features-section .section-label { color: var(--orange); }
+.features-section .section-heading { color: var(--cream); }
+.features-section .section-sub { color: var(--warm-gray); }
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0;
+  border-top: 2px solid rgba(255, 248, 231, 0.12);
+}
+
+.feature-item {
+  padding: 2.5rem;
+  border-bottom: 2px solid rgba(255, 248, 231, 0.12);
+  border-right: 2px solid rgba(255, 248, 231, 0.12);
+  position: relative;
+  transition: background 0.3s;
+}
+
+.feature-item:nth-child(2n) { border-right: none; }
+
+.feature-item:hover { background: rgba(255, 248, 231, 0.03); }
+
+.feature-number {
+  font-family: 'Syne', sans-serif;
+  font-size: 5rem;
+  font-weight: 800;
+  color: rgba(255, 248, 231, 0.05);
+  position: absolute;
+  top: 0.5rem;
+  right: 1rem;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.feature-item h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.6rem;
+  color: var(--cream);
+}
+
+.feature-tag {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.6rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid;
+}
+
+.feature-tag.orange { color: var(--orange); border-color: var(--orange); }
+.feature-tag.teal { color: var(--teal); border-color: var(--teal); }
+.feature-tag.red { color: var(--red); border-color: var(--red); }
+
+.feature-item p {
+  font-size: 0.9rem;
+  color: var(--warm-gray);
+  line-height: 1.6;
+  position: relative;
+  z-index: 1;
+}
+
+/* Pricing - Ticket stub style */
+.pricing-section { text-align: center; }
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.pricing-card {
+  text-align: left;
+  border: 3px solid var(--ink);
+  position: relative;
+  background: var(--cream);
+}
+
+.pricing-card-top {
+  padding: 2rem 2rem 1.5rem;
+  border-bottom: 3px dashed var(--ink);
+  position: relative;
+}
+
+/* Perforated edge circles */
+.pricing-card-top::before,
+.pricing-card-top::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  width: 22px; height: 22px;
+  background: var(--cream);
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+}
+
+.pricing-card-top::before { left: -13px; }
+.pricing-card-top::after { right: -13px; }
+
+.pricing-card-bottom { padding: 1.5rem 2rem 2rem; }
+
+.pricing-card.featured { border-color: var(--orange); }
+.pricing-card.featured .pricing-card-top { border-bottom-color: var(--orange); background: var(--orange); color: var(--cream); }
+.pricing-card.featured .pricing-card-top::before,
+.pricing-card.featured .pricing-card-top::after { border-color: var(--orange); }
+.pricing-card.featured .pricing-tier { color: var(--cream); opacity: 0.8; }
+.pricing-card.featured .pricing-price { color: var(--cream); }
+.pricing-card.featured .pricing-desc { color: rgba(255, 248, 231, 0.8); }
+
+.pricing-tier {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+  opacity: 0.5;
+  margin-bottom: 0.3rem;
+}
+
+.pricing-price {
+  font-family: 'Syne', sans-serif;
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.pricing-price span { font-size: 1rem; font-weight: 500; opacity: 0.6; }
+
+.pricing-desc {
+  color: #666;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.pricing-features {
+  list-style: none;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pricing-features li {
+  font-size: 0.88rem;
+  color: var(--ink);
+  padding-left: 1.3rem;
+  position: relative;
+}
+
+.pricing-features li::before {
+  content: '+';
+  position: absolute;
+  left: 0;
+  color: var(--teal);
+  font-weight: 800;
+}
+
+.pricing-btn {
+  display: block;
+  width: 100%;
+  padding: 0.85rem;
+  border: 3px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  text-decoration: none;
+}
+
+.pricing-btn:hover {
+  background: var(--ink);
+  color: var(--cream);
+}
+
+.pricing-card.featured .pricing-btn {
+  background: var(--orange);
+  border-color: var(--orange);
+  color: var(--cream);
+}
+
+.pricing-card.featured .pricing-btn:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+.popular-stamp {
+  position: absolute;
+  top: -14px;
+  right: 16px;
+  background: var(--red);
+  color: var(--cream);
+  font-family: 'Syne', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.3rem 0.8rem;
+  transform: rotate(2deg);
+}
+
+/* CTA */
+.cta-section {
+  text-align: center;
+  padding: 8rem 2rem;
+  background: var(--ink);
+  color: var(--cream);
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-bg-text {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(6rem, 14vw, 14rem);
+  font-weight: 800;
+  color: rgba(255, 248, 231, 0.03);
+  white-space: nowrap;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.cta-inner {
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.cta-inner h2 {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  margin-bottom: 1.2rem;
+}
+
+.cta-inner h2 .accent { color: var(--orange); }
+
+.cta-inner p {
+  color: var(--warm-gray);
+  font-size: 1.05rem;
+  margin-bottom: 2.5rem;
+  line-height: 1.7;
+}
+
+.btn-fill-light {
+  display: inline-block;
+  padding: 1rem 2.5rem;
+  background: var(--cream);
+  color: var(--ink);
+  text-decoration: none;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 3px solid var(--cream);
+  transition: all 0.2s;
+}
+
+.btn-fill-light:hover {
+  background: var(--orange);
+  border-color: var(--orange);
+  color: var(--cream);
+}
+
+/* Divider */
+.poster-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.poster-divider::before,
+.poster-divider::after {
+  content: '';
+  flex: 1;
+  height: 3px;
+  background: var(--ink);
+}
+
+.poster-divider span {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* Footer */
+footer {
+  padding: 3rem 2rem;
+  text-align: center;
+  border-top: 3px solid var(--ink);
+  color: var(--ink);
+  font-size: 0.85rem;
+}
+
+footer a { color: var(--orange); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav-cta { display: none; }
+  .mobile-toggle { display: block; }
+  nav.mobile-open .nav-links {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%; left: 0; right: 0;
+    background: rgba(255, 248, 231, 0.97);
+    padding: 1.5rem 2rem;
+    border-bottom: 3px solid var(--ink);
+    gap: 1rem;
+  }
+  .features-grid { grid-template-columns: 1fr; }
+  .feature-item { border-right: none !important; }
+  .pricing-grid { grid-template-columns: 1fr; max-width: 380px; }
+  .hero-bg-text { font-size: 5rem; }
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="nav-logo">EPK<span>.</span>DJ</div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#cta">Get Started</a></li>
+  </ul>
+  <button class="nav-cta">Start Free</button>
+  <button class="mobile-toggle" onclick="document.getElementById('nav').classList.toggle('mobile-open')">///</button>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg-text">PRESS KIT</div>
+  <div class="hero-content reveal">
+    <div class="stamp">EST.<br>2025</div>
+    <h1>Your <span class="accent">Press Kit</span><br>Deserves<br><span class="teal-accent">Better</span></h1>
+    <p class="hero-sub">One link for your bio, music, events, rider, and press. Built for DJs who take their career seriously.</p>
+    <div class="hero-buttons">
+      <a href="#cta" class="btn-fill">Build Your EPK</a>
+      <a href="#features" class="btn-outline">See Features</a>
+    </div>
+  </div>
+</section>
+
+<div class="halftone-bar"></div>
+
+<div class="poster-divider"><span>What You Get</span></div>
+
+<section id="features" class="features-section">
+  <div class="section-inner">
+    <div class="reveal" style="margin-bottom: 3rem;">
+      <div class="section-label">Features</div>
+      <h2 class="section-heading">Everything a<br>Working DJ Needs</h2>
+      <p class="section-sub">No fluff. Just the tools that actually help you book gigs and share your sound.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-item reveal">
+        <div class="feature-number">01</div>
+        <div class="feature-tag orange">Core</div>
+        <h3>Artist Bio</h3>
+        <p>Rich text bio with photos and genre tags. Tell your story the way you want it told.</p>
+      </div>
+      <div class="feature-item reveal">
+        <div class="feature-number">02</div>
+        <div class="feature-tag teal">Music</div>
+        <h3>Music Embeds</h3>
+        <p>Embed from SoundCloud, Spotify, Mixcloud, and Bandcamp. Tracks, mixes, and albums in one place.</p>
+      </div>
+      <div class="feature-item reveal">
+        <div class="feature-number">03</div>
+        <div class="feature-tag orange">Live</div>
+        <h3>Event Calendar</h3>
+        <p>Upcoming and past gigs listed with venues, dates, and flyers. Proof you're out there playing.</p>
+      </div>
+      <div class="feature-item reveal">
+        <div class="feature-number">04</div>
+        <div class="feature-tag red">Pro</div>
+        <h3>Technical Rider</h3>
+        <p>Equipment needs and stage plot in a clean, shareable format. No more PDF attachments.</p>
+      </div>
+      <div class="feature-item reveal">
+        <div class="feature-number">05</div>
+        <div class="feature-tag teal">Social</div>
+        <h3>Press Quotes</h3>
+        <p>Showcase reviews and testimonials from media, promoters, and artists who rate your sound.</p>
+      </div>
+      <div class="feature-item reveal">
+        <div class="feature-number">06</div>
+        <div class="feature-tag orange">Booking</div>
+        <h3>Contact Form</h3>
+        <p>Direct booking inquiries to your inbox. No more missed DMs or messages lost in the noise.</p>
+      </div>
+      <div class="feature-item reveal">
+        <div class="feature-number">07</div>
+        <div class="feature-tag red">Data</div>
+        <h3>Analytics</h3>
+        <p>See who views your EPK, where they come from, and what they click. Know your audience.</p>
+      </div>
+      <div class="feature-item reveal">
+        <div class="feature-number">08</div>
+        <div class="feature-tag teal">Brand</div>
+        <h3>Custom Domain</h3>
+        <p>Point your own domain to your EPK. Full brand control, professional presence.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="halftone-bar"></div>
+
+<div class="poster-divider"><span>Pick Your Plan</span></div>
+
+<section id="pricing" class="pricing-section">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">Pricing</div>
+      <h2 class="section-heading">No Contracts.<br>No Surprises.</h2>
+      <p class="section-sub center">Start free and upgrade when you need more. Cancel anytime.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card reveal">
+        <div class="pricing-card-top">
+          <div class="pricing-tier">Free</div>
+          <div class="pricing-price">$0<span>/mo</span></div>
+          <p class="pricing-desc">The essentials to get started.</p>
+        </div>
+        <div class="pricing-card-bottom">
+          <ul class="pricing-features">
+            <li>1 EPK page</li>
+            <li>Bio + photo</li>
+            <li>3 music embeds</li>
+            <li>5 events</li>
+            <li>Contact form</li>
+            <li>EPK.DJ subdomain</li>
+          </ul>
+          <a href="#" class="pricing-btn">Get Started</a>
+        </div>
+      </div>
+      <div class="pricing-card featured reveal">
+        <div class="popular-stamp">Most Popular</div>
+        <div class="pricing-card-top">
+          <div class="pricing-tier">Pro</div>
+          <div class="pricing-price">$9<span>/mo</span></div>
+          <p class="pricing-desc">For DJs who mean business.</p>
+        </div>
+        <div class="pricing-card-bottom">
+          <ul class="pricing-features">
+            <li>Everything in Free</li>
+            <li>Unlimited music embeds</li>
+            <li>Unlimited events</li>
+            <li>Technical rider</li>
+            <li>Press quotes</li>
+            <li>Analytics dashboard</li>
+            <li>Custom domain</li>
+            <li>Priority support</li>
+          </ul>
+          <a href="#" class="pricing-btn">Start Pro Trial</a>
+        </div>
+      </div>
+      <div class="pricing-card reveal">
+        <div class="pricing-card-top">
+          <div class="pricing-tier">Agency</div>
+          <div class="pricing-price">$29<span>/mo</span></div>
+          <p class="pricing-desc">Manage a roster of artists.</p>
+        </div>
+        <div class="pricing-card-bottom">
+          <ul class="pricing-features">
+            <li>Everything in Pro</li>
+            <li>Up to 20 artist EPKs</li>
+            <li>Agency dashboard</li>
+            <li>Aggregated analytics</li>
+            <li>Team member access</li>
+            <li>Bulk updates</li>
+            <li>White-label option</li>
+            <li>Dedicated support</li>
+          </ul>
+          <a href="#" class="pricing-btn">Contact Sales</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cta" class="cta-section">
+  <div class="cta-bg-text">GO TIME</div>
+  <div class="cta-inner reveal">
+    <h2>Stop Sending<br><span class="accent">Zip Files</span></h2>
+    <p>Join thousands of DJs who use EPK.DJ to land gigs, share their music, and look professional doing it.</p>
+    <a href="#" class="btn-fill-light">Create Your Free EPK</a>
+  </div>
+</section>
+
+<footer>
+  <p>&copy; 2025 <a href="#">EPK.DJ</a> &mdash; Built for DJs, by DJs.</p>
+</footer>
+
+<script>
+// Scroll reveal
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+reveals.forEach(el => observer.observe(el));
+
+// Nav scroll
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+      nav.classList.remove('mobile-open');
+    }
+  });
+});
+</script>
+</body>
+</html>

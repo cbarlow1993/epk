@@ -10,13 +10,14 @@ export const Route = createFileRoute('/_dashboard/dashboard/analytics')({
   component: AnalyticsPage,
 })
 
-const CHART_COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981']
+const CHART_COLORS = ['#FF0000', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981']
 
 const TOOLTIP_STYLE = {
   contentStyle: {
-    backgroundColor: '#1a1a2e',
-    border: '1px solid rgba(255,255,255,0.1)',
-    borderRadius: '8px',
+    backgroundColor: '#FFFFFF',
+    border: '1px solid #000000',
+    borderRadius: '0px',
+    color: '#2D2D2D',
   },
 }
 
@@ -69,7 +70,7 @@ function AnalyticsPage() {
   if (!isPro) {
     return (
       <div>
-        <h1 className="text-2xl font-display font-semibold tracking-tight mb-8">Analytics</h1>
+        <h1 className="text-2xl font-display font-extrabold tracking-tight uppercase mb-8">Analytics</h1>
         <div className={`${SETTINGS_CARD} max-w-lg`}>
           <h2 className="font-medium text-text-secondary mb-4">Pro Feature</h2>
           <p className="text-text-secondary text-sm mb-4">
@@ -77,7 +78,7 @@ function AnalyticsPage() {
           </p>
           <Link
             to="/dashboard/settings"
-            className={`${BTN_BASE} bg-accent text-white hover:bg-accent/80 inline-block`}
+            className={`${BTN_BASE} bg-text-primary text-white hover:bg-accent inline-block`}
           >
             Upgrade to Pro
           </Link>
@@ -92,7 +93,7 @@ function AnalyticsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-display font-semibold tracking-tight">Analytics</h1>
+        <h1 className="text-2xl font-display font-extrabold tracking-tight uppercase">Analytics</h1>
         <div className="flex gap-2">
           {[7, 30, 90].map((d) => (
             <button
@@ -101,7 +102,7 @@ function AnalyticsPage() {
               onClick={() => setDays(d)}
               className={`${BTN_BASE} ${
                 days === d
-                  ? 'bg-accent text-white'
+                  ? 'bg-text-primary text-white'
                   : 'bg-bg text-text-secondary hover:text-text-primary'
               }`}
             >
@@ -127,11 +128,11 @@ function AnalyticsPage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className={SETTINGS_CARD}>
               <p className="text-xs font-medium text-text-secondary mb-1">Page Views</p>
-              <p className="text-2xl font-black">{data.pageViews.toLocaleString()}</p>
+              <p className="text-2xl font-display font-extrabold">{data.pageViews.toLocaleString()}</p>
             </div>
             <div className={SETTINGS_CARD}>
               <p className="text-xs font-medium text-text-secondary mb-1">Unique Visitors</p>
-              <p className="text-2xl font-black">{data.uniqueVisitors.toLocaleString()}</p>
+              <p className="text-2xl font-display font-extrabold">{data.uniqueVisitors.toLocaleString()}</p>
             </div>
             <div className={SETTINGS_CARD}>
               <p className="text-xs font-medium text-text-secondary mb-1">Top Referrer</p>
@@ -157,7 +158,7 @@ function AnalyticsPage() {
                     />
                     <YAxis tick={{ fill: '#9ca3af', fontSize: 11 }} />
                     <Tooltip {...TOOLTIP_STYLE} />
-                    <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="count" fill="#FF0000" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

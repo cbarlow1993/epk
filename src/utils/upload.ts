@@ -1,6 +1,6 @@
 import { uploadFile } from '~/server/upload'
 
-export async function uploadFileFromInput(file: File, folder: string): Promise<string | null> {
+export async function uploadFileFromInput(file: File, folder: string): Promise<{ url: string; fileId: string } | null> {
   const base64 = await fileToBase64(file)
   const result = await uploadFile({
     data: {
@@ -14,7 +14,7 @@ export async function uploadFileFromInput(file: File, folder: string): Promise<s
     console.error('Upload failed:', result.error)
     return null
   }
-  return result.url
+  return { url: result.url, fileId: result.fileId }
 }
 
 function fileToBase64(file: File): Promise<string> {

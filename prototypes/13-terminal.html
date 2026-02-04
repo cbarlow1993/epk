@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRESS.KIT // DJ EPK Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --black: #0a0a0a;
+    --green: #00FF41;
+    --amber: #FFB000;
+    --dim-green: #0D4B0D;
+    --dark-green: #003B00;
+    --glow: 0 0 10px rgba(0, 255, 65, 0.4), 0 0 40px rgba(0, 255, 65, 0.1);
+    --glow-amber: 0 0 10px rgba(255, 176, 0, 0.4), 0 0 40px rgba(255, 176, 0, 0.1);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--black);
+    color: var(--green);
+    font-size: 15px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* Boot screen overlay */
+  #boot-screen {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--black);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    transition: opacity 0.5s;
+  }
+  #boot-screen.done { opacity: 0; pointer-events: none; }
+  #boot-text {
+    font-size: 14px; color: var(--green);
+    text-shadow: var(--glow);
+    white-space: pre; text-align: left;
+    max-width: 600px; width: 90%;
+  }
+
+  /* CRT wrapper */
+  #crt {
+    position: relative;
+    min-height: 100vh;
+  }
+  #crt::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 1000;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 255, 65, 0.03) 0px,
+      rgba(0, 255, 65, 0.03) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    pointer-events: none;
+  }
+  #crt::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 1001;
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.4) 100%);
+    pointer-events: none;
+  }
+
+  /* Matrix canvas */
+  #matrix-canvas {
+    position: fixed; inset: 0; z-index: 0;
+    opacity: 0.07;
+  }
+
+  /* Nav */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+    padding: 16px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: background 0.3s, border-color 0.3s;
+    border-bottom: 1px solid transparent;
+  }
+  .nav.scrolled {
+    background: rgba(10, 10, 10, 0.95);
+    border-bottom-color: var(--dim-green);
+    backdrop-filter: blur(8px);
+  }
+  .nav-logo {
+    font-size: 18px; font-weight: 700;
+    color: var(--green);
+    text-shadow: var(--glow);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--amber); }
+  .nav-links { display: flex; gap: 28px; list-style: none; }
+  .nav-links a {
+    color: var(--green); text-decoration: none; font-size: 13px;
+    opacity: 0.7; transition: opacity 0.2s;
+  }
+  .nav-links a:hover { opacity: 1; text-shadow: var(--glow); }
+  .nav-cta {
+    border: 1px solid var(--green); background: transparent;
+    color: var(--green); padding: 8px 20px; font-family: inherit;
+    font-size: 13px; cursor: pointer; transition: all 0.2s;
+    text-shadow: var(--glow);
+  }
+  .nav-cta:hover { background: var(--green); color: var(--black); text-shadow: none; }
+
+  /* Sections */
+  section { position: relative; z-index: 10; padding: 100px 24px; }
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  /* Reveal animation */
+  .reveal {
+    opacity: 0; transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ASCII divider */
+  .ascii-divider {
+    text-align: center; color: var(--dim-green);
+    font-size: 12px; padding: 20px 0;
+    user-select: none; overflow: hidden;
+    white-space: nowrap;
+  }
+
+  /* Hero */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center;
+    padding-top: 80px;
+  }
+  .hero-pre {
+    font-size: 13px; color: var(--amber);
+    text-shadow: var(--glow-amber);
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-size: clamp(32px, 6vw, 64px);
+    font-weight: 700; line-height: 1.2;
+    text-shadow: var(--glow);
+    margin-bottom: 8px;
+  }
+  .cursor {
+    display: inline-block; width: 3px;
+    background: var(--green); margin-left: 4px;
+    animation: blink 1s step-end infinite;
+    vertical-align: baseline;
+  }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+  .hero-sub {
+    font-size: 16px; color: rgba(0, 255, 65, 0.6);
+    max-width: 600px; margin: 24px auto 40px;
+    font-weight: 300;
+  }
+  .hero-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--green); color: var(--black);
+    border: none; padding: 14px 32px; font-family: inherit;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: all 0.2s; text-decoration: none;
+  }
+  .btn-primary:hover { box-shadow: var(--glow); transform: translateY(-2px); }
+  .btn-secondary {
+    background: transparent; color: var(--green);
+    border: 1px solid var(--dim-green); padding: 14px 32px;
+    font-family: inherit; font-size: 14px; cursor: pointer;
+    transition: all 0.2s; text-decoration: none;
+  }
+  .btn-secondary:hover { border-color: var(--green); text-shadow: var(--glow); }
+
+  /* Features */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px; margin-top: 48px;
+  }
+  .feature-card {
+    border: 1px solid var(--dim-green);
+    background: rgba(0, 255, 65, 0.02);
+    overflow: hidden; transition: border-color 0.3s;
+  }
+  .feature-card:hover { border-color: var(--green); }
+  .feature-titlebar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px;
+    background: var(--dim-green);
+    border-bottom: 1px solid var(--dim-green);
+  }
+  .titlebar-dots { display: flex; gap: 5px; }
+  .titlebar-dots span {
+    width: 10px; height: 10px; border-radius: 50%;
+    border: 1px solid rgba(0, 255, 65, 0.3);
+  }
+  .titlebar-dots span:nth-child(1) { background: #ff5f57; border-color: #e0443e; }
+  .titlebar-dots span:nth-child(2) { background: #febc2e; border-color: #d4a028; }
+  .titlebar-dots span:nth-child(3) { background: #28c840; border-color: #1aab29; }
+  .titlebar-filename {
+    font-size: 11px; color: rgba(0, 255, 65, 0.5);
+    flex: 1;
+  }
+  .feature-body { padding: 24px; }
+  .feature-body h3 {
+    font-size: 15px; font-weight: 600;
+    color: var(--amber); text-shadow: var(--glow-amber);
+    margin-bottom: 8px;
+  }
+  .feature-body h3::before { content: '> '; color: var(--green); }
+  .feature-body p {
+    font-size: 13px; color: rgba(0, 255, 65, 0.6);
+    line-height: 1.8;
+  }
+
+  /* Section headings */
+  .section-label {
+    font-size: 12px; color: var(--amber);
+    text-shadow: var(--glow-amber);
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-size: clamp(24px, 4vw, 40px);
+    font-weight: 700;
+    text-shadow: var(--glow);
+    margin-bottom: 16px;
+  }
+  .section-desc {
+    font-size: 14px; color: rgba(0, 255, 65, 0.5);
+    max-width: 600px;
+  }
+  .section-desc.center { margin: 0 auto; text-align: center; }
+  .text-center { text-align: center; }
+
+  /* Pricing */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px; margin-top: 48px;
+  }
+  .pricing-card {
+    border: 1px solid var(--dim-green);
+    background: rgba(0, 255, 65, 0.02);
+    padding: 0; overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .pricing-card:hover { transform: translateY(-4px); }
+  .pricing-card.featured { border-color: var(--amber); }
+  .pricing-header {
+    padding: 24px;
+    border-bottom: 1px solid var(--dim-green);
+    font-size: 12px; color: rgba(0, 255, 65, 0.5);
+  }
+  .pricing-card.featured .pricing-header { border-bottom-color: rgba(255, 176, 0, 0.3); }
+  .pricing-header .comment { color: var(--dim-green); }
+  .pricing-header .key { color: var(--amber); }
+  .pricing-header .value { color: var(--green); text-shadow: var(--glow); }
+  .pricing-header .price-line {
+    font-size: 28px; font-weight: 700;
+    color: var(--green); text-shadow: var(--glow);
+    margin: 12px 0 4px;
+  }
+  .pricing-card.featured .pricing-header .price-line { color: var(--amber); text-shadow: var(--glow-amber); }
+  .pricing-header .period { font-size: 13px; color: rgba(0, 255, 65, 0.4); }
+  .pricing-body {
+    padding: 24px;
+    font-size: 13px;
+  }
+  .pricing-body ul { list-style: none; }
+  .pricing-body li {
+    padding: 6px 0;
+    color: rgba(0, 255, 65, 0.7);
+  }
+  .pricing-body li::before {
+    content: '[+] ';
+    color: var(--green);
+  }
+  .pricing-body .btn-primary,
+  .pricing-body .btn-secondary {
+    display: block; width: 100%;
+    text-align: center; margin-top: 24px;
+  }
+  .pricing-card.featured .btn-primary {
+    background: var(--amber); color: var(--black);
+  }
+  .pricing-card.featured .btn-primary:hover { box-shadow: var(--glow-amber); }
+
+  /* Final CTA */
+  .final-cta {
+    text-align: center;
+    border: 1px solid var(--dim-green);
+    padding: 64px 32px;
+    max-width: 800px;
+    margin: 0 auto;
+    background: rgba(0, 255, 65, 0.02);
+  }
+  .final-cta h2 {
+    font-size: clamp(24px, 4vw, 36px);
+    text-shadow: var(--glow);
+    margin-bottom: 16px;
+  }
+  .final-cta p {
+    color: rgba(0, 255, 65, 0.5);
+    font-size: 14px;
+    margin-bottom: 32px;
+    max-width: 500px;
+    margin-left: auto; margin-right: auto;
+  }
+
+  /* Footer */
+  footer {
+    position: relative; z-index: 10;
+    text-align: center;
+    padding: 40px 24px;
+    font-size: 12px;
+    color: var(--dim-green);
+    border-top: 1px solid rgba(13, 75, 13, 0.3);
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    section { padding: 64px 16px; }
+    .features-grid, .pricing-grid { grid-template-columns: 1fr; }
+    .hero { padding-top: 100px; }
+    .ascii-divider { font-size: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="matrix-canvas"></canvas>
+
+<div id="boot-screen">
+  <pre id="boot-text"></pre>
+</div>
+
+<div id="crt">
+
+<nav class="nav" id="nav">
+  <a href="#" class="nav-logo">press<span>.</span>kit</a>
+  <ul class="nav-links">
+    <li><a href="#features">features</a></li>
+    <li><a href="#pricing">pricing</a></li>
+    <li><a href="#start">get_started</a></li>
+  </ul>
+  <button class="nav-cta" onclick="document.getElementById('start').scrollIntoView({behavior:'smooth'})">./login</button>
+</nav>
+
+<section class="hero" id="top">
+  <div class="container">
+    <div class="reveal">
+      <p class="hero-pre">$ npx create-epk --init</p>
+      <h1>
+        <span id="typed-text"></span><span class="cursor">&nbsp;</span>
+      </h1>
+      <p class="hero-sub">
+        The open-source-inspired press kit builder for DJs who take their craft seriously. Ship your EPK in minutes, not days.
+      </p>
+      <div class="hero-buttons">
+        <a href="#pricing" class="btn-primary">./build --deploy</a>
+        <a href="#features" class="btn-secondary">cat features.md</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ascii-divider reveal">
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+</div>
+
+<section id="features">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">// MODULES</p>
+      <h2 class="section-title">ls ./features/</h2>
+      <p class="section-desc">Everything you need to build a professional DJ press kit, configured in one place.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-titlebar">
+          <div class="titlebar-dots"><span></span><span></span><span></span></div>
+          <span class="titlebar-filename">bio.config</span>
+        </div>
+        <div class="feature-body">
+          <h3>Artist Bio</h3>
+          <p>Rich text biography editor with markdown support. Tell your story the way you want it read.</p>
+        </div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-titlebar">
+          <div class="titlebar-dots"><span></span><span></span><span></span></div>
+          <span class="titlebar-filename">music.config</span>
+        </div>
+        <div class="feature-body">
+          <h3>Music Embeds</h3>
+          <p>SoundCloud, Spotify, Mixcloud, Bandcamp. Embed your tracks and mixes with zero friction.</p>
+        </div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-titlebar">
+          <div class="titlebar-dots"><span></span><span></span><span></span></div>
+          <span class="titlebar-filename">events.config</span>
+        </div>
+        <div class="feature-body">
+          <h3>Events &amp; Gigs</h3>
+          <p>Upcoming shows with dates, venues, and ticket links. Past events auto-archive for your history.</p>
+        </div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-titlebar">
+          <div class="titlebar-dots"><span></span><span></span><span></span></div>
+          <span class="titlebar-filename">rider.config</span>
+        </div>
+        <div class="feature-body">
+          <h3>Technical Rider</h3>
+          <p>Equipment requirements, stage plot, and hospitality needs. Downloadable PDF for promoters.</p>
+        </div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-titlebar">
+          <div class="titlebar-dots"><span></span><span></span><span></span></div>
+          <span class="titlebar-filename">press.config</span>
+        </div>
+        <div class="feature-body">
+          <h3>Press Quotes</h3>
+          <p>Showcase reviews, testimonials, and media mentions. Social proof that books gigs.</p>
+        </div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-titlebar">
+          <div class="titlebar-dots"><span></span><span></span><span></span></div>
+          <span class="titlebar-filename">contact.config</span>
+        </div>
+        <div class="feature-body">
+          <h3>Contact Form</h3>
+          <p>Built-in booking enquiry form. Submissions land in your inbox, no third-party tools needed.</p>
+        </div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-titlebar">
+          <div class="titlebar-dots"><span></span><span></span><span></span></div>
+          <span class="titlebar-filename">analytics.config</span>
+        </div>
+        <div class="feature-body">
+          <h3>Analytics</h3>
+          <p>Track page views, link clicks, and visitor sources. Know who is looking at your EPK and when.</p>
+        </div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-titlebar">
+          <div class="titlebar-dots"><span></span><span></span><span></span></div>
+          <span class="titlebar-filename">domain.config</span>
+        </div>
+        <div class="feature-body">
+          <h3>Custom Domains</h3>
+          <p>Connect your own domain for a fully branded experience. SSL included, zero config required.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ascii-divider reveal">
+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+</div>
+
+<section id="pricing">
+  <div class="container">
+    <div class="reveal text-center">
+      <p class="section-label">// PLANS</p>
+      <h2 class="section-title">cat pricing.yml</h2>
+      <p class="section-desc center">Simple, transparent pricing. No hidden fees, no vendor lock-in.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card reveal">
+        <div class="pricing-header">
+          <span class="comment"># Free tier</span><br>
+          <span class="key">name:</span> <span class="value">"Free"</span><br>
+          <div class="price-line">$0</div>
+          <span class="period">forever</span>
+        </div>
+        <div class="pricing-body">
+          <ul>
+            <li>1 EPK page</li>
+            <li>Bio + photo gallery</li>
+            <li>Music embeds</li>
+            <li>Event listings</li>
+            <li>Contact form</li>
+            <li>press.kit subdomain</li>
+          </ul>
+          <a href="#" class="btn-secondary">./signup --free</a>
+        </div>
+      </div>
+      <div class="pricing-card featured reveal">
+        <div class="pricing-header">
+          <span class="comment"># Recommended</span><br>
+          <span class="key">name:</span> <span class="value">"Pro"</span><br>
+          <div class="price-line">$9<span class="period">/mo</span></div>
+          <span class="period">billed monthly</span>
+        </div>
+        <div class="pricing-body">
+          <ul>
+            <li>Everything in Free</li>
+            <li>Custom domain</li>
+            <li>Technical rider PDF</li>
+            <li>Press quotes section</li>
+            <li>Analytics dashboard</li>
+            <li>Priority support</li>
+            <li>Remove branding</li>
+          </ul>
+          <a href="#" class="btn-primary">./signup --pro</a>
+        </div>
+      </div>
+      <div class="pricing-card reveal">
+        <div class="pricing-header">
+          <span class="comment"># For agencies</span><br>
+          <span class="key">name:</span> <span class="value">"Agency"</span><br>
+          <div class="price-line">$29<span class="period">/mo</span></div>
+          <span class="period">billed monthly</span>
+        </div>
+        <div class="pricing-body">
+          <ul>
+            <li>Everything in Pro</li>
+            <li>Up to 20 artist EPKs</li>
+            <li>Agency dashboard</li>
+            <li>Aggregated analytics</li>
+            <li>Team collaboration</li>
+            <li>Bulk export</li>
+            <li>Dedicated support</li>
+          </ul>
+          <a href="#" class="btn-secondary">./signup --agency</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ascii-divider reveal">
+~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+</div>
+
+<section id="start">
+  <div class="container">
+    <div class="final-cta reveal">
+      <p class="section-label">// READY?</p>
+      <h2>Initialize your EPK</h2>
+      <p>Your next booking is one press kit away. Start building for free, upgrade when you are ready.</p>
+      <div class="hero-buttons" style="justify-content:center;">
+        <a href="#" class="btn-primary">npx create-epk</a>
+        <a href="#" class="btn-secondary">man press.kit</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>&copy; 2026 press.kit &mdash; built for DJs, by DJs &mdash; v1.0.0</p>
+</footer>
+
+</div>
+
+<script>
+// Boot sequence
+const bootLines = [
+  'BIOS v4.2.0 ... OK',
+  'Detecting hardware ... MIDI controller found',
+  'Loading kernel modules ...',
+  '  [OK] audio_engine',
+  '  [OK] beat_sync',
+  '  [OK] crowd_reader',
+  'Mounting /dev/decks ... OK',
+  'Starting press.kit daemon ...',
+  '',
+  'press.kit v1.0.0 ready.',
+  ''
+];
+
+const bootEl = document.getElementById('boot-text');
+const bootScreen = document.getElementById('boot-screen');
+let lineIdx = 0;
+
+function typeBoot() {
+  if (lineIdx < bootLines.length) {
+    bootEl.textContent += bootLines[lineIdx] + '\n';
+    lineIdx++;
+    setTimeout(typeBoot, 120 + Math.random() * 80);
+  } else {
+    setTimeout(() => {
+      bootScreen.classList.add('done');
+      setTimeout(() => { bootScreen.style.display = 'none'; startTyping(); }, 500);
+    }, 400);
+  }
+}
+setTimeout(typeBoot, 300);
+
+// Typed headline
+const headline = 'Your press kit, version-controlled.';
+const typedEl = document.getElementById('typed-text');
+let charIdx = 0;
+
+function startTyping() {
+  if (charIdx < headline.length) {
+    typedEl.textContent += headline[charIdx];
+    charIdx++;
+    setTimeout(startTyping, 50 + Math.random() * 30);
+  }
+}
+
+// Matrix rain
+const canvas = document.getElementById('matrix-canvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()';
+const fontSize = 14;
+let columns = Math.floor(canvas.width / fontSize);
+let drops = Array(columns).fill(1);
+
+function drawMatrix() {
+  ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#00FF41';
+  ctx.font = fontSize + 'px JetBrains Mono';
+
+  for (let i = 0; i < drops.length; i++) {
+    const char = chars[Math.floor(Math.random() * chars.length)];
+    ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+      drops[i] = 0;
+    }
+    drops[i]++;
+  }
+}
+setInterval(drawMatrix, 60);
+
+window.addEventListener('resize', () => {
+  columns = Math.floor(canvas.width / fontSize);
+  drops = Array(columns).fill(1);
+});
+
+// Nav scroll
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// Reveal on scroll
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
