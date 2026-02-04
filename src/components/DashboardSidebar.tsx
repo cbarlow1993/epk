@@ -21,9 +21,18 @@ const NAV_ITEMS = [
   { label: 'Settings', href: '/dashboard/settings' },
 ]
 
-export function DashboardSidebar({ profile }: { profile: SidebarProfile }) {
+const AGENCY_NAV_ITEMS = [
+  { label: 'Roster', href: '/dashboard/roster' },
+  { label: 'Team', href: '/dashboard/team' },
+]
+
+export function DashboardSidebar({ profile, isAgency = false }: { profile: SidebarProfile; isAgency?: boolean }) {
   const matchRoute = useMatchRoute()
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  const navItems = isAgency
+    ? [...NAV_ITEMS.slice(0, 1), ...AGENCY_NAV_ITEMS, ...NAV_ITEMS.slice(1)]
+    : NAV_ITEMS
 
   const handleLogout = async () => {
     await logout()
@@ -47,7 +56,7 @@ export function DashboardSidebar({ profile }: { profile: SidebarProfile }) {
 
       {/* Nav */}
       <nav className="flex-1 py-4 overflow-y-auto">
-        {NAV_ITEMS.map((item) => {
+        {navItems.map((item) => {
           const isActive = matchRoute({ to: item.href, fuzzy: true })
           return (
             <Link
