@@ -1,19 +1,21 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
-import { getProfile } from '~/server/profile'
+import { getProfile, getUserEmail, updateProfile, updateUserEmail, updateUserPassword } from '~/server/profile'
 import type { ProfileRow } from '~/types/database'
 import { createCheckoutSession, createPortalSession } from '~/server/billing'
 import { addCustomDomain, removeCustomDomain, checkDomainStatus } from '~/server/domains'
-import { SETTINGS_CARD } from '~/components/forms'
-import { updateProfile } from '~/server/profile'
+import { SETTINGS_CARD, FORM_LABEL, FORM_INPUT, BTN_PRIMARY } from '~/components/forms'
 
 export const Route = createFileRoute('/_dashboard/dashboard/settings')({
-  loader: () => getProfile(),
+  loader: async () => {
+    const [profile, emailResult] = await Promise.all([getProfile(), getUserEmail()])
+    return { profile, userEmail: emailResult.email }
+  },
   component: SettingsPage,
 })
 
 function SettingsPage() {
-  const profile = Route.useLoaderData()
+  const { profile, userEmail } = Route.useLoaderData()
   const [billingLoading, setBillingLoading] = useState(false)
   const [billingError, setBillingError] = useState('')
 
@@ -36,9 +38,15 @@ function SettingsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-display font-semibold tracking-tight mb-8">Settings</h1>
+      <h1 className="text-2xl font-display font-extrabold tracking-tight uppercase mb-8">Settings</h1>
 
       <div className="space-y-8 max-w-2xl">
+        {/* Profile */}
+        <ProfileSection profile={profile} userEmail={userEmail} />
+
+        {/* Security */}
+        <SecuritySection />
+
         {/* Account Info */}
         <div className={SETTINGS_CARD}>
           <h2 className="font-medium text-text-secondary text-sm mb-4">Account</h2>
@@ -70,7 +78,7 @@ function SettingsPage() {
                 type="button"
                 onClick={() => redirectToBilling(createPortalSession)}
                 disabled={billingLoading}
-                className="bg-bg hover:bg-border disabled:opacity-30 text-text-primary text-sm font-medium px-6 py-2 rounded-lg transition-colors"
+                className="bg-bg hover:bg-border disabled:opacity-30 text-text-primary text-sm font-medium px-6 py-2 transition-colors"
               >
                 {billingLoading ? 'Loading...' : 'Manage Subscription'}
               </button>
@@ -82,7 +90,7 @@ function SettingsPage() {
                 type="button"
                 onClick={() => redirectToBilling(createCheckoutSession)}
                 disabled={billingLoading}
-                className="bg-accent hover:bg-accent/80 disabled:opacity-30 text-white text-sm font-medium px-6 py-2 rounded-lg transition-colors"
+                className="bg-text-primary hover:bg-accent disabled:opacity-30 text-white text-sm font-medium px-6 py-2 transition-colors"
               >
                 {billingLoading ? 'Loading...' : 'Upgrade to Pro'}
               </button>
@@ -149,7 +157,7 @@ function BrandingSection({ profile }: { profile: ProfileRow | null }) {
             value={faviconUrl}
             onChange={(e) => setFaviconUrl(e.target.value)}
             placeholder="https://example.com/favicon.ico"
-            className="w-full bg-bg border border-border rounded-lg px-4 py-2 text-text-primary text-sm focus:border-accent focus:outline-none"
+            className="w-full bg-bg border border-border  px-4 py-2 text-text-primary text-sm focus:border-accent focus:outline-none"
           />
         </div>
         <div className="flex items-center gap-3">
@@ -173,7 +181,7 @@ function BrandingSection({ profile }: { profile: ProfileRow | null }) {
             onChange={(e) => setMetaDescription(e.target.value.slice(0, 300))}
             placeholder="Custom description for search engines and social sharing..."
             rows={3}
-            className="w-full bg-bg border border-border rounded-lg px-4 py-2 text-text-primary text-sm focus:border-accent focus:outline-none resize-none"
+            className="w-full bg-bg border border-border  px-4 py-2 text-text-primary text-sm focus:border-accent focus:outline-none resize-none"
           />
         </div>
         <div className="flex items-center gap-3">
@@ -181,11 +189,168 @@ function BrandingSection({ profile }: { profile: ProfileRow | null }) {
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="bg-accent hover:bg-accent/80 disabled:opacity-30 text-white text-sm font-medium px-6 py-2 rounded-lg transition-colors"
+            className="bg-text-primary hover:bg-accent disabled:opacity-30 text-white text-sm font-medium px-6 py-2 transition-colors"
           >
             {saving ? 'Saving...' : 'Save'}
           </button>
           {saved && <span className="text-xs text-green-600">Saved!</span>}
+          {error && <span className="text-xs text-red-500">{error}</span>}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ProfileSection({ profile, userEmail }: { profile: ProfileRow | null; userEmail: string }) {
+  const [displayName, setDisplayName] = useState(profile?.display_name || '')
+  const [email, setEmail] = useState(userEmail)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleSave = async () => {
+    setSaving(true)
+    setSaved(false)
+    setError('')
+
+    // Update display name if changed
+    if (displayName !== (profile?.display_name || '')) {
+      const result = await updateProfile({ data: { display_name: displayName } })
+      if (result && 'error' in result && result.error) {
+        setError(result.error as string)
+        setSaving(false)
+        return
+      }
+    }
+
+    // Update email if changed
+    if (email !== userEmail) {
+      const result = await updateUserEmail({ data: { email } })
+      if (result && 'error' in result && result.error) {
+        setError(result.error as string)
+        setSaving(false)
+        return
+      }
+    }
+
+    setSaving(false)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 3000)
+  }
+
+  const isDirty = displayName !== (profile?.display_name || '') || email !== userEmail
+
+  return (
+    <div className={SETTINGS_CARD}>
+      <h2 className="font-medium text-text-secondary text-sm mb-4">Profile</h2>
+      <div className="space-y-4">
+        <div>
+          <label className={FORM_LABEL}>Display Name</label>
+          <input
+            type="text"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            placeholder="Your name"
+            className={FORM_INPUT}
+          />
+        </div>
+        <div>
+          <label className={FORM_LABEL}>Email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            className={FORM_INPUT}
+          />
+          <p className="text-xs text-text-secondary/60 mt-1">A confirmation email will be sent to your new address.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving || !isDirty}
+            className={BTN_PRIMARY}
+          >
+            {saving ? 'Saving...' : 'Save'}
+          </button>
+          {saved && <span className="text-xs text-green-600">{email !== userEmail ? 'Saved! Check your email to confirm the change.' : 'Saved!'}</span>}
+          {error && <span className="text-xs text-red-500">{error}</span>}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function SecuritySection() {
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleSave = async () => {
+    setError('')
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.')
+      return
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.')
+      return
+    }
+
+    setSaving(true)
+    setSaved(false)
+    const result = await updateUserPassword({ data: { password } })
+    setSaving(false)
+
+    if (result && 'error' in result && result.error) {
+      setError(result.error as string)
+    } else {
+      setSaved(true)
+      setPassword('')
+      setConfirmPassword('')
+      setTimeout(() => setSaved(false), 3000)
+    }
+  }
+
+  const isDirty = password.length > 0 || confirmPassword.length > 0
+
+  return (
+    <div className={SETTINGS_CARD}>
+      <h2 className="font-medium text-text-secondary text-sm mb-4">Security</h2>
+      <div className="space-y-4">
+        <div>
+          <label className={FORM_LABEL}>New Password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            className={FORM_INPUT}
+          />
+        </div>
+        <div>
+          <label className={FORM_LABEL}>Confirm Password</label>
+          <input
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="••••••••"
+            className={FORM_INPUT}
+          />
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving || !isDirty}
+            className={BTN_PRIMARY}
+          >
+            {saving ? 'Updating...' : 'Update Password'}
+          </button>
+          {saved && <span className="text-xs text-green-600">Password updated!</span>}
           {error && <span className="text-xs text-red-500">{error}</span>}
         </div>
       </div>
@@ -239,7 +404,7 @@ function CustomDomainSection({ profile }: { profile: ProfileRow | null }) {
           <p className="text-sm">Current domain: <span className="font-mono text-accent">{profile.custom_domain}</span></p>
           <div className="flex gap-2">
             <button type="button" onClick={handleCheck} className="text-xs text-text-secondary hover:text-text-primary transition-colors">Check status</button>
-            <button type="button" onClick={handleRemove} disabled={loading} className="text-xs text-red-500 hover:text-red-400 transition-colors">Remove</button>
+            <button type="button" onClick={handleRemove} disabled={loading} className="text-xs text-red-500 hover:text-red-600 transition-colors">Remove</button>
           </div>
         </div>
       ) : (
@@ -249,13 +414,13 @@ function CustomDomainSection({ profile }: { profile: ProfileRow | null }) {
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
             placeholder="yourdomain.com"
-            className="w-full bg-bg border border-border rounded-lg px-4 py-2 text-text-primary text-sm focus:border-accent focus:outline-none"
+            className="w-full bg-bg border border-border  px-4 py-2 text-text-primary text-sm focus:border-accent focus:outline-none"
           />
           <button
             type="button"
             onClick={handleAdd}
             disabled={!domain || loading}
-            className="bg-accent hover:bg-accent/80 disabled:opacity-30 text-white text-sm font-medium px-6 py-2 rounded-lg transition-colors"
+            className="bg-text-primary hover:bg-accent disabled:opacity-30 text-white text-sm font-medium px-6 py-2 transition-colors"
           >
             {loading ? 'Adding...' : 'Add Domain'}
           </button>

@@ -1,4 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
+import { z } from 'zod'
 import { profileUpdateSchema } from '~/schemas/profile'
 import { RESERVED_SLUGS } from '~/utils/constants'
 import { withAuth, withAuthOrNull } from './utils'
@@ -14,8 +15,7 @@ const ALLOWED_PROFILE_FIELDS = new Set([
   'accent_color',
   'bg_color',
   'font_family',
-  'bio_left',
-  'bio_right',
+  'bio',
   'bpm_min',
   'bpm_max',
   'favicon_url',
@@ -74,4 +74,31 @@ export const updateProfile = createServerFn({ method: 'POST' })
 
     if (error) return { error: error.message }
     return { profile }
+  })
+
+export const getUserEmail = createServerFn({ method: 'GET' }).handler(async () => {
+  const { user } = await withAuth()
+  return { email: user.email ?? '' }
+})
+
+const emailUpdateSchema = z.object({ email: z.string().email('Please enter a valid email address') })
+
+export const updateUserEmail = createServerFn({ method: 'POST' })
+  .inputValidator((data: unknown) => emailUpdateSchema.parse(data))
+  .handler(async ({ data }) => {
+    const { supabase } = await withAuth()
+    const { error } = await supabase.auth.updateUser({ email: data.email })
+    if (error) return { error: error.message }
+    return { data: { message: 'Confirmation email sent to your new address.' } }
+  })
+
+const passwordUpdateSchema = z.object({ password: z.string().min(8, 'Password must be at least 8 characters') })
+
+export const updateUserPassword = createServerFn({ method: 'POST' })
+  .inputValidator((data: unknown) => passwordUpdateSchema.parse(data))
+  .handler(async ({ data }) => {
+    const { supabase } = await withAuth()
+    const { error } = await supabase.auth.updateUser({ password: data.password })
+    if (error) return { error: error.message }
+    return { data: { message: 'Password updated successfully.' } }
   })
