@@ -284,3 +284,49 @@ ALTER TABLE profiles ADD COLUMN IF NOT EXISTS meta_description TEXT;
 
 -- Template system
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS template TEXT DEFAULT 'default';
+
+-- Organizations (agencies)
+CREATE TABLE organizations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  logo_url TEXT,
+  website_url TEXT,
+  billing_email TEXT,
+  stripe_customer_id TEXT,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE organization_members (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  role TEXT NOT NULL CHECK (role IN ('owner', 'admin', 'manager', 'artist')),
+  assigned_profiles UUID[] DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(organization_id, user_id)
+);
+
+CREATE TABLE organization_invites (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+  email TEXT NOT NULL,
+  role TEXT NOT NULL CHECK (role IN ('admin', 'manager', 'artist')),
+  token TEXT UNIQUE NOT NULL DEFAULT encode(gen_random_bytes(32), 'hex'),
+  accepted_at TIMESTAMPTZ,
+  expires_at TIMESTAMPTZ DEFAULT now() + interval '7 days',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Add organization reference to profiles
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS organization_id UUID REFERENCES organizations(id) ON DELETE SET NULL;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS managed_by UUID REFERENCES auth.users(id) ON DELETE SET NULL;
+
+-- Enable RLS
+ALTER TABLE organizations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE organization_members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE organization_invites ENABLE ROW LEVEL SECURITY;
+
+-- Updated_at trigger for organizations
+CREATE TRIGGER organizations_updated_at BEFORE UPDATE ON organizations FOR EACH ROW EXECUTE FUNCTION update_updated_at();

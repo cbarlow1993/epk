@@ -29,6 +29,8 @@ export interface ProfileRow {
   hide_platform_branding: boolean
   meta_description: string | null
   template: string
+  organization_id: string | null
+  managed_by: string | null
   created_at: string
 }
 
@@ -124,6 +126,40 @@ export interface FileRow {
   mime_type: string | null
   created_at: string
   tags?: string[]
+}
+
+export type OrgRole = 'owner' | 'admin' | 'manager' | 'artist'
+
+export interface OrganizationRow {
+  id: string
+  name: string
+  slug: string
+  logo_url: string | null
+  website_url: string | null
+  billing_email: string | null
+  stripe_customer_id: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface OrganizationMemberRow {
+  id: string
+  organization_id: string
+  user_id: string
+  role: OrgRole
+  assigned_profiles: string[]
+  created_at: string
+}
+
+export interface OrganizationInviteRow {
+  id: string
+  organization_id: string
+  email: string
+  role: OrgRole
+  token: string
+  accepted_at: string | null
+  expires_at: string
+  created_at: string
 }
 
 export interface PublicProfileData {
