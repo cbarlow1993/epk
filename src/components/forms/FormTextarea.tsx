@@ -1,5 +1,5 @@
 import type { UseFormRegisterReturn, FieldError } from 'react-hook-form'
-import { FORM_LABEL, FORM_ERROR_MSG } from './styles'
+import { FORM_LABEL, FORM_INPUT as INPUT_STYLE, FORM_INPUT_ERROR as INPUT_ERROR_STYLE, FORM_ERROR_MSG } from './styles'
 
 interface FormTextareaProps {
   label: string
@@ -18,9 +18,7 @@ export function FormTextarea({ label, registration, error, rows = 8, placeholder
         rows={rows}
         placeholder={placeholder}
         {...registration}
-        className={`w-full bg-dark-card border rounded-lg px-4 py-3 text-white placeholder-text-secondary/50 focus:border-accent focus:outline-none transition-colors resize-none text-sm leading-relaxed ${
-          error ? 'border-red-500' : 'border-white/10'
-        }`}
+        className={`${error ? INPUT_ERROR_STYLE : INPUT_STYLE} resize-none leading-relaxed`}
       />
       {error && <p className={FORM_ERROR_MSG}>{error.message}</p>}
     </div>

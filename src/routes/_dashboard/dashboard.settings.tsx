@@ -46,6 +46,7 @@ function SettingsPage() {
             <div>
               <p className="text-sm text-text-secondary mb-4">You're on the <span className="text-accent font-bold">Pro</span> plan.</p>
               <button
+                type="button"
                 onClick={async () => {
                   const result = await createPortalSession()
                   if ('url' in result && result.url) window.location.href = result.url
@@ -59,6 +60,7 @@ function SettingsPage() {
             <div>
               <p className="text-sm text-text-secondary mb-4">You're on the <span className="font-bold">Free</span> plan. Upgrade for custom domains, remove branding, and more.</p>
               <button
+                type="button"
                 onClick={async () => {
                   const result = await createCheckoutSession()
                   if ('url' in result && result.url) window.location.href = result.url
@@ -123,8 +125,8 @@ function CustomDomainSection({ profile }: { profile: ProfileRow | null }) {
         <div className="space-y-3">
           <p className="text-sm">Current domain: <span className="font-mono text-accent">{profile.custom_domain}</span></p>
           <div className="flex gap-2">
-            <button onClick={handleCheck} className="text-xs text-text-secondary hover:text-white transition-colors">Check status</button>
-            <button onClick={handleRemove} disabled={loading} className="text-xs text-red-400 hover:text-red-300 transition-colors">Remove</button>
+            <button type="button" onClick={handleCheck} className="text-xs text-text-secondary hover:text-white transition-colors">Check status</button>
+            <button type="button" onClick={handleRemove} disabled={loading} className="text-xs text-red-400 hover:text-red-300 transition-colors">Remove</button>
           </div>
         </div>
       ) : (
@@ -137,6 +139,7 @@ function CustomDomainSection({ profile }: { profile: ProfileRow | null }) {
             className="w-full bg-dark-bg border border-white/10 rounded-lg px-4 py-2 text-white text-sm focus:border-accent focus:outline-none"
           />
           <button
+            type="button"
             onClick={handleAdd}
             disabled={!domain || loading}
             className="bg-accent hover:bg-accent/80 disabled:opacity-30 text-white text-sm font-bold uppercase tracking-widest px-6 py-2 rounded-lg transition-colors"

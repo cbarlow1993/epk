@@ -1,7 +1,8 @@
 import { useState } from 'react'
 
-type DeleteFn = (args: { data: string }) => Promise<unknown>
-type ReorderFn = (args: { data: { ids: string[] } }) => Promise<unknown>
+type ServerResult = { error: string } | Record<string, unknown>
+type DeleteFn = (args: { data: string }) => Promise<ServerResult>
+type ReorderFn = (args: { data: { ids: string[] } }) => Promise<ServerResult>
 
 export function useListEditor<T extends { id: string }>(
   initialItems: T[],
@@ -10,8 +11,12 @@ export function useListEditor<T extends { id: string }>(
   const [items, setItems] = useState<T[]>(initialItems)
 
   const handleDelete = async (id: string) => {
-    await opts.deleteFn({ data: id })
-    setItems(prev => prev.filter(item => item.id !== id))
+    const prev = items
+    setItems(items.filter(item => item.id !== id))
+    const result = await opts.deleteFn({ data: id })
+    if ('error' in result && typeof result.error === 'string') {
+      setItems(prev) // rollback on failure
+    }
   }
 
   const handleReorder = opts.reorderFn

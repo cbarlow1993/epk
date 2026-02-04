@@ -113,6 +113,7 @@ function SocialsEditor() {
 
               {/* Delete */}
               <button
+                type="button"
                 onClick={() => handleDelete(link.id)}
                 className={`${BTN_BASE} bg-red-500/20 text-red-400 hover:bg-red-500/30`}
               >

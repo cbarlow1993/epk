@@ -2,10 +2,9 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { getPressAssets, upsertPressAsset, deletePressAsset } from '~/server/press-assets'
-import { ASSET_TYPES, type PressAssetUpsert } from '~/schemas/press-asset'
+import { getPressAssets, upsertPressAsset, deletePressAsset, reorderPressAssets } from '~/server/press-assets'
+import { pressAssetUpsertSchema, ASSET_TYPES, type PressAssetUpsert } from '~/schemas/press-asset'
 import { uploadFileFromInput } from '~/utils/upload'
-import { z } from 'zod'
 import { FORM_INPUT, BTN_BASE, toSelectOptions } from '~/components/forms'
 import { useListEditor } from '~/hooks/useListEditor'
 
@@ -18,20 +17,15 @@ const ASSET_TYPE_OPTIONS = toSelectOptions(ASSET_TYPES)
 
 function PressEditor() {
   const initialAssets = Route.useLoaderData()
-  const { items: assets, handleDelete, addItem } = useListEditor(
+  const { items: assets, handleDelete, handleReorder, addItem } = useListEditor(
     initialAssets || [],
-    { deleteFn: deletePressAsset }
+    { deleteFn: deletePressAsset, reorderFn: reorderPressAssets }
   )
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const pressFormSchema = z.object({
-    title: z.string().max(200).optional(),
-    type: z.enum(ASSET_TYPES),
-  })
-
-  const { register, getValues, reset } = useForm<{ title?: string; type: PressAssetUpsert['type'] }>({
-    resolver: zodResolver(pressFormSchema),
+  const { register, getValues, reset } = useForm<Pick<PressAssetUpsert, 'title' | 'type'>>({
+    resolver: zodResolver(pressAssetUpsertSchema.pick({ title: true, type: true })),
     defaultValues: { title: '', type: 'photo' },
   })
 
@@ -102,7 +96,7 @@ function PressEditor() {
         <p className="text-text-secondary text-sm">No press assets yet. Upload one above.</p>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {assets.map((asset) => (
+          {assets.map((asset, index) => (
             <div
               key={asset.id}
               className="group relative aspect-square bg-dark-card border border-white/10 rounded-xl overflow-hidden"
@@ -130,13 +124,34 @@ function PressEditor() {
                 <span className="inline-block bg-white/10 rounded px-2 py-0.5 text-[10px] text-text-secondary uppercase tracking-wider">
                   {asset.type}
                 </span>
-                <button
-                  onClick={() => handleDelete(asset.id)}
-                  className="w-8 h-8 flex items-center justify-center rounded bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors text-xs"
-                  title="Delete"
-                >
-                  &#10005;
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleReorder?.(index, 'up')}
+                    disabled={index === 0}
+                    className="w-8 h-8 flex items-center justify-center rounded bg-white/10 text-white hover:bg-white/20 disabled:opacity-20 transition-colors text-xs"
+                    title="Move up"
+                  >
+                    &#9650;
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleReorder?.(index, 'down')}
+                    disabled={index === assets.length - 1}
+                    className="w-8 h-8 flex items-center justify-center rounded bg-white/10 text-white hover:bg-white/20 disabled:opacity-20 transition-colors text-xs"
+                    title="Move down"
+                  >
+                    &#9660;
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(asset.id)}
+                    className="w-8 h-8 flex items-center justify-center rounded bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors text-xs"
+                    title="Delete"
+                  >
+                    &#10005;
+                  </button>
+                </div>
               </div>
             </div>
           ))}

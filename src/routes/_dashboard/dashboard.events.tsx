@@ -123,6 +123,7 @@ function EventsEditor() {
                 </p>
                 <div className="flex gap-2">
                   <button
+                    type="button"
                     onClick={() => handleReorder?.(index, 'up')}
                     disabled={index === 0}
                     className="w-8 h-8 flex items-center justify-center rounded bg-white/10 text-white hover:bg-white/20 disabled:opacity-20 transition-colors text-xs"
@@ -131,6 +132,7 @@ function EventsEditor() {
                     &#9650;
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleReorder?.(index, 'down')}
                     disabled={index === events.length - 1}
                     className="w-8 h-8 flex items-center justify-center rounded bg-white/10 text-white hover:bg-white/20 disabled:opacity-20 transition-colors text-xs"
@@ -139,6 +141,7 @@ function EventsEditor() {
                     &#9660;
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleDelete(event.id)}
                     className="w-8 h-8 flex items-center justify-center rounded bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors text-xs"
                     title="Delete"

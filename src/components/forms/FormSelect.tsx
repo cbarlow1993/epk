@@ -1,5 +1,5 @@
 import type { UseFormRegisterReturn, FieldError } from 'react-hook-form'
-import { FORM_LABEL, FORM_ERROR_MSG } from './styles'
+import { FORM_LABEL, FORM_INPUT as INPUT_STYLE, FORM_INPUT_ERROR as INPUT_ERROR_STYLE, FORM_ERROR_MSG } from './styles'
 
 interface FormSelectProps {
   label: string
@@ -15,9 +15,7 @@ export function FormSelect({ label, registration, error, options, className }: F
       <label className={FORM_LABEL}>{label}</label>
       <select
         {...registration}
-        className={`w-full bg-dark-card border rounded-lg px-4 py-3 text-white focus:border-accent focus:outline-none transition-colors text-sm ${
-          error ? 'border-red-500' : 'border-white/10'
-        }`}
+        className={error ? INPUT_ERROR_STYLE : INPUT_STYLE}
       >
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>{opt.label}</option>

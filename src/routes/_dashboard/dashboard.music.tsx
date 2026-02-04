@@ -160,12 +160,14 @@ function MusicEditor() {
                 {editingId === mix.id ? (
                   <>
                     <button
+                      type="button"
                       onClick={() => handleSaveEdit(mix.id)}
                       className={`${BTN_BASE} bg-accent text-black hover:bg-accent/80`}
                     >
                       Save
                     </button>
                     <button
+                      type="button"
                       onClick={() => setEditingId(null)}
                       className={`${BTN_BASE} bg-white/10 text-white hover:bg-white/20`}
                     >
@@ -175,12 +177,14 @@ function MusicEditor() {
                 ) : (
                   <>
                     <button
+                      type="button"
                       onClick={() => handleEdit(mix)}
                       className={`${BTN_BASE} bg-white/10 text-white hover:bg-white/20`}
                     >
                       Edit
                     </button>
                     <button
+                      type="button"
                       onClick={() => handleDelete(mix.id)}
                       className={`${BTN_BASE} bg-red-500/20 text-red-400 hover:bg-red-500/30`}
                     >
