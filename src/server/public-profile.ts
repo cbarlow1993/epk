@@ -16,7 +16,7 @@ export const getPublicProfile = createServerFn({ method: 'GET' })
     if (!fullProfile) return null
 
     // Strip sensitive fields before returning to client
-    const { id, stripe_customer_id, custom_css, ...profile } = fullProfile
+    const { id, stripe_customer_id, stripe_subscription_id, custom_css, ...profile } = fullProfile
     const profileId = id
 
     const [

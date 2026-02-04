@@ -57,14 +57,14 @@ export const getStorageUsage = createServerFn({ method: 'GET' }).handler(async (
 })
 
 export const uploadFileToRepo = createServerFn({ method: 'POST' })
-  .inputValidator((data: {
-    base64: string
-    fileName: string
-    contentType: string
-    fileSize: number
-    folderId?: string | null
-    tags?: string[]
-  }) => data)
+  .inputValidator((data: unknown) => z.object({
+    base64: z.string().min(1),
+    fileName: z.string().min(1).max(200),
+    contentType: z.string().min(1),
+    fileSize: z.number().int().positive(),
+    folderId: z.string().uuid().nullable().optional(),
+    tags: z.array(z.string().max(50)).max(20).optional(),
+  }).parse(data))
   .handler(async ({ data }) => {
     const { supabase, user } = await withAuth()
 
@@ -77,11 +77,13 @@ export const uploadFileToRepo = createServerFn({ method: 'POST' })
       .eq('profile_id', user.id)
     const currentUsage = existingFiles?.reduce((sum: number, f: { file_size: number }) => sum + f.file_size, 0) || 0
 
-    if (currentUsage + data.fileSize > limit) {
+    const buffer = Buffer.from(data.base64, 'base64')
+    const actualSize = buffer.length
+
+    if (currentUsage + actualSize > limit) {
       return { error: 'Storage limit exceeded. Upgrade to Pro for 100GB storage.' }
     }
 
-    const buffer = Buffer.from(data.base64, 'base64')
     const safeName = data.fileName.replace(/[^a-zA-Z0-9._-]/g, '_')
     const path = `${user.id}/files/${Date.now()}-${safeName}`
 
@@ -107,7 +109,7 @@ export const uploadFileToRepo = createServerFn({ method: 'POST' })
         name: data.fileName,
         file_url: urlData.publicUrl,
         file_type: fileType,
-        file_size: data.fileSize,
+        file_size: actualSize,
         mime_type: data.contentType,
       })
       .select()
