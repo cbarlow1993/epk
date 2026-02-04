@@ -8,3 +8,4 @@ export { pressAssetUpsertSchema, ASSET_TYPES, type PressAssetUpsert } from './pr
 export { bookingRequestSubmitSchema, bookingRequestStatusSchema, type BookingRequestSubmit } from './booking-request'
 export { fileUploadSchema, fileMoveSchema, fileTagsSchema } from './file'
 export { folderCreateSchema, folderRenameSchema } from './folder'
+export * from './organization'
