@@ -28,6 +28,7 @@ import { Route as DashboardDashboardInquiriesRouteImport } from './routes/_dashb
 import { Route as DashboardDashboardEventsRouteImport } from './routes/_dashboard/dashboard.events'
 import { Route as DashboardDashboardContactRouteImport } from './routes/_dashboard/dashboard.contact'
 import { Route as DashboardDashboardBioRouteImport } from './routes/_dashboard/dashboard.bio'
+import { Route as DashboardDashboardAnalyticsRouteImport } from './routes/_dashboard/dashboard.analytics'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -129,6 +130,12 @@ const DashboardDashboardBioRoute = DashboardDashboardBioRouteImport.update({
   path: '/bio',
   getParentRoute: () => DashboardDashboardRoute,
 } as any)
+const DashboardDashboardAnalyticsRoute =
+  DashboardDashboardAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => DashboardDashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/dashboard': typeof DashboardDashboardRouteWithChildren
+  '/dashboard/analytics': typeof DashboardDashboardAnalyticsRoute
   '/dashboard/bio': typeof DashboardDashboardBioRoute
   '/dashboard/contact': typeof DashboardDashboardContactRoute
   '/dashboard/events': typeof DashboardDashboardEventsRoute
@@ -157,6 +165,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/dashboard/analytics': typeof DashboardDashboardAnalyticsRoute
   '/dashboard/bio': typeof DashboardDashboardBioRoute
   '/dashboard/contact': typeof DashboardDashboardContactRoute
   '/dashboard/events': typeof DashboardDashboardEventsRoute
@@ -179,6 +188,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/_dashboard/dashboard': typeof DashboardDashboardRouteWithChildren
+  '/_dashboard/dashboard/analytics': typeof DashboardDashboardAnalyticsRoute
   '/_dashboard/dashboard/bio': typeof DashboardDashboardBioRoute
   '/_dashboard/dashboard/contact': typeof DashboardDashboardContactRoute
   '/_dashboard/dashboard/events': typeof DashboardDashboardEventsRoute
@@ -201,6 +211,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/dashboard'
+    | '/dashboard/analytics'
     | '/dashboard/bio'
     | '/dashboard/contact'
     | '/dashboard/events'
@@ -220,6 +231,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/signup'
+    | '/dashboard/analytics'
     | '/dashboard/bio'
     | '/dashboard/contact'
     | '/dashboard/events'
@@ -241,6 +253,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/_dashboard/dashboard'
+    | '/_dashboard/dashboard/analytics'
     | '/_dashboard/dashboard/bio'
     | '/_dashboard/dashboard/contact'
     | '/_dashboard/dashboard/events'
@@ -399,10 +412,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardBioRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
+    '/_dashboard/dashboard/analytics': {
+      id: '/_dashboard/dashboard/analytics'
+      path: '/analytics'
+      fullPath: '/dashboard/analytics'
+      preLoaderRoute: typeof DashboardDashboardAnalyticsRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
   }
 }
 
 interface DashboardDashboardRouteChildren {
+  DashboardDashboardAnalyticsRoute: typeof DashboardDashboardAnalyticsRoute
   DashboardDashboardBioRoute: typeof DashboardDashboardBioRoute
   DashboardDashboardContactRoute: typeof DashboardDashboardContactRoute
   DashboardDashboardEventsRoute: typeof DashboardDashboardEventsRoute
@@ -417,6 +438,7 @@ interface DashboardDashboardRouteChildren {
 }
 
 const DashboardDashboardRouteChildren: DashboardDashboardRouteChildren = {
+  DashboardDashboardAnalyticsRoute: DashboardDashboardAnalyticsRoute,
   DashboardDashboardBioRoute: DashboardDashboardBioRoute,
   DashboardDashboardContactRoute: DashboardDashboardContactRoute,
   DashboardDashboardEventsRoute: DashboardDashboardEventsRoute,

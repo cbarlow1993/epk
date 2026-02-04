@@ -16,6 +16,7 @@ const NAV_ITEMS = [
   { label: 'Inquiries', href: '/dashboard/inquiries' },
   { label: 'Social Links', href: '/dashboard/socials' },
   { label: 'Theme', href: '/dashboard/theme' },
+  { label: 'Analytics', href: '/dashboard/analytics' },
   { label: 'Settings', href: '/dashboard/settings' },
 ]
 
