@@ -15,7 +15,7 @@ export function DashboardHeader({ title, saving, saved, error, isDirty }: Dashbo
         {error && <span className="text-xs text-red-400">{error}</span>}
         <button
           type="submit"
-          disabled={saving || (!isDirty && !saved)}
+          disabled={saving || !isDirty}
           className="px-5 py-2 rounded-lg text-sm font-bold uppercase tracking-wider bg-accent text-black hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {saving ? 'Saving...' : 'Save'}

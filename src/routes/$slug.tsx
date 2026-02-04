@@ -52,6 +52,16 @@ function PublicEPK() {
   const accent = search.accent || profile.accent_color || '#3b82f6'
   const bg = search.bg || profile.bg_color || '#0a0a0f'
   const font = search.font || profile.font_family || 'Inter'
+  const name = profile.display_name || 'DJ'
+
+  const navSections = [
+    (profile.bio_left || profile.bio_right) && { label: 'Bio', href: '#bio' },
+    mixes.length > 0 && { label: 'Music', href: '#music' },
+    events.length > 0 && { label: 'Events', href: '#events' },
+    technicalRider && (technicalRider.preferred_setup || technicalRider.alternative_setup) && { label: 'Technical', href: '#technical' },
+    pressAssets.length > 0 && { label: 'Press', href: '#press' },
+    bookingContact && bookingContact.manager_name && { label: 'Contact', href: '#contact' },
+  ].filter((s): s is { label: string; href: string } => !!s)
 
   return (
     <div
@@ -65,7 +75,7 @@ function PublicEPK() {
       } as React.CSSProperties}
       className="min-h-screen text-white"
     >
-      <Nav />
+      <Nav displayName={name} sections={navSections} />
       <main>
         {/* Hero */}
         <section className="relative h-screen flex items-center justify-center overflow-hidden">

@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react'
 
-const NAV_ITEMS = [
-  { label: 'Bio', href: '#bio' },
-  { label: 'Music', href: '#highlights' },
-  { label: 'Events', href: '#events' },
-  { label: 'Technical', href: '#technical' },
-  { label: 'Contact', href: '#contact' },
-]
+interface NavSection {
+  label: string
+  href: string
+}
 
-export function Nav() {
+interface NavProps {
+  displayName: string
+  sections: NavSection[]
+}
+
+export function Nav({ displayName, sections }: NavProps) {
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
@@ -24,9 +26,9 @@ export function Nav() {
       }`}
     >
       <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        <a href="#" className="text-lg font-bold tracking-wider">ISSY SMITH</a>
+        <a href="#" className="text-lg font-bold tracking-wider">{displayName.toUpperCase()}</a>
         <div className="hidden md:flex gap-6">
-          {NAV_ITEMS.map((item) => (
+          {sections.map((item) => (
             <a
               key={item.href}
               href={item.href}
