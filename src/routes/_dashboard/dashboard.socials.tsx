@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { getSocialLinks, upsertSocialLink, deleteSocialLink, reorderSocialLinks } from '~/server/social-links'
 import { socialLinkUpsertSchema, SOCIAL_PLATFORMS, type SocialLinkUpsert } from '~/schemas/social-link'
-import { FORM_INPUT, FORM_INPUT_ERROR, BTN_BASE, toSelectOptions } from '~/components/forms'
+import { FORM_INPUT, FORM_INPUT_ERROR, FORM_ERROR_MSG, BTN_BASE, BTN_DELETE, CARD_SECTION, toSelectOptions } from '~/components/forms'
 import { useListEditor } from '~/hooks/useListEditor'
 import { ReorderButtons } from '~/components/ReorderButtons'
 
@@ -51,7 +51,7 @@ function SocialsEditor() {
       <h1 className="text-2xl font-black uppercase tracking-wider mb-8">Social Links</h1>
 
       {/* Add Form */}
-      <form onSubmit={onAdd} className="bg-dark-card border border-white/10 rounded-xl p-6 mb-8">
+      <form onSubmit={onAdd} className={CARD_SECTION}>
         <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Add Social Link</h2>
         <div className="grid md:grid-cols-3 gap-4 mb-2">
           <div>
@@ -68,7 +68,7 @@ function SocialsEditor() {
               {...register('url')}
               className={errors.url ? FORM_INPUT_ERROR : FORM_INPUT}
             />
-            {errors.url && <p className="text-xs text-red-400 mt-1">{errors.url.message}</p>}
+            {errors.url && <p className={FORM_ERROR_MSG}>{errors.url.message}</p>}
           </div>
           <div>
             <input
@@ -77,7 +77,7 @@ function SocialsEditor() {
               {...register('handle')}
               className={errors.handle ? FORM_INPUT_ERROR : FORM_INPUT}
             />
-            {errors.handle && <p className="text-xs text-red-400 mt-1">{errors.handle.message}</p>}
+            {errors.handle && <p className={FORM_ERROR_MSG}>{errors.handle.message}</p>}
           </div>
         </div>
         <button
@@ -115,7 +115,7 @@ function SocialsEditor() {
               <button
                 type="button"
                 onClick={() => handleDelete(link.id)}
-                className={`${BTN_BASE} bg-red-500/20 text-red-400 hover:bg-red-500/30`}
+                className={BTN_DELETE}
               >
                 Delete
               </button>

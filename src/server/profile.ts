@@ -1,11 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { profileUpdateSchema } from '~/schemas/profile'
+import { RESERVED_SLUGS } from '~/utils/constants'
 import { withAuth, withAuthOrNull } from './utils'
-
-const RESERVED_SLUGS = new Set([
-  'dashboard', 'login', 'signup', 'admin', 'api', 'settings',
-  'profile', 'billing', 'help', 'support', 'about', 'pricing',
-])
 
 const ALLOWED_PROFILE_FIELDS = new Set([
   'display_name',

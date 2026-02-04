@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { getPublicProfile } from '~/server/public-profile'
 import { Nav } from '~/components/Nav'
 import { FadeIn } from '~/components/FadeIn'
+import { SectionHeading } from '~/components/SectionHeading'
 import type { MixRow, EventRow, SocialLinkRow, PressAssetRow } from '~/types/database'
 
 export const Route = createFileRoute('/$slug')({
@@ -118,8 +119,7 @@ function PublicEPK() {
           <FadeIn>
             <section id="bio" className="py-20 px-4">
               <div className="max-w-6xl mx-auto">
-                <div className="w-20 h-1 bg-accent mb-8 shadow-[0_0_10px_var(--color-accent-glow)]" />
-                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-wider mb-12">Bio</h2>
+                <SectionHeading>Bio</SectionHeading>
                 <div className="grid md:grid-cols-2 gap-8 md:gap-12 text-text-secondary leading-relaxed">
                   {profile.bio_left && <div className="whitespace-pre-line">{profile.bio_left}</div>}
                   {profile.bio_right && <div className="whitespace-pre-line">{profile.bio_right}</div>}
@@ -134,8 +134,7 @@ function PublicEPK() {
           <FadeIn>
             <section id="music" className="py-20 px-4">
               <div className="max-w-6xl mx-auto">
-                <div className="w-20 h-1 bg-accent mb-8 shadow-[0_0_10px_var(--color-accent-glow)]" />
-                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-wider mb-12">Listen</h2>
+                <SectionHeading>Listen</SectionHeading>
                 {Object.entries(
                   mixes.reduce<Record<string, MixRow[]>>((acc, mix) => {
                     const cat = mix.category || 'other'
@@ -169,10 +168,7 @@ function PublicEPK() {
           <FadeIn>
             <section id="events" className="py-20 px-4">
               <div className="max-w-6xl mx-auto">
-                <div className="w-20 h-1 bg-accent mb-8 shadow-[0_0_10px_var(--color-accent-glow)]" />
-                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-wider mb-12">
-                  Events <span className="text-accent">&amp;</span> Brands
-                </h2>
+                <SectionHeading>Events <span className="text-accent">&amp;</span> Brands</SectionHeading>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                   {events.map((event: EventRow) => (
                     <a
@@ -203,8 +199,7 @@ function PublicEPK() {
           <FadeIn>
             <section id="technical" className="py-20 px-4">
               <div className="max-w-4xl mx-auto">
-                <div className="w-20 h-1 bg-accent mb-8 shadow-[0_0_10px_var(--color-accent-glow)]" />
-                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-wider mb-12">Technical Rider</h2>
+                <SectionHeading>Technical Rider</SectionHeading>
                 <div className="bg-dark-card backdrop-blur-sm rounded-xl border border-white/5 overflow-hidden">
                   {technicalRider.preferred_setup && (
                     <div className="px-6 py-4 border-b border-white/5">
@@ -229,12 +224,11 @@ function PublicEPK() {
           <FadeIn>
             <section id="press" className="py-20 px-4">
               <div className="max-w-6xl mx-auto">
-                <div className="w-20 h-1 bg-accent mb-8 shadow-[0_0_10px_var(--color-accent-glow)]" />
-                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-wider mb-12">Press Assets</h2>
+                <SectionHeading>Press Assets</SectionHeading>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {pressAssets.map((asset: PressAssetRow) => (
                     <a
-                      key={asset.title}
+                      key={asset.id}
                       href={asset.file_url}
                       download
                       target="_blank"
@@ -256,8 +250,7 @@ function PublicEPK() {
           <FadeIn>
             <section id="contact" className="py-20 px-4">
               <div className="max-w-4xl mx-auto">
-                <div className="w-20 h-1 bg-accent mb-8 shadow-[0_0_10px_var(--color-accent-glow)]" />
-                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-wider mb-12">Booking Contact</h2>
+                <SectionHeading>Booking Contact</SectionHeading>
                 <div className="text-text-secondary space-y-2">
                   <p><strong>Management:</strong> {bookingContact.manager_name}</p>
                   {bookingContact.email && <p><strong>Email:</strong> {bookingContact.email}</p>}

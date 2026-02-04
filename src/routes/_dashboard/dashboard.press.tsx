@@ -5,7 +5,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { getPressAssets, upsertPressAsset, deletePressAsset, reorderPressAssets } from '~/server/press-assets'
 import { pressAssetUpsertSchema, ASSET_TYPES, type PressAssetUpsert } from '~/schemas/press-asset'
 import { uploadFileFromInput } from '~/utils/upload'
-import { FORM_INPUT, BTN_BASE, toSelectOptions } from '~/components/forms'
+import { FORM_INPUT, BTN_BASE, CARD_SECTION, toSelectOptions } from '~/components/forms'
+import { GridItemOverlay } from '~/components/GridItemOverlay'
 import { useListEditor } from '~/hooks/useListEditor'
 
 export const Route = createFileRoute('/_dashboard/dashboard/press')({
@@ -60,7 +61,7 @@ function PressEditor() {
       <h1 className="text-2xl font-black uppercase tracking-wider mb-8">Press Assets</h1>
 
       {/* Upload Form */}
-      <div className="bg-dark-card border border-white/10 rounded-xl p-6 mb-8">
+      <div className={CARD_SECTION}>
         <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Upload Asset</h2>
         <div className="grid md:grid-cols-3 gap-4 mb-4">
           <input
@@ -116,43 +117,17 @@ function PressEditor() {
                 />
               )}
 
-              {/* Hover Overlay */}
-              <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
-                <p className="text-white text-xs font-bold uppercase tracking-wider text-center px-2 truncate w-full">
-                  {asset.title}
-                </p>
+              <GridItemOverlay
+                label={asset.title}
+                index={index}
+                total={assets.length}
+                onReorder={handleReorder!}
+                onDelete={() => handleDelete(asset.id)}
+              >
                 <span className="inline-block bg-white/10 rounded px-2 py-0.5 text-[10px] text-text-secondary uppercase tracking-wider">
                   {asset.type}
                 </span>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleReorder?.(index, 'up')}
-                    disabled={index === 0}
-                    className="w-8 h-8 flex items-center justify-center rounded bg-white/10 text-white hover:bg-white/20 disabled:opacity-20 transition-colors text-xs"
-                    title="Move up"
-                  >
-                    &#9650;
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleReorder?.(index, 'down')}
-                    disabled={index === assets.length - 1}
-                    className="w-8 h-8 flex items-center justify-center rounded bg-white/10 text-white hover:bg-white/20 disabled:opacity-20 transition-colors text-xs"
-                    title="Move down"
-                  >
-                    &#9660;
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(asset.id)}
-                    className="w-8 h-8 flex items-center justify-center rounded bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors text-xs"
-                    title="Delete"
-                  >
-                    &#10005;
-                  </button>
-                </div>
-              </div>
+              </GridItemOverlay>
             </div>
           ))}
         </div>

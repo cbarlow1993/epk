@@ -1,9 +1,5 @@
 import { z } from 'zod'
-
-const RESERVED_SLUGS = new Set([
-  'dashboard', 'login', 'signup', 'admin', 'api', 'settings',
-  'profile', 'billing', 'help', 'support', 'about', 'pricing',
-])
+import { RESERVED_SLUGS } from '~/utils/constants'
 
 export const profileUpdateSchema = z.object({
   display_name: z.string().max(100, 'Max 100 characters').optional(),

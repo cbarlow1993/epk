@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { getProfile, updateProfile } from '~/server/profile'
 import { uploadFileFromInput } from '~/utils/upload'
 import { profileUpdateSchema, type ProfileUpdate } from '~/schemas/profile'
-import { FormInput } from '~/components/forms'
+import { FormInput, FORM_ERROR_MSG } from '~/components/forms'
 import { useDashboardSave } from '~/hooks/useDashboardSave'
 import { DashboardHeader } from '~/components/DashboardHeader'
 
@@ -85,7 +85,7 @@ function ProfileEditor() {
               }`}
             />
           </div>
-          {errors.slug && <p className="text-xs text-red-400 mt-1">{errors.slug.message}</p>}
+          {errors.slug && <p className={FORM_ERROR_MSG}>{errors.slug.message}</p>}
         </div>
 
         <FormInput
@@ -108,7 +108,7 @@ function ProfileEditor() {
             placeholder="House, Tech House, Melodic House"
           />
           <p className="text-xs text-text-secondary mt-1">Comma-separated</p>
-          {errors.genres && <p className="text-xs text-red-400 mt-1">{errors.genres.message}</p>}
+          {errors.genres && <p className={FORM_ERROR_MSG}>{errors.genres.message}</p>}
         </div>
 
         <div>

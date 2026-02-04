@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { getProfile, updateProfile } from '~/server/profile'
 import { profileUpdateSchema, type ProfileUpdate } from '~/schemas/profile'
+import { FORM_ERROR_MSG } from '~/components/forms'
 import { useDashboardSave } from '~/hooks/useDashboardSave'
 import { DashboardHeader } from '~/components/DashboardHeader'
 
@@ -67,7 +68,7 @@ function ThemeEditor() {
                 }`}
               />
             </div>
-            {errors.accent_color && <p className="text-xs text-red-400 mt-1">{errors.accent_color.message}</p>}
+            {errors.accent_color && <p className={FORM_ERROR_MSG}>{errors.accent_color.message}</p>}
           </div>
 
           <div>
@@ -87,7 +88,7 @@ function ThemeEditor() {
                 }`}
               />
             </div>
-            {errors.bg_color && <p className="text-xs text-red-400 mt-1">{errors.bg_color.message}</p>}
+            {errors.bg_color && <p className={FORM_ERROR_MSG}>{errors.bg_color.message}</p>}
           </div>
 
           <div>
@@ -116,7 +117,7 @@ function ThemeEditor() {
         <div className="hidden lg:block">
           <label className="block text-sm uppercase tracking-widest font-bold mb-2">Live Preview</label>
           {previewUrl ? (
-            <div className="border border-white/10 rounded-lg overflow-hidden bg-dark-surface" style={{ height: '70vh' }}>
+            <div className="border border-white/10 rounded-lg overflow-hidden bg-dark-surface h-[70vh]">
               <iframe
                 src={`${previewUrl}?preview=true&accent=${encodeURIComponent(accentColor)}&bg=${encodeURIComponent(bgColor)}&font=${encodeURIComponent(fontFamily)}`}
                 className="w-full h-full"

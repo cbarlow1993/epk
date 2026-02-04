@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { getMixes, upsertMix, deleteMix, reorderMixes } from '~/server/mixes'
 import { mixUpsertSchema, MIX_CATEGORIES, type MixUpsert } from '~/schemas/mix'
-import { FORM_INPUT, FORM_INPUT_ERROR, BTN_BASE, toSelectOptions } from '~/components/forms'
+import { FORM_INPUT, FORM_INPUT_ERROR, FORM_ERROR_MSG, BTN_BASE, BTN_DELETE, CARD_SECTION, toSelectOptions } from '~/components/forms'
 import { useListEditor } from '~/hooks/useListEditor'
 import { ReorderButtons } from '~/components/ReorderButtons'
 import type { MixRow } from '~/types/database'
@@ -64,7 +64,7 @@ function MusicEditor() {
       <h1 className="text-2xl font-black uppercase tracking-wider mb-8">Music / Mixes</h1>
 
       {/* Add Form */}
-      <form onSubmit={onAdd} className="bg-dark-card border border-white/10 rounded-xl p-6 mb-8">
+      <form onSubmit={onAdd} className={CARD_SECTION}>
         <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Add Mix</h2>
         <div className="grid md:grid-cols-3 gap-4 mb-2">
           <div>
@@ -74,7 +74,7 @@ function MusicEditor() {
               {...register('title')}
               className={errors.title ? FORM_INPUT_ERROR : FORM_INPUT}
             />
-            {errors.title && <p className="text-xs text-red-400 mt-1">{errors.title.message}</p>}
+            {errors.title && <p className={FORM_ERROR_MSG}>{errors.title.message}</p>}
           </div>
           <div>
             <input
@@ -83,7 +83,7 @@ function MusicEditor() {
               {...register('url')}
               className={errors.url ? FORM_INPUT_ERROR : FORM_INPUT}
             />
-            {errors.url && <p className="text-xs text-red-400 mt-1">{errors.url.message}</p>}
+            {errors.url && <p className={FORM_ERROR_MSG}>{errors.url.message}</p>}
           </div>
           <div>
             <select {...register('category')} className={FORM_INPUT}>
@@ -91,7 +91,7 @@ function MusicEditor() {
                 <option key={c.value} value={c.value}>{c.label}</option>
               ))}
             </select>
-            {errors.category && <p className="text-xs text-red-400 mt-1">{errors.category.message}</p>}
+            {errors.category && <p className={FORM_ERROR_MSG}>{errors.category.message}</p>}
           </div>
         </div>
         <button
@@ -186,7 +186,7 @@ function MusicEditor() {
                     <button
                       type="button"
                       onClick={() => handleDelete(mix.id)}
-                      className={`${BTN_BASE} bg-red-500/20 text-red-400 hover:bg-red-500/30`}
+                      className={BTN_DELETE}
                     >
                       Delete
                     </button>
