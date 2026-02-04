@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
-import { getSupabaseServerClient } from '~/utils/supabase'
+import { getSupabaseServerClient } from '~/utils/supabase.server'
 
 const getAgencyPage = createServerFn({ method: 'GET' })
   .inputValidator((slug: string) => slug)

@@ -115,8 +115,31 @@ src/
   utils/            # Shared utilities (supabase client, upload helper)
 ```
 
+## Database Migrations (Supabase CLI)
+
+Migrations live in `supabase/migrations/` as timestamped SQL files. The Supabase CLI manages schema changes against the remote project.
+
+### Setup (one-time)
+```bash
+npx supabase login          # Authenticate with Supabase
+npx supabase link --project-ref <ref>  # Link to remote project
+```
+
+### Workflow
+- **Create a new migration:** `npx supabase migration new <description>` — creates a timestamped file in `supabase/migrations/`
+- **Push migrations to remote:** `npx supabase db push` — applies pending migrations
+- **Reset remote database:** `npx supabase db reset --linked` — drops everything, re-applies all migrations from scratch
+- **Pull remote changes:** `npx supabase db pull` — generates migration from remote schema diff
+
+### Rules
+- All schema changes MUST go through migration files — never edit the database directly via the dashboard
+- Migration files are immutable once pushed — create new migrations for changes
+- The `handle_new_user()` trigger function MUST use `SET search_path = public` to work in the auth trigger context
+- Test migrations locally or with `db reset` before pushing to production
+
 ## Commands
 - `npm run dev` — Start dev server
 - `npm run build` — Production build (vite build + tsc --noEmit)
-- `npm run db:migrate` — Run schema.sql against DATABASE_URL
+- `npm run test:e2e` — Run Playwright E2E tests
+- `npm run test:e2e:ui` — Run Playwright tests with interactive UI
 - `npm start` — Run production server

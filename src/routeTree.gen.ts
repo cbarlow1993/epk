@@ -11,23 +11,31 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as InviteTokenRouteImport } from './routes/invite/$token'
+import { Route as AgencyOrgSlugRouteImport } from './routes/agency/$orgSlug'
 import { Route as DashboardDashboardRouteImport } from './routes/_dashboard/dashboard'
 import { Route as DashboardDashboardIndexRouteImport } from './routes/_dashboard/dashboard.index'
 import { Route as DashboardDashboardThemeRouteImport } from './routes/_dashboard/dashboard.theme'
 import { Route as DashboardDashboardTechnicalRouteImport } from './routes/_dashboard/dashboard.technical'
+import { Route as DashboardDashboardTeamRouteImport } from './routes/_dashboard/dashboard.team'
 import { Route as DashboardDashboardSocialsRouteImport } from './routes/_dashboard/dashboard.socials'
 import { Route as DashboardDashboardSettingsRouteImport } from './routes/_dashboard/dashboard.settings'
+import { Route as DashboardDashboardRosterRouteImport } from './routes/_dashboard/dashboard.roster'
 import { Route as DashboardDashboardPressRouteImport } from './routes/_dashboard/dashboard.press'
 import { Route as DashboardDashboardMusicRouteImport } from './routes/_dashboard/dashboard.music'
 import { Route as DashboardDashboardInquiriesRouteImport } from './routes/_dashboard/dashboard.inquiries'
+import { Route as DashboardDashboardFilesRouteImport } from './routes/_dashboard/dashboard.files'
 import { Route as DashboardDashboardEventsRouteImport } from './routes/_dashboard/dashboard.events'
 import { Route as DashboardDashboardContactRouteImport } from './routes/_dashboard/dashboard.contact'
 import { Route as DashboardDashboardBioRouteImport } from './routes/_dashboard/dashboard.bio'
+import { Route as DashboardDashboardBillingRouteImport } from './routes/_dashboard/dashboard.billing'
+import { Route as DashboardDashboardAnalyticsOverviewRouteImport } from './routes/_dashboard/dashboard.analytics-overview'
 import { Route as DashboardDashboardAnalyticsRouteImport } from './routes/_dashboard/dashboard.analytics'
 
 const SignupRoute = SignupRouteImport.update({
@@ -38,6 +46,11 @@ const SignupRoute = SignupRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -64,6 +77,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InviteTokenRoute = InviteTokenRouteImport.update({
+  id: '/invite/$token',
+  path: '/invite/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgencyOrgSlugRoute = AgencyOrgSlugRouteImport.update({
+  id: '/agency/$orgSlug',
+  path: '/agency/$orgSlug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardDashboardRoute = DashboardDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -85,6 +108,11 @@ const DashboardDashboardTechnicalRoute =
     path: '/technical',
     getParentRoute: () => DashboardDashboardRoute,
   } as any)
+const DashboardDashboardTeamRoute = DashboardDashboardTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => DashboardDashboardRoute,
+} as any)
 const DashboardDashboardSocialsRoute =
   DashboardDashboardSocialsRouteImport.update({
     id: '/socials',
@@ -95,6 +123,12 @@ const DashboardDashboardSettingsRoute =
   DashboardDashboardSettingsRouteImport.update({
     id: '/settings',
     path: '/settings',
+    getParentRoute: () => DashboardDashboardRoute,
+  } as any)
+const DashboardDashboardRosterRoute =
+  DashboardDashboardRosterRouteImport.update({
+    id: '/roster',
+    path: '/roster',
     getParentRoute: () => DashboardDashboardRoute,
   } as any)
 const DashboardDashboardPressRoute = DashboardDashboardPressRouteImport.update({
@@ -113,6 +147,11 @@ const DashboardDashboardInquiriesRoute =
     path: '/inquiries',
     getParentRoute: () => DashboardDashboardRoute,
   } as any)
+const DashboardDashboardFilesRoute = DashboardDashboardFilesRouteImport.update({
+  id: '/files',
+  path: '/files',
+  getParentRoute: () => DashboardDashboardRoute,
+} as any)
 const DashboardDashboardEventsRoute =
   DashboardDashboardEventsRouteImport.update({
     id: '/events',
@@ -130,6 +169,18 @@ const DashboardDashboardBioRoute = DashboardDashboardBioRouteImport.update({
   path: '/bio',
   getParentRoute: () => DashboardDashboardRoute,
 } as any)
+const DashboardDashboardBillingRoute =
+  DashboardDashboardBillingRouteImport.update({
+    id: '/billing',
+    path: '/billing',
+    getParentRoute: () => DashboardDashboardRoute,
+  } as any)
+const DashboardDashboardAnalyticsOverviewRoute =
+  DashboardDashboardAnalyticsOverviewRouteImport.update({
+    id: '/analytics-overview',
+    path: '/analytics-overview',
+    getParentRoute: () => DashboardDashboardRoute,
+  } as any)
 const DashboardDashboardAnalyticsRoute =
   DashboardDashboardAnalyticsRouteImport.update({
     id: '/analytics',
@@ -142,18 +193,26 @@ export interface FileRoutesByFullPath {
   '/$slug': typeof SlugRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/dashboard': typeof DashboardDashboardRouteWithChildren
+  '/agency/$orgSlug': typeof AgencyOrgSlugRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/dashboard/analytics': typeof DashboardDashboardAnalyticsRoute
+  '/dashboard/analytics-overview': typeof DashboardDashboardAnalyticsOverviewRoute
+  '/dashboard/billing': typeof DashboardDashboardBillingRoute
   '/dashboard/bio': typeof DashboardDashboardBioRoute
   '/dashboard/contact': typeof DashboardDashboardContactRoute
   '/dashboard/events': typeof DashboardDashboardEventsRoute
+  '/dashboard/files': typeof DashboardDashboardFilesRoute
   '/dashboard/inquiries': typeof DashboardDashboardInquiriesRoute
   '/dashboard/music': typeof DashboardDashboardMusicRoute
   '/dashboard/press': typeof DashboardDashboardPressRoute
+  '/dashboard/roster': typeof DashboardDashboardRosterRoute
   '/dashboard/settings': typeof DashboardDashboardSettingsRoute
   '/dashboard/socials': typeof DashboardDashboardSocialsRoute
+  '/dashboard/team': typeof DashboardDashboardTeamRoute
   '/dashboard/technical': typeof DashboardDashboardTechnicalRoute
   '/dashboard/theme': typeof DashboardDashboardThemeRoute
   '/dashboard/': typeof DashboardDashboardIndexRoute
@@ -163,17 +222,25 @@ export interface FileRoutesByTo {
   '/$slug': typeof SlugRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/agency/$orgSlug': typeof AgencyOrgSlugRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/dashboard/analytics': typeof DashboardDashboardAnalyticsRoute
+  '/dashboard/analytics-overview': typeof DashboardDashboardAnalyticsOverviewRoute
+  '/dashboard/billing': typeof DashboardDashboardBillingRoute
   '/dashboard/bio': typeof DashboardDashboardBioRoute
   '/dashboard/contact': typeof DashboardDashboardContactRoute
   '/dashboard/events': typeof DashboardDashboardEventsRoute
+  '/dashboard/files': typeof DashboardDashboardFilesRoute
   '/dashboard/inquiries': typeof DashboardDashboardInquiriesRoute
   '/dashboard/music': typeof DashboardDashboardMusicRoute
   '/dashboard/press': typeof DashboardDashboardPressRoute
+  '/dashboard/roster': typeof DashboardDashboardRosterRoute
   '/dashboard/settings': typeof DashboardDashboardSettingsRoute
   '/dashboard/socials': typeof DashboardDashboardSocialsRoute
+  '/dashboard/team': typeof DashboardDashboardTeamRoute
   '/dashboard/technical': typeof DashboardDashboardTechnicalRoute
   '/dashboard/theme': typeof DashboardDashboardThemeRoute
   '/dashboard': typeof DashboardDashboardIndexRoute
@@ -185,18 +252,26 @@ export interface FileRoutesById {
   '/_dashboard': typeof DashboardRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/_dashboard/dashboard': typeof DashboardDashboardRouteWithChildren
+  '/agency/$orgSlug': typeof AgencyOrgSlugRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/_dashboard/dashboard/analytics': typeof DashboardDashboardAnalyticsRoute
+  '/_dashboard/dashboard/analytics-overview': typeof DashboardDashboardAnalyticsOverviewRoute
+  '/_dashboard/dashboard/billing': typeof DashboardDashboardBillingRoute
   '/_dashboard/dashboard/bio': typeof DashboardDashboardBioRoute
   '/_dashboard/dashboard/contact': typeof DashboardDashboardContactRoute
   '/_dashboard/dashboard/events': typeof DashboardDashboardEventsRoute
+  '/_dashboard/dashboard/files': typeof DashboardDashboardFilesRoute
   '/_dashboard/dashboard/inquiries': typeof DashboardDashboardInquiriesRoute
   '/_dashboard/dashboard/music': typeof DashboardDashboardMusicRoute
   '/_dashboard/dashboard/press': typeof DashboardDashboardPressRoute
+  '/_dashboard/dashboard/roster': typeof DashboardDashboardRosterRoute
   '/_dashboard/dashboard/settings': typeof DashboardDashboardSettingsRoute
   '/_dashboard/dashboard/socials': typeof DashboardDashboardSocialsRoute
+  '/_dashboard/dashboard/team': typeof DashboardDashboardTeamRoute
   '/_dashboard/dashboard/technical': typeof DashboardDashboardTechnicalRoute
   '/_dashboard/dashboard/theme': typeof DashboardDashboardThemeRoute
   '/_dashboard/dashboard/': typeof DashboardDashboardIndexRoute
@@ -208,18 +283,26 @@ export interface FileRouteTypes {
     | '/$slug'
     | '/forgot-password'
     | '/login'
+    | '/onboarding'
     | '/reset-password'
     | '/signup'
     | '/dashboard'
+    | '/agency/$orgSlug'
+    | '/invite/$token'
     | '/dashboard/analytics'
+    | '/dashboard/analytics-overview'
+    | '/dashboard/billing'
     | '/dashboard/bio'
     | '/dashboard/contact'
     | '/dashboard/events'
+    | '/dashboard/files'
     | '/dashboard/inquiries'
     | '/dashboard/music'
     | '/dashboard/press'
+    | '/dashboard/roster'
     | '/dashboard/settings'
     | '/dashboard/socials'
+    | '/dashboard/team'
     | '/dashboard/technical'
     | '/dashboard/theme'
     | '/dashboard/'
@@ -229,17 +312,25 @@ export interface FileRouteTypes {
     | '/$slug'
     | '/forgot-password'
     | '/login'
+    | '/onboarding'
     | '/reset-password'
     | '/signup'
+    | '/agency/$orgSlug'
+    | '/invite/$token'
     | '/dashboard/analytics'
+    | '/dashboard/analytics-overview'
+    | '/dashboard/billing'
     | '/dashboard/bio'
     | '/dashboard/contact'
     | '/dashboard/events'
+    | '/dashboard/files'
     | '/dashboard/inquiries'
     | '/dashboard/music'
     | '/dashboard/press'
+    | '/dashboard/roster'
     | '/dashboard/settings'
     | '/dashboard/socials'
+    | '/dashboard/team'
     | '/dashboard/technical'
     | '/dashboard/theme'
     | '/dashboard'
@@ -250,18 +341,26 @@ export interface FileRouteTypes {
     | '/_dashboard'
     | '/forgot-password'
     | '/login'
+    | '/onboarding'
     | '/reset-password'
     | '/signup'
     | '/_dashboard/dashboard'
+    | '/agency/$orgSlug'
+    | '/invite/$token'
     | '/_dashboard/dashboard/analytics'
+    | '/_dashboard/dashboard/analytics-overview'
+    | '/_dashboard/dashboard/billing'
     | '/_dashboard/dashboard/bio'
     | '/_dashboard/dashboard/contact'
     | '/_dashboard/dashboard/events'
+    | '/_dashboard/dashboard/files'
     | '/_dashboard/dashboard/inquiries'
     | '/_dashboard/dashboard/music'
     | '/_dashboard/dashboard/press'
+    | '/_dashboard/dashboard/roster'
     | '/_dashboard/dashboard/settings'
     | '/_dashboard/dashboard/socials'
+    | '/_dashboard/dashboard/team'
     | '/_dashboard/dashboard/technical'
     | '/_dashboard/dashboard/theme'
     | '/_dashboard/dashboard/'
@@ -273,8 +372,11 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
+  AgencyOrgSlugRoute: typeof AgencyOrgSlugRoute
+  InviteTokenRoute: typeof InviteTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -291,6 +393,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -328,6 +437,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/invite/$token': {
+      id: '/invite/$token'
+      path: '/invite/$token'
+      fullPath: '/invite/$token'
+      preLoaderRoute: typeof InviteTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agency/$orgSlug': {
+      id: '/agency/$orgSlug'
+      path: '/agency/$orgSlug'
+      fullPath: '/agency/$orgSlug'
+      preLoaderRoute: typeof AgencyOrgSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_dashboard/dashboard': {
       id: '/_dashboard/dashboard'
       path: '/dashboard'
@@ -356,6 +479,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardTechnicalRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
+    '/_dashboard/dashboard/team': {
+      id: '/_dashboard/dashboard/team'
+      path: '/team'
+      fullPath: '/dashboard/team'
+      preLoaderRoute: typeof DashboardDashboardTeamRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
     '/_dashboard/dashboard/socials': {
       id: '/_dashboard/dashboard/socials'
       path: '/socials'
@@ -368,6 +498,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/dashboard/settings'
       preLoaderRoute: typeof DashboardDashboardSettingsRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
+    '/_dashboard/dashboard/roster': {
+      id: '/_dashboard/dashboard/roster'
+      path: '/roster'
+      fullPath: '/dashboard/roster'
+      preLoaderRoute: typeof DashboardDashboardRosterRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
     '/_dashboard/dashboard/press': {
@@ -391,6 +528,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardInquiriesRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
+    '/_dashboard/dashboard/files': {
+      id: '/_dashboard/dashboard/files'
+      path: '/files'
+      fullPath: '/dashboard/files'
+      preLoaderRoute: typeof DashboardDashboardFilesRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
     '/_dashboard/dashboard/events': {
       id: '/_dashboard/dashboard/events'
       path: '/events'
@@ -412,6 +556,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardBioRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
+    '/_dashboard/dashboard/billing': {
+      id: '/_dashboard/dashboard/billing'
+      path: '/billing'
+      fullPath: '/dashboard/billing'
+      preLoaderRoute: typeof DashboardDashboardBillingRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
+    '/_dashboard/dashboard/analytics-overview': {
+      id: '/_dashboard/dashboard/analytics-overview'
+      path: '/analytics-overview'
+      fullPath: '/dashboard/analytics-overview'
+      preLoaderRoute: typeof DashboardDashboardAnalyticsOverviewRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
     '/_dashboard/dashboard/analytics': {
       id: '/_dashboard/dashboard/analytics'
       path: '/analytics'
@@ -424,14 +582,19 @@ declare module '@tanstack/react-router' {
 
 interface DashboardDashboardRouteChildren {
   DashboardDashboardAnalyticsRoute: typeof DashboardDashboardAnalyticsRoute
+  DashboardDashboardAnalyticsOverviewRoute: typeof DashboardDashboardAnalyticsOverviewRoute
+  DashboardDashboardBillingRoute: typeof DashboardDashboardBillingRoute
   DashboardDashboardBioRoute: typeof DashboardDashboardBioRoute
   DashboardDashboardContactRoute: typeof DashboardDashboardContactRoute
   DashboardDashboardEventsRoute: typeof DashboardDashboardEventsRoute
+  DashboardDashboardFilesRoute: typeof DashboardDashboardFilesRoute
   DashboardDashboardInquiriesRoute: typeof DashboardDashboardInquiriesRoute
   DashboardDashboardMusicRoute: typeof DashboardDashboardMusicRoute
   DashboardDashboardPressRoute: typeof DashboardDashboardPressRoute
+  DashboardDashboardRosterRoute: typeof DashboardDashboardRosterRoute
   DashboardDashboardSettingsRoute: typeof DashboardDashboardSettingsRoute
   DashboardDashboardSocialsRoute: typeof DashboardDashboardSocialsRoute
+  DashboardDashboardTeamRoute: typeof DashboardDashboardTeamRoute
   DashboardDashboardTechnicalRoute: typeof DashboardDashboardTechnicalRoute
   DashboardDashboardThemeRoute: typeof DashboardDashboardThemeRoute
   DashboardDashboardIndexRoute: typeof DashboardDashboardIndexRoute
@@ -439,14 +602,20 @@ interface DashboardDashboardRouteChildren {
 
 const DashboardDashboardRouteChildren: DashboardDashboardRouteChildren = {
   DashboardDashboardAnalyticsRoute: DashboardDashboardAnalyticsRoute,
+  DashboardDashboardAnalyticsOverviewRoute:
+    DashboardDashboardAnalyticsOverviewRoute,
+  DashboardDashboardBillingRoute: DashboardDashboardBillingRoute,
   DashboardDashboardBioRoute: DashboardDashboardBioRoute,
   DashboardDashboardContactRoute: DashboardDashboardContactRoute,
   DashboardDashboardEventsRoute: DashboardDashboardEventsRoute,
+  DashboardDashboardFilesRoute: DashboardDashboardFilesRoute,
   DashboardDashboardInquiriesRoute: DashboardDashboardInquiriesRoute,
   DashboardDashboardMusicRoute: DashboardDashboardMusicRoute,
   DashboardDashboardPressRoute: DashboardDashboardPressRoute,
+  DashboardDashboardRosterRoute: DashboardDashboardRosterRoute,
   DashboardDashboardSettingsRoute: DashboardDashboardSettingsRoute,
   DashboardDashboardSocialsRoute: DashboardDashboardSocialsRoute,
+  DashboardDashboardTeamRoute: DashboardDashboardTeamRoute,
   DashboardDashboardTechnicalRoute: DashboardDashboardTechnicalRoute,
   DashboardDashboardThemeRoute: DashboardDashboardThemeRoute,
   DashboardDashboardIndexRoute: DashboardDashboardIndexRoute,
@@ -473,8 +642,11 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
+  AgencyOrgSlugRoute: AgencyOrgSlugRoute,
+  InviteTokenRoute: InviteTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

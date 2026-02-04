@@ -14,7 +14,7 @@ export function useActiveProfile() {
         const { profile: _removed, ...rest } = prev
         return rest
       },
-    })
+    } as Parameters<typeof navigate>[0])
   }
 
   return { activeProfileId, setActiveProfile }

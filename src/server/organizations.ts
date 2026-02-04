@@ -126,7 +126,7 @@ export const createOrgProfile = createServerFn({ method: 'POST' })
     if (!membership) return { error: 'Not authorized' }
 
     // Use admin client to create profile (not tied to auth.uid())
-    const { getSupabaseAdmin } = await import('~/utils/supabase')
+    const { getSupabaseAdmin } = await import('~/utils/supabase.server')
     const admin = getSupabaseAdmin()
 
     const profileId = crypto.randomUUID()

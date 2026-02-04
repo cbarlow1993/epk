@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 import { bookingRequestSubmitSchema, bookingRequestStatusSchema } from '~/schemas/booking-request'
-import { getSupabaseServerClient } from '~/utils/supabase'
+import { getSupabaseServerClient } from '~/utils/supabase.server'
 import { withAuth } from './utils'
 import { sendBookingNotification, sendBookingConfirmation } from './email'
 
