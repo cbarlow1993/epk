@@ -152,11 +152,20 @@ function PublicEPK() {
                 </h3>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {categoryMixes.map((mix) => (
-                    <a key={mix.id} href={mix.url} target="_blank" rel="noopener noreferrer"
-                      className="bg-dark-card border border-white/5 rounded-lg p-4 hover:border-accent/30 transition-colors">
-                      <p className="font-bold text-sm mb-1">{mix.title}</p>
-                      <p className="text-xs text-text-secondary truncate">{mix.url}</p>
-                    </a>
+                    <div key={mix.id} className="bg-dark-card border border-white/5 rounded-lg overflow-hidden">
+                      {mix.embed_html ? (
+                        <div
+                          className="w-full [&_iframe]:w-full [&_iframe]:rounded-none"
+                          dangerouslySetInnerHTML={{ __html: mix.embed_html }}
+                        />
+                      ) : (
+                        <a href={mix.url} target="_blank" rel="noopener noreferrer"
+                          className="block p-4 hover:border-accent/30 transition-colors">
+                          <p className="font-bold text-sm mb-1">{mix.title}</p>
+                          <p className="text-xs text-text-secondary truncate">{mix.url}</p>
+                        </a>
+                      )}
+                    </div>
                   ))}
                 </div>
               </div>
