@@ -330,3 +330,61 @@ ALTER TABLE organization_invites ENABLE ROW LEVEL SECURITY;
 
 -- Updated_at trigger for organizations
 CREATE TRIGGER organizations_updated_at BEFORE UPDATE ON organizations FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- Unified profile access function
+-- Checks: direct owner, org owner/admin, assigned manager, or artist managing own profile
+CREATE OR REPLACE FUNCTION can_access_profile(p_profile_id UUID)
+RETURNS BOOLEAN AS $$
+  SELECT EXISTS (
+    -- Direct owner (individual account — profile.id = auth.uid())
+    SELECT 1 FROM profiles WHERE id = p_profile_id AND id = auth.uid()
+    UNION ALL
+    -- Org owner or admin
+    SELECT 1 FROM profiles p
+    JOIN organization_members om ON om.organization_id = p.organization_id
+    WHERE p.id = p_profile_id
+    AND om.user_id = auth.uid()
+    AND om.role IN ('owner', 'admin')
+    UNION ALL
+    -- Manager with profile assigned
+    SELECT 1 FROM profiles p
+    JOIN organization_members om ON om.organization_id = p.organization_id
+    WHERE p.id = p_profile_id
+    AND om.user_id = auth.uid()
+    AND om.role = 'manager'
+    AND p_profile_id = ANY(om.assigned_profiles)
+    UNION ALL
+    -- Artist managing own profile
+    SELECT 1 FROM profiles
+    WHERE id = p_profile_id
+    AND managed_by = auth.uid()
+  );
+$$ LANGUAGE sql SECURITY DEFINER;
+
+-- Update the existing is_profile_owner function to use can_access_profile
+CREATE OR REPLACE FUNCTION is_profile_owner(p_profile_id UUID)
+RETURNS BOOLEAN AS $$
+  SELECT can_access_profile(p_profile_id);
+$$ LANGUAGE sql SECURITY DEFINER;
+
+-- Organization RLS policies
+CREATE POLICY "Members can view own org" ON organizations FOR SELECT USING (
+  EXISTS (SELECT 1 FROM organization_members WHERE organization_id = organizations.id AND user_id = auth.uid())
+);
+CREATE POLICY "Owner/admin can update org" ON organizations FOR UPDATE USING (
+  EXISTS (SELECT 1 FROM organization_members WHERE organization_id = organizations.id AND user_id = auth.uid() AND role IN ('owner', 'admin'))
+);
+
+CREATE POLICY "Members can view org members" ON organization_members FOR SELECT USING (
+  EXISTS (SELECT 1 FROM organization_members om WHERE om.organization_id = organization_members.organization_id AND om.user_id = auth.uid())
+);
+CREATE POLICY "Owner/admin can manage members" ON organization_members FOR ALL USING (
+  EXISTS (SELECT 1 FROM organization_members om WHERE om.organization_id = organization_members.organization_id AND om.user_id = auth.uid() AND om.role IN ('owner', 'admin'))
+);
+
+CREATE POLICY "Owner/admin can manage invites" ON organization_invites FOR ALL USING (
+  EXISTS (SELECT 1 FROM organization_members om WHERE om.organization_id = organization_invites.organization_id AND om.user_id = auth.uid() AND om.role IN ('owner', 'admin'))
+);
+
+-- Public can view org for agency landing pages
+CREATE POLICY "Public can view organizations" ON organizations FOR SELECT USING (true);
