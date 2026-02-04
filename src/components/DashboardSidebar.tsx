@@ -1,13 +1,9 @@
 import { Link, useMatchRoute } from '@tanstack/react-router'
 import { logout } from '~/server/auth'
-import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
+import type { ProfileRow } from '~/types/database'
 
-interface Profile {
-  slug: string
-  display_name: string
-  profile_image_url: string
-}
+type SidebarProfile = Pick<ProfileRow, 'slug' | 'display_name' | 'profile_image_url'>
 
 const NAV_ITEMS = [
   { label: 'Profile', href: '/dashboard' },
@@ -22,14 +18,13 @@ const NAV_ITEMS = [
   { label: 'Settings', href: '/dashboard/settings' },
 ]
 
-export function DashboardSidebar({ profile }: { profile: Profile }) {
+export function DashboardSidebar({ profile }: { profile: SidebarProfile }) {
   const matchRoute = useMatchRoute()
-  const navigate = useNavigate()
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const handleLogout = async () => {
     await logout()
-    navigate({ to: '/login' })
+    window.location.href = '/login'
   }
 
   const navContent = (
