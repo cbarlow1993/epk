@@ -35,6 +35,8 @@ export interface MixRow {
   thumbnail_url: string | null
   sort_order: number
   created_at: string
+  platform: string | null
+  embed_html: string | null
 }
 
 export interface EventRow {
@@ -81,6 +83,20 @@ export interface TechnicalRiderRow {
   profile_id: string
   preferred_setup: string | null
   alternative_setup: string | null
+}
+
+export interface BookingRequestRow {
+  id: string
+  profile_id: string
+  name: string
+  email: string
+  event_name: string | null
+  event_date: string | null
+  venue_location: string | null
+  budget_range: string | null
+  message: string
+  status: 'new' | 'read' | 'replied' | 'archived'
+  created_at: string
 }
 
 export interface PublicProfileData {

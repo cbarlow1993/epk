@@ -199,3 +199,35 @@ ALTER TABLE profiles ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT;
 -- Supabase Storage bucket for uploads
 -- Run this in the Supabase dashboard under Storage:
 -- Create a bucket called "uploads" with public access
+
+-- Migration: Add platform column to mixes for oEmbed support
+ALTER TABLE mixes ADD COLUMN IF NOT EXISTS platform TEXT;
+ALTER TABLE mixes ADD COLUMN IF NOT EXISTS embed_html TEXT;
+
+-- Booking requests (public inquiry form)
+CREATE TABLE booking_requests (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  event_name TEXT DEFAULT '',
+  event_date DATE,
+  venue_location TEXT DEFAULT '',
+  budget_range TEXT DEFAULT '',
+  message TEXT NOT NULL,
+  status TEXT DEFAULT 'new' CHECK (status IN ('new', 'read', 'replied', 'archived')),
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE booking_requests ENABLE ROW LEVEL SECURITY;
+
+-- Anyone can insert a booking request (public form)
+CREATE POLICY "Public can submit booking requests" ON booking_requests
+  FOR INSERT WITH CHECK (true);
+
+-- Only the profile owner can read/update their booking requests
+CREATE POLICY "Owner can view booking requests" ON booking_requests
+  FOR SELECT USING (is_profile_owner(profile_id));
+
+CREATE POLICY "Owner can update booking requests" ON booking_requests
+  FOR UPDATE USING (is_profile_owner(profile_id));

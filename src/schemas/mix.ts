@@ -4,6 +4,10 @@ export const MIX_CATEGORIES = [
   'commercial', 'melodic', 'progressive', 'tech-house', 'deep-house', 'other',
 ] as const
 
+export const SUPPORTED_PLATFORMS = [
+  'soundcloud', 'spotify', 'mixcloud', 'youtube', 'bandcamp', 'other',
+] as const
+
 export const mixUpsertSchema = z.object({
   id: z.string().uuid().optional(),
   title: z.string().min(1, 'Title is required').max(200, 'Max 200 characters'),
@@ -11,6 +15,8 @@ export const mixUpsertSchema = z.object({
   category: z.enum(MIX_CATEGORIES, { message: 'Select a valid category' }),
   thumbnail_url: z.string().url().optional(),
   sort_order: z.number().int().min(0).optional(),
+  platform: z.string().nullable().optional(),
+  embed_html: z.string().nullable().optional(),
 })
 
 export type MixUpsert = z.infer<typeof mixUpsertSchema>
