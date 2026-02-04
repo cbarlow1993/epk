@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { getProfile, updateProfile } from '~/server/profile'
 import { uploadFileFromInput } from '~/utils/upload'
 import { profileUpdateSchema, type ProfileUpdate } from '~/schemas/profile'
-import { FormInput, FORM_ERROR_MSG } from '~/components/forms'
+import { FormInput, FORM_LABEL, FORM_ERROR_MSG, FORM_FILE_INPUT } from '~/components/forms'
 import { useDashboardSave } from '~/hooks/useDashboardSave'
 import { DashboardHeader } from '~/components/DashboardHeader'
 
@@ -69,7 +69,7 @@ function ProfileEditor() {
         />
 
         <div>
-          <label className="block text-sm uppercase tracking-widest font-bold mb-2">URL Slug</label>
+          <label className={FORM_LABEL}>URL Slug</label>
           <div className="flex items-center gap-2">
             <span className="text-text-secondary text-sm">yourdomain.com/</span>
             <input
@@ -96,7 +96,7 @@ function ProfileEditor() {
         />
 
         <div>
-          <label className="block text-sm uppercase tracking-widest font-bold mb-2">Genres</label>
+          <label className={FORM_LABEL}>Genres</label>
           <input
             type="text"
             value={(genres || []).join(', ')}
@@ -112,7 +112,7 @@ function ProfileEditor() {
         </div>
 
         <div>
-          <label className="block text-sm uppercase tracking-widest font-bold mb-2">Profile Photo</label>
+          <label className={FORM_LABEL}>Profile Photo</label>
           <div className="flex items-center gap-4">
             {profileImageUrl && (
               <img src={profileImageUrl} alt="Profile" className="w-24 h-24 rounded-full object-cover border border-white/10" />
@@ -126,7 +126,7 @@ function ProfileEditor() {
                   const file = e.target.files?.[0]
                   if (file) handleProfileImage(file)
                 }}
-                className="text-sm text-text-secondary file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-dark-card file:text-white file:cursor-pointer hover:file:bg-white/10"
+                className={FORM_FILE_INPUT}
               />
               {uploadingProfile && <p className="text-xs text-accent mt-1">Uploading...</p>}
             </div>
@@ -134,7 +134,7 @@ function ProfileEditor() {
         </div>
 
         <div>
-          <label className="block text-sm uppercase tracking-widest font-bold mb-2">Hero Image</label>
+          <label className={FORM_LABEL}>Hero Image</label>
           {heroImageUrl && (
             <img src={heroImageUrl} alt="Hero" className="w-full h-32 rounded-lg object-cover border border-white/10 mb-3" />
           )}
@@ -146,7 +146,7 @@ function ProfileEditor() {
               const file = e.target.files?.[0]
               if (file) handleHeroImage(file)
             }}
-            className="text-sm text-text-secondary file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-dark-card file:text-white file:cursor-pointer hover:file:bg-white/10"
+            className={FORM_FILE_INPUT}
           />
           {uploadingHero && <p className="text-xs text-accent mt-1">Uploading...</p>}
         </div>

@@ -28,6 +28,7 @@ export default defineEventHandler(async (event) => {
 
   switch (stripeEvent.type) {
     case 'checkout.session.completed': {
+      console.log(`[stripe-webhook] Processing ${stripeEvent.type}`)
       const session = stripeEvent.data.object as Stripe.Checkout.Session
       const userId = session.metadata?.supabase_user_id
       if (!userId) break
@@ -35,8 +36,9 @@ export default defineEventHandler(async (event) => {
       const subscriptionId = typeof session.subscription === 'string'
         ? session.subscription
         : session.subscription?.id
+      if (!subscriptionId) break
 
-      await supabase
+      const { error } = await supabase
         .from('profiles')
         .update({
           tier: 'pro',
@@ -45,10 +47,15 @@ export default defineEventHandler(async (event) => {
         })
         .eq('id', userId)
 
+      if (error) {
+        throw createError({ statusCode: 500, message: `Database update failed: ${error.message}` })
+      }
+
       break
     }
 
     case 'customer.subscription.updated': {
+      console.log(`[stripe-webhook] Processing ${stripeEvent.type}`)
       const subscription = stripeEvent.data.object as Stripe.Subscription
       const customerId = typeof subscription.customer === 'string'
         ? subscription.customer
@@ -57,22 +64,27 @@ export default defineEventHandler(async (event) => {
       const status = subscription.status
       const tier = (status === 'active' || status === 'trialing') ? 'pro' : 'free'
 
-      await supabase
+      const { error } = await supabase
         .from('profiles')
         .update({ tier, stripe_subscription_id: subscription.id })
         .eq('stripe_customer_id', customerId)
+
+      if (error) {
+        throw createError({ statusCode: 500, message: `Database update failed: ${error.message}` })
+      }
 
       break
     }
 
     case 'customer.subscription.deleted': {
+      console.log(`[stripe-webhook] Processing ${stripeEvent.type}`)
       const subscription = stripeEvent.data.object as Stripe.Subscription
       const customerId = typeof subscription.customer === 'string'
         ? subscription.customer
         : subscription.customer.id
 
       // Downgrade to free, clear custom domain
-      await supabase
+      const { error } = await supabase
         .from('profiles')
         .update({
           tier: 'free',
@@ -80,6 +92,10 @@ export default defineEventHandler(async (event) => {
           custom_domain: null,
         })
         .eq('stripe_customer_id', customerId)
+
+      if (error) {
+        throw createError({ statusCode: 500, message: `Database update failed: ${error.message}` })
+      }
 
       break
     }

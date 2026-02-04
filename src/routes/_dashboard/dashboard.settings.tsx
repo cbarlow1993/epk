@@ -4,11 +4,17 @@ import { getProfile } from '~/server/profile'
 import type { ProfileRow } from '~/types/database'
 import { createCheckoutSession, createPortalSession } from '~/server/billing'
 import { addCustomDomain, removeCustomDomain, checkDomainStatus } from '~/server/domains'
+import { SETTINGS_CARD } from '~/components/forms'
 
 export const Route = createFileRoute('/_dashboard/dashboard/settings')({
   loader: () => getProfile(),
   component: SettingsPage,
 })
+
+async function redirectToBilling(action: () => Promise<Record<string, unknown>>) {
+  const result = await action()
+  if ('url' in result && typeof result.url === 'string') window.location.href = result.url
+}
 
 function SettingsPage() {
   const profile = Route.useLoaderData()
@@ -19,7 +25,7 @@ function SettingsPage() {
 
       <div className="space-y-8 max-w-2xl">
         {/* Account Info */}
-        <div className="bg-dark-card border border-white/10 rounded-lg p-6">
+        <div className={SETTINGS_CARD}>
           <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Account</h2>
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
@@ -40,17 +46,14 @@ function SettingsPage() {
         </div>
 
         {/* Billing */}
-        <div className="bg-dark-card border border-white/10 rounded-lg p-6">
+        <div className={SETTINGS_CARD}>
           <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Billing</h2>
           {profile?.tier === 'pro' ? (
             <div>
               <p className="text-sm text-text-secondary mb-4">You're on the <span className="text-accent font-bold">Pro</span> plan.</p>
               <button
                 type="button"
-                onClick={async () => {
-                  const result = await createPortalSession()
-                  if ('url' in result && result.url) window.location.href = result.url
-                }}
+                onClick={() => redirectToBilling(createPortalSession)}
                 className="bg-white/10 hover:bg-white/20 text-white text-sm font-bold uppercase tracking-widest px-6 py-2 rounded-lg transition-colors"
               >
                 Manage Subscription
@@ -61,10 +64,7 @@ function SettingsPage() {
               <p className="text-sm text-text-secondary mb-4">You're on the <span className="font-bold">Free</span> plan. Upgrade for custom domains, remove branding, and more.</p>
               <button
                 type="button"
-                onClick={async () => {
-                  const result = await createCheckoutSession()
-                  if ('url' in result && result.url) window.location.href = result.url
-                }}
+                onClick={() => redirectToBilling(createCheckoutSession)}
                 className="bg-accent hover:bg-accent/80 text-white text-sm font-bold uppercase tracking-widest px-6 py-2 rounded-lg transition-colors"
               >
                 Upgrade to Pro
@@ -111,7 +111,7 @@ function CustomDomainSection({ profile }: { profile: ProfileRow | null }) {
 
   if (profile?.tier !== 'pro') {
     return (
-      <div className="bg-dark-card border border-white/10 rounded-lg p-6">
+      <div className={SETTINGS_CARD}>
         <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Custom Domain</h2>
         <p className="text-text-secondary text-sm">Upgrade to Pro to use a custom domain.</p>
       </div>
@@ -119,7 +119,7 @@ function CustomDomainSection({ profile }: { profile: ProfileRow | null }) {
   }
 
   return (
-    <div className="bg-dark-card border border-white/10 rounded-lg p-6">
+    <div className={SETTINGS_CARD}>
       <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Custom Domain</h2>
       {profile?.custom_domain ? (
         <div className="space-y-3">
