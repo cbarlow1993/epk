@@ -24,8 +24,8 @@ export const profileUpdateSchema = z.object({
     .regex(/^#[0-9a-fA-F]{6}$/, 'Must be a valid hex colour (e.g. #0a0a0f)')
     .optional(),
   font_family: z.string().max(50).optional(),
-  bio_left: z.string().max(5000, 'Max 5000 characters').optional(),
-  bio_right: z.string().max(5000, 'Max 5000 characters').optional(),
+  bio_left: z.string().max(10000, 'Max 10000 characters').optional(),
+  bio_right: z.string().max(10000, 'Max 10000 characters').optional(),
 })
 
 export type ProfileUpdate = z.infer<typeof profileUpdateSchema>
