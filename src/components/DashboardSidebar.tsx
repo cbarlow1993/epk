@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { label: 'Technical', href: '/dashboard/technical' },
   { label: 'Press Assets', href: '/dashboard/press' },
   { label: 'Contact', href: '/dashboard/contact' },
+  { label: 'Inquiries', href: '/dashboard/inquiries' },
   { label: 'Social Links', href: '/dashboard/socials' },
   { label: 'Theme', href: '/dashboard/theme' },
   { label: 'Settings', href: '/dashboard/settings' },
