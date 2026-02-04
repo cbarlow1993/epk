@@ -10,20 +10,22 @@ const getAgencyPage = createServerFn({ method: 'GET' })
 
     const { data: org } = await supabase
       .from('organizations')
-      .select('name, logo_url, website_url, slug')
+      .select('id, name, logo_url, website_url, slug')
       .eq('slug', slug)
       .single()
 
     if (!org) return null
 
+    const { id: orgId, ...safeOrg } = org
+
     const { data: profiles } = await supabase
       .from('profiles')
       .select('display_name, slug, profile_image_url, tagline, genres')
-      .eq('organization_id', org.id)
+      .eq('organization_id', orgId)
       .eq('published', true)
       .order('display_name')
 
-    return { organization: org, profiles: profiles || [] }
+    return { organization: safeOrg, profiles: profiles || [] }
   })
 
 export const Route = createFileRoute('/agency/$orgSlug')({
