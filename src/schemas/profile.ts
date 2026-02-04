@@ -31,6 +31,7 @@ export const profileUpdateSchema = z.object({
   favicon_url: z.string().url().optional().or(z.literal('')),
   hide_platform_branding: z.boolean().optional(),
   meta_description: z.string().max(300).optional(),
+  template: z.enum(['default', 'minimal', 'festival', 'underground']).optional(),
 })
 
 export type ProfileUpdate = z.infer<typeof profileUpdateSchema>

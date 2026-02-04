@@ -28,6 +28,7 @@ export interface ProfileRow {
   favicon_url: string | null
   hide_platform_branding: boolean
   meta_description: string | null
+  template: string
   created_at: string
 }
 

@@ -21,6 +21,7 @@ const ALLOWED_PROFILE_FIELDS = new Set([
   'favicon_url',
   'hide_platform_branding',
   'meta_description',
+  'template',
 ])
 
 export const getProfile = createServerFn({ method: 'GET' }).handler(async () => {

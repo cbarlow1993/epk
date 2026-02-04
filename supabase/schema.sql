@@ -281,3 +281,6 @@ CREATE POLICY "Owner CRUD on file_tags" ON file_tags FOR ALL USING (
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS favicon_url TEXT;
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS hide_platform_branding BOOLEAN DEFAULT false;
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS meta_description TEXT;
+
+-- Template system
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS template TEXT DEFAULT 'default';

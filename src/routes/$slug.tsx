@@ -6,6 +6,7 @@ import { Nav } from '~/components/Nav'
 import { sanitize, sanitizeEmbed } from '~/utils/sanitize'
 import { EPKSection } from '~/components/EPKSection'
 import { Analytics, trackSectionView } from '~/components/Analytics'
+import { getTemplate } from '~/utils/templates'
 import type { MixRow, EventRow, SocialLinkRow, PressAssetRow } from '~/types/database'
 
 export const Route = createFileRoute('/$slug')({
@@ -152,6 +153,7 @@ function PublicEPK() {
 
   const { profile, socialLinks, mixes, events, technicalRider, bookingContact, pressAssets } = data
 
+  const template = getTemplate(profile.template || 'default')
   const accent = search.accent || profile.accent_color || '#3b82f6'
   const bg = search.bg || profile.bg_color || '#0a0a0f'
   const font = search.font || profile.font_family || 'Inter'
@@ -207,13 +209,21 @@ function PublicEPK() {
       <Nav displayName={name} sections={navSections} />
       <main ref={mainRef}>
         {/* Hero */}
-        <section className="relative h-screen flex items-center justify-center overflow-hidden">
-          {profile.hero_image_url ? (
-            <img src={profile.hero_image_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-b from-dark-bg via-dark-surface to-dark-bg" />
+        <section className={`relative flex items-center justify-center overflow-hidden ${
+          template.heroStyle === 'fullbleed' ? 'h-screen' :
+          template.heroStyle === 'contained' ? 'h-[60vh]' :
+          'py-32'
+        }`}>
+          {template.heroStyle !== 'minimal' && (
+            <>
+              {profile.hero_image_url ? (
+                <img src={profile.hero_image_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-b from-dark-bg via-dark-surface to-dark-bg" />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-dark-bg/90 via-transparent to-dark-bg/60" />
+            </>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-dark-bg/90 via-transparent to-dark-bg/60" />
           <div className="relative z-10 text-center">
             <h1 className="text-6xl md:text-8xl font-black tracking-tight mb-2">
               {(profile.display_name || 'DJ').toUpperCase()}
@@ -259,132 +269,136 @@ function PublicEPK() {
           </div>
         </section>
 
-        {/* Bio */}
-        {(profile.bio_left || profile.bio_right) && (
-          <EPKSection id="bio" heading="Bio">
-            <div className="grid md:grid-cols-2 gap-8 md:gap-12 text-text-secondary leading-relaxed">
-              {profile.bio_left && <div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: sanitize(profile.bio_left) }} />}
-              {profile.bio_right && <div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: sanitize(profile.bio_right) }} />}
-            </div>
-          </EPKSection>
-        )}
+        {/* Template-ordered sections */}
+        {template.sectionOrder.map((sectionId) => {
+          const sectionRenderers: Record<string, React.ReactNode> = {
+            bio: (profile.bio_left || profile.bio_right) ? (
+              <EPKSection key="bio" id="bio" heading="Bio">
+                <div className={`${
+                  template.bioLayout === 'two-column'
+                    ? 'grid md:grid-cols-2 gap-8 md:gap-12'
+                    : 'space-y-6'
+                } text-text-secondary leading-relaxed`}>
+                  {profile.bio_left && <div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: sanitize(profile.bio_left) }} />}
+                  {profile.bio_right && <div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: sanitize(profile.bio_right) }} />}
+                </div>
+              </EPKSection>
+            ) : null,
 
-        {/* Mixes */}
-        {mixes.length > 0 && (
-          <EPKSection id="music" heading="Listen">
-            {Object.entries(
-              mixes.reduce((acc: Record<string, MixRow[]>, mix) => {
-                const cat = mix.category || 'other'
-                if (!acc[cat]) acc[cat] = []
-                acc[cat].push(mix)
-                return acc
-              }, {} as Record<string, MixRow[]>)
-            ).map(([category, categoryMixes]) => (
-              <div key={category} className="mb-10">
-                <h3 className="text-lg font-bold uppercase tracking-wider text-accent mb-6 capitalize">
-                  {category.replace(/-/g, ' ')}
-                </h3>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {categoryMixes.map((mix) => (
-                    <div key={mix.id} className="bg-dark-card border border-white/5 rounded-lg overflow-hidden">
-                      {mix.embed_html ? (
-                        <div
-                          className="w-full [&_iframe]:w-full [&_iframe]:rounded-none"
-                          dangerouslySetInnerHTML={{ __html: sanitizeEmbed(mix.embed_html) }}
-                        />
-                      ) : (
-                        <a href={mix.url} target="_blank" rel="noopener noreferrer"
-                          className="block p-4 hover:border-accent/30 transition-colors">
-                          <p className="font-bold text-sm mb-1">{mix.title}</p>
-                          <p className="text-xs text-text-secondary truncate">{mix.url}</p>
-                        </a>
-                      )}
+            music: mixes.length > 0 ? (
+              <EPKSection key="music" id="music" heading="Listen">
+                {Object.entries(
+                  mixes.reduce((acc: Record<string, MixRow[]>, mix) => {
+                    const cat = mix.category || 'other'
+                    if (!acc[cat]) acc[cat] = []
+                    acc[cat].push(mix)
+                    return acc
+                  }, {} as Record<string, MixRow[]>)
+                ).map(([category, categoryMixes]) => (
+                  <div key={category} className="mb-10">
+                    <h3 className="text-lg font-bold uppercase tracking-wider text-accent mb-6 capitalize">
+                      {category.replace(/-/g, ' ')}
+                    </h3>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {categoryMixes.map((mix) => (
+                        <div key={mix.id} className="bg-dark-card border border-white/5 rounded-lg overflow-hidden">
+                          {mix.embed_html ? (
+                            <div
+                              className="w-full [&_iframe]:w-full [&_iframe]:rounded-none"
+                              dangerouslySetInnerHTML={{ __html: sanitizeEmbed(mix.embed_html) }}
+                            />
+                          ) : (
+                            <a href={mix.url} target="_blank" rel="noopener noreferrer"
+                              className="block p-4 hover:border-accent/30 transition-colors">
+                              <p className="font-bold text-sm mb-1">{mix.title}</p>
+                              <p className="text-xs text-text-secondary truncate">{mix.url}</p>
+                            </a>
+                          )}
+                        </div>
+                      ))}
                     </div>
+                  </div>
+                ))}
+              </EPKSection>
+            ) : null,
+
+            events: events.length > 0 ? (
+              <EPKSection key="events" id="events" heading={<>Events <span className="text-accent">&amp;</span> Brands</>}>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                  {events.map((event: EventRow) => (
+                    <a
+                      key={event.id}
+                      href={event.link_url || '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group block rounded-lg overflow-hidden border border-white/5 hover:border-accent/30 transition-all hover:scale-105"
+                    >
+                      <div className="aspect-square overflow-hidden bg-dark-card">
+                        {event.image_url && (
+                          <img src={event.image_url} alt={event.name} className="w-full h-full object-cover object-center" loading="lazy" />
+                        )}
+                      </div>
+                      <div className="bg-dark-card/80 backdrop-blur-sm px-3 py-2">
+                        <p className="text-xs text-center text-text-secondary leading-tight">{event.name}</p>
+                      </div>
+                    </a>
                   ))}
                 </div>
-              </div>
-            ))}
-          </EPKSection>
-        )}
+              </EPKSection>
+            ) : null,
 
-        {/* Events */}
-        {events.length > 0 && (
-          <EPKSection id="events" heading={<>Events <span className="text-accent">&amp;</span> Brands</>}>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {events.map((event: EventRow) => (
-                <a
-                  key={event.id}
-                  href={event.link_url || '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group block rounded-lg overflow-hidden border border-white/5 hover:border-accent/30 transition-all hover:scale-105"
-                >
-                  <div className="aspect-square overflow-hidden bg-dark-card">
-                    {event.image_url && (
-                      <img src={event.image_url} alt={event.name} className="w-full h-full object-cover object-center" loading="lazy" />
-                    )}
-                  </div>
-                  <div className="bg-dark-card/80 backdrop-blur-sm px-3 py-2">
-                    <p className="text-xs text-center text-text-secondary leading-tight">{event.name}</p>
-                  </div>
-                </a>
-              ))}
-            </div>
-          </EPKSection>
-        )}
-
-        {/* Technical Rider */}
-        {technicalRider && (technicalRider.preferred_setup || technicalRider.alternative_setup) && (
-          <EPKSection id="technical" heading="Technical Rider" maxWidth="max-w-4xl">
-            <div className="bg-dark-card backdrop-blur-sm rounded-xl border border-white/5 overflow-hidden">
-              {technicalRider.preferred_setup && (
-                <div className="px-6 py-4 border-b border-white/5">
-                  <p className="text-sm uppercase tracking-widest font-bold mb-3">Preferred Setup</p>
-                  <div className="prose prose-invert prose-sm max-w-none text-text-secondary" dangerouslySetInnerHTML={{ __html: sanitize(technicalRider.preferred_setup) }} />
+            technical: technicalRider && (technicalRider.preferred_setup || technicalRider.alternative_setup) ? (
+              <EPKSection key="technical" id="technical" heading="Technical Rider" maxWidth="max-w-4xl">
+                <div className="bg-dark-card backdrop-blur-sm rounded-xl border border-white/5 overflow-hidden">
+                  {technicalRider.preferred_setup && (
+                    <div className="px-6 py-4 border-b border-white/5">
+                      <p className="text-sm uppercase tracking-widest font-bold mb-3">Preferred Setup</p>
+                      <div className="prose prose-invert prose-sm max-w-none text-text-secondary" dangerouslySetInnerHTML={{ __html: sanitize(technicalRider.preferred_setup) }} />
+                    </div>
+                  )}
+                  {technicalRider.alternative_setup && (
+                    <div className="px-6 py-4">
+                      <p className="text-sm uppercase tracking-widest font-bold mb-3">Alternative Setup</p>
+                      <div className="prose prose-invert prose-sm max-w-none text-text-secondary" dangerouslySetInnerHTML={{ __html: sanitize(technicalRider.alternative_setup) }} />
+                    </div>
+                  )}
                 </div>
-              )}
-              {technicalRider.alternative_setup && (
-                <div className="px-6 py-4">
-                  <p className="text-sm uppercase tracking-widest font-bold mb-3">Alternative Setup</p>
-                  <div className="prose prose-invert prose-sm max-w-none text-text-secondary" dangerouslySetInnerHTML={{ __html: sanitize(technicalRider.alternative_setup) }} />
+              </EPKSection>
+            ) : null,
+
+            press: pressAssets && pressAssets.length > 0 ? (
+              <EPKSection key="press" id="press" heading="Press Assets">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {pressAssets.map((asset: PressAssetRow) => (
+                    <a
+                      key={asset.id}
+                      href={asset.file_url}
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-dark-card border border-white/5 rounded-lg p-4 hover:border-accent/30 transition-colors group"
+                    >
+                      <p className="font-bold text-sm mb-1">{asset.title}</p>
+                      <p className="text-xs text-text-secondary group-hover:text-accent transition-colors">Download</p>
+                    </a>
+                  ))}
                 </div>
-              )}
-            </div>
-          </EPKSection>
-        )}
+              </EPKSection>
+            ) : null,
 
-        {/* Press Assets */}
-        {pressAssets && pressAssets.length > 0 && (
-          <EPKSection id="press" heading="Press Assets">
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {pressAssets.map((asset: PressAssetRow) => (
-                <a
-                  key={asset.id}
-                  href={asset.file_url}
-                  download
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-dark-card border border-white/5 rounded-lg p-4 hover:border-accent/30 transition-colors group"
-                >
-                  <p className="font-bold text-sm mb-1">{asset.title}</p>
-                  <p className="text-xs text-text-secondary group-hover:text-accent transition-colors">Download</p>
-                </a>
-              ))}
-            </div>
-          </EPKSection>
-        )}
-
-        {/* Contact */}
-        {bookingContact && bookingContact.manager_name && (
-          <EPKSection id="contact" heading="Booking Contact" maxWidth="max-w-4xl">
-            <div className="text-text-secondary space-y-2">
-              <p><strong>Management:</strong> {bookingContact.manager_name}</p>
-              {bookingContact.email && <p><strong>Email:</strong> {bookingContact.email}</p>}
-              {bookingContact.phone && <p><strong>Phone:</strong> {bookingContact.phone}</p>}
-            </div>
-            <BookingForm slug={profile.slug as string} />
-          </EPKSection>
-        )}
+            contact: bookingContact && bookingContact.manager_name ? (
+              <EPKSection key="contact" id="contact" heading="Booking Contact" maxWidth="max-w-4xl">
+                <div className="text-text-secondary space-y-2">
+                  <p><strong>Management:</strong> {bookingContact.manager_name}</p>
+                  {bookingContact.email && <p><strong>Email:</strong> {bookingContact.email}</p>}
+                  {bookingContact.phone && <p><strong>Phone:</strong> {bookingContact.phone}</p>}
+                </div>
+                <BookingForm slug={profile.slug as string} />
+              </EPKSection>
+            ) : null,
+          }
+          return sectionRenderers[sectionId] || null
+        })}
       </main>
 
       {/* Branded footer for free tier */}
