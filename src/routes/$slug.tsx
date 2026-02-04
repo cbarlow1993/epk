@@ -401,6 +401,22 @@ function PublicEPK() {
         })}
       </main>
 
+      {/* Agency Branding */}
+      {data.organization && (
+        <div className="py-6 text-center border-t border-white/5">
+          <p className="text-xs text-text-secondary">
+            Represented by{' '}
+            {data.organization.website_url ? (
+              <a href={data.organization.website_url} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
+                {data.organization.name}
+              </a>
+            ) : (
+              <span className="text-white">{data.organization.name}</span>
+            )}
+          </p>
+        </div>
+      )}
+
       {/* Branded footer for free tier */}
       {!(profile.hide_platform_branding && profile.tier === 'pro') && (
         <footer className="py-6 text-center border-t border-white/5">

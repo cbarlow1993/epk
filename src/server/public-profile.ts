@@ -1,5 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getSupabaseServerClient } from '~/utils/supabase'
+import { getSupabaseServerClient } from '~/utils/supabase.server'
 
 export const getPublicProfile = createServerFn({ method: 'GET' })
   .inputValidator((slug: string) => slug)
@@ -18,6 +18,17 @@ export const getPublicProfile = createServerFn({ method: 'GET' })
     // Strip sensitive fields before returning to client
     const { id, stripe_customer_id, stripe_subscription_id, custom_css, ...profile } = fullProfile
     const profileId = id
+
+    // Fetch organization if profile belongs to one
+    let organization: { name: string; logo_url: string | null; website_url: string | null; slug: string } | null = null
+    if (fullProfile.organization_id) {
+      const { data: org } = await supabase
+        .from('organizations')
+        .select('name, logo_url, website_url, slug')
+        .eq('id', fullProfile.organization_id)
+        .single()
+      organization = org
+    }
 
     const [
       { data: socialLinks },
@@ -43,5 +54,6 @@ export const getPublicProfile = createServerFn({ method: 'GET' })
       technicalRider: technicalRider || null,
       bookingContact: bookingContact || null,
       pressAssets: pressAssets || [],
+      organization,
     }
   })
