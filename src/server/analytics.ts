@@ -82,3 +82,73 @@ export const getAnalyticsSummary = createServerFn({ method: 'POST' })
       return { error: 'Failed to process analytics' }
     }
   })
+
+export const getAggregatedAnalytics = createServerFn({ method: 'POST' })
+  .inputValidator((data: unknown) => z.object({ days: z.number().int().min(1).max(90) }).parse(data))
+  .handler(async ({ data: { days } }) => {
+    const { supabase, user } = await withAuth()
+
+    // Get all org profiles
+    const { data: membership } = await supabase
+      .from('organization_members')
+      .select('organization_id, role')
+      .eq('user_id', user.id)
+      .in('role', ['owner', 'admin'])
+      .single()
+
+    if (!membership) return { error: 'Not authorized' }
+
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('slug, display_name')
+      .eq('organization_id', membership.organization_id)
+
+    if (!profiles || profiles.length === 0) return { error: 'No profiles' }
+
+    if (!POSTHOG_API_KEY || !POSTHOG_PROJECT_ID) {
+      return { error: 'Analytics not configured' }
+    }
+
+    const dateFrom = new Date()
+    dateFrom.setDate(dateFrom.getDate() - days)
+
+    // Query PostHog for each slug
+    const perArtist: { slug: string; name: string; views: number; visitors: number }[] = []
+    let totalViews = 0
+    let totalVisitors = 0
+
+    for (const profile of profiles) {
+      try {
+        const response = await fetch(
+          `${POSTHOG_HOST}/api/projects/${POSTHOG_PROJECT_ID}/events?event=epk_page_view&properties=[{"key":"slug","value":"${profile.slug}","operator":"exact"}]&after=${dateFrom.toISOString()}&limit=10000`,
+          { headers: { Authorization: `Bearer ${POSTHOG_API_KEY}` } }
+        )
+
+        if (response.ok) {
+          const { results } = await response.json()
+          const visitors = new Set<string>()
+          for (const event of results) {
+            visitors.add(event.distinct_id)
+          }
+          const views = results.length
+          const uniqueVisitors = visitors.size
+          perArtist.push({ slug: profile.slug!, name: profile.display_name || '', views, visitors: uniqueVisitors })
+          totalViews += views
+          totalVisitors += uniqueVisitors
+        } else {
+          perArtist.push({ slug: profile.slug!, name: profile.display_name || '', views: 0, visitors: 0 })
+        }
+      } catch {
+        perArtist.push({ slug: profile.slug!, name: profile.display_name || '', views: 0, visitors: 0 })
+      }
+    }
+
+    // Sort by views descending
+    perArtist.sort((a, b) => b.views - a.views)
+
+    return {
+      profiles: perArtist,
+      totalViews,
+      totalVisitors,
+    }
+  })
