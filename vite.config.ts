@@ -9,6 +9,11 @@ export default defineConfig({
   server: {
     port: 3000,
   },
+  build: {
+    rollupOptions: {
+      external: [/^node:/],
+    },
+  },
   plugins: [
     tailwindcss(),
     tsConfigPaths({ projects: ['./tsconfig.json'] }),

@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
@@ -22,6 +24,7 @@ import { Route as DashboardDashboardSocialsRouteImport } from './routes/_dashboa
 import { Route as DashboardDashboardSettingsRouteImport } from './routes/_dashboard/dashboard.settings'
 import { Route as DashboardDashboardPressRouteImport } from './routes/_dashboard/dashboard.press'
 import { Route as DashboardDashboardMusicRouteImport } from './routes/_dashboard/dashboard.music'
+import { Route as DashboardDashboardInquiriesRouteImport } from './routes/_dashboard/dashboard.inquiries'
 import { Route as DashboardDashboardEventsRouteImport } from './routes/_dashboard/dashboard.events'
 import { Route as DashboardDashboardContactRouteImport } from './routes/_dashboard/dashboard.contact'
 import { Route as DashboardDashboardBioRouteImport } from './routes/_dashboard/dashboard.bio'
@@ -31,9 +34,19 @@ const SignupRoute = SignupRouteImport.update({
   path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -93,6 +106,12 @@ const DashboardDashboardMusicRoute = DashboardDashboardMusicRouteImport.update({
   path: '/music',
   getParentRoute: () => DashboardDashboardRoute,
 } as any)
+const DashboardDashboardInquiriesRoute =
+  DashboardDashboardInquiriesRouteImport.update({
+    id: '/inquiries',
+    path: '/inquiries',
+    getParentRoute: () => DashboardDashboardRoute,
+  } as any)
 const DashboardDashboardEventsRoute =
   DashboardDashboardEventsRouteImport.update({
     id: '/events',
@@ -114,12 +133,15 @@ const DashboardDashboardBioRoute = DashboardDashboardBioRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$slug': typeof SlugRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/dashboard': typeof DashboardDashboardRouteWithChildren
   '/dashboard/bio': typeof DashboardDashboardBioRoute
   '/dashboard/contact': typeof DashboardDashboardContactRoute
   '/dashboard/events': typeof DashboardDashboardEventsRoute
+  '/dashboard/inquiries': typeof DashboardDashboardInquiriesRoute
   '/dashboard/music': typeof DashboardDashboardMusicRoute
   '/dashboard/press': typeof DashboardDashboardPressRoute
   '/dashboard/settings': typeof DashboardDashboardSettingsRoute
@@ -131,11 +153,14 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$slug': typeof SlugRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/dashboard/bio': typeof DashboardDashboardBioRoute
   '/dashboard/contact': typeof DashboardDashboardContactRoute
   '/dashboard/events': typeof DashboardDashboardEventsRoute
+  '/dashboard/inquiries': typeof DashboardDashboardInquiriesRoute
   '/dashboard/music': typeof DashboardDashboardMusicRoute
   '/dashboard/press': typeof DashboardDashboardPressRoute
   '/dashboard/settings': typeof DashboardDashboardSettingsRoute
@@ -149,12 +174,15 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$slug': typeof SlugRoute
   '/_dashboard': typeof DashboardRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/_dashboard/dashboard': typeof DashboardDashboardRouteWithChildren
   '/_dashboard/dashboard/bio': typeof DashboardDashboardBioRoute
   '/_dashboard/dashboard/contact': typeof DashboardDashboardContactRoute
   '/_dashboard/dashboard/events': typeof DashboardDashboardEventsRoute
+  '/_dashboard/dashboard/inquiries': typeof DashboardDashboardInquiriesRoute
   '/_dashboard/dashboard/music': typeof DashboardDashboardMusicRoute
   '/_dashboard/dashboard/press': typeof DashboardDashboardPressRoute
   '/_dashboard/dashboard/settings': typeof DashboardDashboardSettingsRoute
@@ -168,12 +196,15 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$slug'
+    | '/forgot-password'
     | '/login'
+    | '/reset-password'
     | '/signup'
     | '/dashboard'
     | '/dashboard/bio'
     | '/dashboard/contact'
     | '/dashboard/events'
+    | '/dashboard/inquiries'
     | '/dashboard/music'
     | '/dashboard/press'
     | '/dashboard/settings'
@@ -185,11 +216,14 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/$slug'
+    | '/forgot-password'
     | '/login'
+    | '/reset-password'
     | '/signup'
     | '/dashboard/bio'
     | '/dashboard/contact'
     | '/dashboard/events'
+    | '/dashboard/inquiries'
     | '/dashboard/music'
     | '/dashboard/press'
     | '/dashboard/settings'
@@ -202,12 +236,15 @@ export interface FileRouteTypes {
     | '/'
     | '/$slug'
     | '/_dashboard'
+    | '/forgot-password'
     | '/login'
+    | '/reset-password'
     | '/signup'
     | '/_dashboard/dashboard'
     | '/_dashboard/dashboard/bio'
     | '/_dashboard/dashboard/contact'
     | '/_dashboard/dashboard/events'
+    | '/_dashboard/dashboard/inquiries'
     | '/_dashboard/dashboard/music'
     | '/_dashboard/dashboard/press'
     | '/_dashboard/dashboard/settings'
@@ -221,7 +258,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SlugRoute: typeof SlugRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
 }
 
@@ -234,11 +273,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_dashboard': {
@@ -318,6 +371,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardMusicRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
+    '/_dashboard/dashboard/inquiries': {
+      id: '/_dashboard/dashboard/inquiries'
+      path: '/inquiries'
+      fullPath: '/dashboard/inquiries'
+      preLoaderRoute: typeof DashboardDashboardInquiriesRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
     '/_dashboard/dashboard/events': {
       id: '/_dashboard/dashboard/events'
       path: '/events'
@@ -346,6 +406,7 @@ interface DashboardDashboardRouteChildren {
   DashboardDashboardBioRoute: typeof DashboardDashboardBioRoute
   DashboardDashboardContactRoute: typeof DashboardDashboardContactRoute
   DashboardDashboardEventsRoute: typeof DashboardDashboardEventsRoute
+  DashboardDashboardInquiriesRoute: typeof DashboardDashboardInquiriesRoute
   DashboardDashboardMusicRoute: typeof DashboardDashboardMusicRoute
   DashboardDashboardPressRoute: typeof DashboardDashboardPressRoute
   DashboardDashboardSettingsRoute: typeof DashboardDashboardSettingsRoute
@@ -359,6 +420,7 @@ const DashboardDashboardRouteChildren: DashboardDashboardRouteChildren = {
   DashboardDashboardBioRoute: DashboardDashboardBioRoute,
   DashboardDashboardContactRoute: DashboardDashboardContactRoute,
   DashboardDashboardEventsRoute: DashboardDashboardEventsRoute,
+  DashboardDashboardInquiriesRoute: DashboardDashboardInquiriesRoute,
   DashboardDashboardMusicRoute: DashboardDashboardMusicRoute,
   DashboardDashboardPressRoute: DashboardDashboardPressRoute,
   DashboardDashboardSettingsRoute: DashboardDashboardSettingsRoute,
@@ -387,7 +449,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SlugRoute: SlugRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport
