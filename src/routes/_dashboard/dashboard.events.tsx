@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { getEvents, upsertEvent, deleteEvent, reorderEvents } from '~/server/events'
 import { eventUpsertSchema, type EventUpsert } from '~/schemas/event'
 import { uploadFileFromInput } from '~/utils/upload'
-import { FORM_INPUT, FORM_INPUT_ERROR, FORM_ERROR_MSG, BTN_BASE, CARD_SECTION } from '~/components/forms'
+import { FORM_INPUT, FORM_INPUT_ERROR, FORM_ERROR_MSG, BTN_PRIMARY, CARD_SECTION } from '~/components/forms'
 import { GridItemOverlay } from '~/components/GridItemOverlay'
 import { useListEditor } from '~/hooks/useListEditor'
 
@@ -89,7 +89,7 @@ function EventsEditor() {
         <button
           type="submit"
           disabled={adding || uploading}
-          className={`${BTN_BASE} bg-accent text-black hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed mt-2`}
+          className={`${BTN_PRIMARY} mt-2`}
         >
           {uploading ? 'Uploading...' : adding ? 'Adding...' : 'Add Event'}
         </button>

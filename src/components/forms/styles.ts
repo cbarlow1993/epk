@@ -8,6 +8,7 @@ export const FORM_ERROR_MSG = 'text-xs text-red-400 mt-1'
 
 // Button base used in list page forms
 export const BTN_BASE = 'px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-colors'
+export const BTN_PRIMARY = `${BTN_BASE} bg-accent text-black hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed`
 export const BTN_DELETE = `${BTN_BASE} bg-red-500/20 text-red-400 hover:bg-red-500/30`
 
 // Card container used in dashboard add/upload forms

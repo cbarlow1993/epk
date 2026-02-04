@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { getProfile, updateProfile } from '~/server/profile'
 import { profileUpdateSchema, type ProfileUpdate } from '~/schemas/profile'
-import { FORM_ERROR_MSG } from '~/components/forms'
+import { FormColorInput, FORM_LABEL } from '~/components/forms'
 import { useDashboardSave } from '~/hooks/useDashboardSave'
 import { DashboardHeader } from '~/components/DashboardHeader'
 
@@ -51,48 +51,24 @@ function ThemeEditor() {
       <div className="grid lg:grid-cols-[320px_1fr] gap-8">
         {/* Controls */}
         <div className="space-y-6">
-          <div>
-            <label className="block text-sm uppercase tracking-widest font-bold mb-2">Accent Colour</label>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                value={accentColor}
-                onChange={(e) => setValue('accent_color', e.target.value, { shouldDirty: true })}
-                className="w-12 h-10 rounded border border-white/10 bg-transparent cursor-pointer"
-              />
-              <input
-                type="text"
-                {...register('accent_color')}
-                className={`flex-1 bg-dark-card border rounded-lg px-3 py-2 text-white text-sm font-mono focus:border-accent focus:outline-none ${
-                  errors.accent_color ? 'border-red-500' : 'border-white/10'
-                }`}
-              />
-            </div>
-            {errors.accent_color && <p className={FORM_ERROR_MSG}>{errors.accent_color.message}</p>}
-          </div>
+          <FormColorInput
+            label="Accent Colour"
+            value={accentColor}
+            registration={register('accent_color')}
+            onChange={(v) => setValue('accent_color', v, { shouldDirty: true })}
+            error={errors.accent_color}
+          />
+
+          <FormColorInput
+            label="Background Colour"
+            value={bgColor}
+            registration={register('bg_color')}
+            onChange={(v) => setValue('bg_color', v, { shouldDirty: true })}
+            error={errors.bg_color}
+          />
 
           <div>
-            <label className="block text-sm uppercase tracking-widest font-bold mb-2">Background Colour</label>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                value={bgColor}
-                onChange={(e) => setValue('bg_color', e.target.value, { shouldDirty: true })}
-                className="w-12 h-10 rounded border border-white/10 bg-transparent cursor-pointer"
-              />
-              <input
-                type="text"
-                {...register('bg_color')}
-                className={`flex-1 bg-dark-card border rounded-lg px-3 py-2 text-white text-sm font-mono focus:border-accent focus:outline-none ${
-                  errors.bg_color ? 'border-red-500' : 'border-white/10'
-                }`}
-              />
-            </div>
-            {errors.bg_color && <p className={FORM_ERROR_MSG}>{errors.bg_color.message}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm uppercase tracking-widest font-bold mb-2">Font</label>
+            <label className={FORM_LABEL}>Font</label>
             <select
               {...register('font_family')}
               className="w-full bg-dark-card border border-white/10 rounded-lg px-4 py-3 text-white focus:border-accent focus:outline-none"
@@ -115,7 +91,7 @@ function ThemeEditor() {
 
         {/* Live preview iframe */}
         <div className="hidden lg:block">
-          <label className="block text-sm uppercase tracking-widest font-bold mb-2">Live Preview</label>
+          <label className={FORM_LABEL}>Live Preview</label>
           {previewUrl ? (
             <div className="border border-white/10 rounded-lg overflow-hidden bg-dark-surface h-[70vh]">
               <iframe

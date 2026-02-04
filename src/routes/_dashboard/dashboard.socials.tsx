@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { getSocialLinks, upsertSocialLink, deleteSocialLink, reorderSocialLinks } from '~/server/social-links'
 import { socialLinkUpsertSchema, SOCIAL_PLATFORMS, type SocialLinkUpsert } from '~/schemas/social-link'
-import { FORM_INPUT, FORM_INPUT_ERROR, FORM_ERROR_MSG, BTN_BASE, BTN_DELETE, CARD_SECTION, toSelectOptions } from '~/components/forms'
+import { FORM_INPUT, FORM_INPUT_ERROR, FORM_ERROR_MSG, BTN_PRIMARY, BTN_DELETE, CARD_SECTION, toSelectOptions } from '~/components/forms'
 import { useListEditor } from '~/hooks/useListEditor'
 import { ReorderButtons } from '~/components/ReorderButtons'
 
@@ -83,7 +83,7 @@ function SocialsEditor() {
         <button
           type="submit"
           disabled={adding}
-          className={`${BTN_BASE} bg-accent text-black hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed mt-2`}
+          className={`${BTN_PRIMARY} mt-2`}
         >
           {adding ? 'Adding...' : 'Add'}
         </button>

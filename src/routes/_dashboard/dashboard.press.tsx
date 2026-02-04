@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { getPressAssets, upsertPressAsset, deletePressAsset, reorderPressAssets } from '~/server/press-assets'
 import { pressAssetUpsertSchema, ASSET_TYPES, type PressAssetUpsert } from '~/schemas/press-asset'
 import { uploadFileFromInput } from '~/utils/upload'
-import { FORM_INPUT, BTN_BASE, CARD_SECTION, toSelectOptions } from '~/components/forms'
+import { FORM_INPUT, BTN_PRIMARY, CARD_SECTION, toSelectOptions } from '~/components/forms'
 import { GridItemOverlay } from '~/components/GridItemOverlay'
 import { useListEditor } from '~/hooks/useListEditor'
 
@@ -86,7 +86,7 @@ function PressEditor() {
           type="button"
           onClick={handleUpload}
           disabled={uploading}
-          className={`${BTN_BASE} bg-accent text-black hover:bg-accent/80 disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={BTN_PRIMARY}
         >
           {uploading ? 'Uploading...' : 'Upload'}
         </button>

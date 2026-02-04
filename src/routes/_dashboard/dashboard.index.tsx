@@ -155,6 +155,9 @@ function ProfileEditor() {
           <label className="text-sm uppercase tracking-widest font-bold">Published</label>
           <button
             type="button"
+            role="switch"
+            aria-checked={published}
+            aria-label="Toggle published status"
             onClick={() => {
               setValue('published', !published, { shouldDirty: true })
             }}
