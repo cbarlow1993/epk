@@ -10,5 +10,6 @@
       "~/*": ["./src/*"]
     }
   },
-  "include": ["src", "server"]
+  "include": ["src"],
+  "exclude": ["server"]
 }
