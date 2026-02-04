@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { getMixes, upsertMix, deleteMix, reorderMixes } from '~/server/mixes'
+import { resolveEmbed } from '~/server/oembed'
 import { mixUpsertSchema, MIX_CATEGORIES, type MixUpsert } from '~/schemas/mix'
 import { FORM_INPUT, FORM_INPUT_ERROR, FORM_ERROR_MSG, BTN_BASE, BTN_PRIMARY, BTN_DELETE, CARD_SECTION, toSelectOptions } from '~/components/forms'
 import { useListEditor } from '~/hooks/useListEditor'
@@ -35,7 +36,8 @@ function MusicEditor() {
 
   const onAdd = handleSubmit(async (data) => {
     setAdding(true)
-    const result = await upsertMix({ data: { ...data, sort_order: mixes.length } })
+    const embed = await resolveEmbed({ data: { url: data.url } })
+    const result = await upsertMix({ data: { ...data, sort_order: mixes.length, platform: embed.platform, embed_html: embed.embedHtml } })
     if ('mix' in result && result.mix) {
       addItem(result.mix)
       reset()
@@ -51,7 +53,18 @@ function MusicEditor() {
   }
 
   const handleSaveEdit = async (id: string) => {
-    const result = await upsertMix({ data: { id, title: editTitle, url: editUrl, category: editCategory as MixRow['category'] } })
+    const currentMix = mixes.find((m) => m.id === id)
+    const urlChanged = currentMix?.url !== editUrl
+    let platform = currentMix?.platform ?? null
+    let embed_html = currentMix?.embed_html ?? null
+
+    if (urlChanged) {
+      const embed = await resolveEmbed({ data: { url: editUrl } })
+      platform = embed.platform
+      embed_html = embed.embedHtml
+    }
+
+    const result = await upsertMix({ data: { id, title: editTitle, url: editUrl, category: editCategory as MixRow['category'], platform, embed_html } })
     if ('mix' in result && result.mix) {
       setMixes(prev => prev.map((m) => (m.id === id ? result.mix : m)))
     }
