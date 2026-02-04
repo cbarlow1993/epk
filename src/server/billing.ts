@@ -28,6 +28,9 @@ export const createCheckoutSession = createServerFn({ method: 'POST' }).handler(
     success_url: `${BASE_URL}/dashboard/settings?upgraded=true`,
     cancel_url: `${BASE_URL}/dashboard/settings`,
     metadata: { supabase_user_id: user.id },
+    subscription_data: {
+      metadata: { supabase_user_id: user.id },
+    },
   })
 
   return { url: session.url }
