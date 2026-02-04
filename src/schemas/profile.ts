@@ -28,6 +28,9 @@ export const profileUpdateSchema = z.object({
   font_family: z.string().max(50).optional(),
   bio_left: z.string().max(10000, 'Max 10000 characters').optional(),
   bio_right: z.string().max(10000, 'Max 10000 characters').optional(),
+  favicon_url: z.string().url().optional().or(z.literal('')),
+  hide_platform_branding: z.boolean().optional(),
+  meta_description: z.string().max(300).optional(),
 })
 
 export type ProfileUpdate = z.infer<typeof profileUpdateSchema>

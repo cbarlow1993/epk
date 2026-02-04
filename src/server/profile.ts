@@ -18,6 +18,9 @@ const ALLOWED_PROFILE_FIELDS = new Set([
   'bio_right',
   'bpm_min',
   'bpm_max',
+  'favicon_url',
+  'hide_platform_branding',
+  'meta_description',
 ])
 
 export const getProfile = createServerFn({ method: 'GET' }).handler(async () => {

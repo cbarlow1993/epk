@@ -5,6 +5,7 @@ import type { ProfileRow } from '~/types/database'
 import { createCheckoutSession, createPortalSession } from '~/server/billing'
 import { addCustomDomain, removeCustomDomain, checkDomainStatus } from '~/server/domains'
 import { SETTINGS_CARD } from '~/components/forms'
+import { updateProfile } from '~/server/profile'
 
 export const Route = createFileRoute('/_dashboard/dashboard/settings')({
   loader: () => getProfile(),
@@ -73,8 +74,103 @@ function SettingsPage() {
           )}
         </div>
 
+        {/* Branding */}
+        <BrandingSection profile={profile} />
+
         {/* Custom Domain */}
         <CustomDomainSection profile={profile} />
+      </div>
+    </div>
+  )
+}
+
+function BrandingSection({ profile }: { profile: ProfileRow | null }) {
+  const [faviconUrl, setFaviconUrl] = useState(profile?.favicon_url || '')
+  const [hideBranding, setHideBranding] = useState(profile?.hide_platform_branding || false)
+  const [metaDescription, setMetaDescription] = useState(profile?.meta_description || '')
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState('')
+
+  if (profile?.tier !== 'pro') {
+    return (
+      <div className={SETTINGS_CARD}>
+        <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Branding</h2>
+        <p className="text-text-secondary text-sm">Upgrade to Pro to customise branding.</p>
+      </div>
+    )
+  }
+
+  const handleSave = async () => {
+    setSaving(true)
+    setSaved(false)
+    setError('')
+    const result = await updateProfile({
+      data: {
+        favicon_url: faviconUrl || undefined,
+        hide_platform_branding: hideBranding,
+        meta_description: metaDescription || undefined,
+      },
+    })
+    setSaving(false)
+    if (result && 'error' in result && result.error) {
+      setError(result.error as string)
+    } else {
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+    }
+  }
+
+  return (
+    <div className={SETTINGS_CARD}>
+      <h2 className="text-sm uppercase tracking-widest font-bold mb-4">Branding</h2>
+      <div className="space-y-4">
+        <div>
+          <label className="text-xs text-text-secondary block mb-1">Favicon URL</label>
+          <input
+            type="text"
+            value={faviconUrl}
+            onChange={(e) => setFaviconUrl(e.target.value)}
+            placeholder="https://example.com/favicon.ico"
+            className="w-full bg-dark-bg border border-white/10 rounded-lg px-4 py-2 text-white text-sm focus:border-accent focus:outline-none"
+          />
+        </div>
+        <div className="flex items-center gap-3">
+          <input
+            type="checkbox"
+            id="hide-branding"
+            checked={hideBranding}
+            onChange={(e) => setHideBranding(e.target.checked)}
+            className="accent-accent w-4 h-4"
+          />
+          <label htmlFor="hide-branding" className="text-sm text-text-secondary cursor-pointer">
+            Hide &ldquo;Built with DJ EPK&rdquo; footer
+          </label>
+        </div>
+        <div>
+          <label className="text-xs text-text-secondary block mb-1">
+            Custom Meta Description <span className="text-text-secondary/50">({metaDescription.length}/300)</span>
+          </label>
+          <textarea
+            value={metaDescription}
+            onChange={(e) => setMetaDescription(e.target.value.slice(0, 300))}
+            placeholder="Custom description for search engines and social sharing..."
+            rows={3}
+            className="w-full bg-dark-bg border border-white/10 rounded-lg px-4 py-2 text-white text-sm focus:border-accent focus:outline-none resize-none"
+          />
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving}
+            className="bg-accent hover:bg-accent/80 disabled:opacity-30 text-white text-sm font-bold uppercase tracking-widest px-6 py-2 rounded-lg transition-colors"
+          >
+            {saving ? 'Saving...' : 'Save'}
+          </button>
+          {saved && <span className="text-xs text-green-400">Saved!</span>}
+          {error && <span className="text-xs text-red-400">{error}</span>}
+        </div>
       </div>
     </div>
   )

@@ -23,11 +23,12 @@ export const Route = createFileRoute('/$slug')({
     const fontParam = font.replace(/ /g, '+')
     const tagline = profile?.tagline
     const genres = profile?.genres as string[] | undefined
-    const description = [
+    const autoDescription = [
       `Official Electronic Press Kit for ${name}.`,
       tagline,
       genres?.length ? genres.join(', ') : null,
     ].filter(Boolean).join(' — ')
+    const description = profile?.meta_description || autoDescription
     return {
       meta: [
         { title: `${name} | DJ - Official Press Kit` },
@@ -38,6 +39,7 @@ export const Route = createFileRoute('/$slug')({
         ...(profile?.profile_image_url ? [{ name: 'og:image', content: profile.profile_image_url }] : []),
       ],
       links: [
+        ...(profile?.favicon_url ? [{ rel: 'icon', href: profile.favicon_url }] : []),
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'stylesheet', href: `https://fonts.googleapis.com/css2?family=${fontParam}:wght@400;700;900&display=swap` },
       ],
@@ -386,7 +388,7 @@ function PublicEPK() {
       </main>
 
       {/* Branded footer for free tier */}
-      {profile.tier === 'free' && (
+      {!(profile.hide_platform_branding && profile.tier === 'pro') && (
         <footer className="py-6 text-center border-t border-white/5">
           <p className="text-xs text-text-secondary">
             Built with <a href="/" className="text-accent hover:underline">DJ EPK</a>

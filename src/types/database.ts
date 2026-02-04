@@ -25,6 +25,9 @@ export interface ProfileRow {
   custom_css: string | null
   bpm_min: number | null
   bpm_max: number | null
+  favicon_url: string | null
+  hide_platform_branding: boolean
+  meta_description: string | null
   created_at: string
 }
 

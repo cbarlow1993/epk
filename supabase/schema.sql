@@ -138,7 +138,11 @@ INSERT INTO reserved_slugs (slug) VALUES
 
 -- Auto-create profile on user signup via trigger
 CREATE OR REPLACE FUNCTION handle_new_user()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+SECURITY DEFINER
+SET search_path = public
+LANGUAGE plpgsql
+AS $$
 DECLARE
   base_slug TEXT;
   new_slug TEXT;
@@ -174,7 +178,7 @@ BEGIN
   INSERT INTO booking_contact (profile_id) VALUES (NEW.id);
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
 
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
@@ -272,3 +276,8 @@ CREATE POLICY "Owner CRUD on files" ON files FOR ALL USING (is_profile_owner(pro
 CREATE POLICY "Owner CRUD on file_tags" ON file_tags FOR ALL USING (
   EXISTS (SELECT 1 FROM files WHERE files.id = file_tags.file_id AND is_profile_owner(files.profile_id))
 );
+
+-- White-label branding columns
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS favicon_url TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS hide_platform_branding BOOLEAN DEFAULT false;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS meta_description TEXT;
