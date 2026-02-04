@@ -1,4 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
+import { z } from 'zod'
+
+const resolveEmbedInput = z.object({ url: z.string().url() })
 
 interface OEmbedResult {
   platform: string
@@ -21,7 +24,7 @@ function detectPlatform(url: string): { platform: string; oembedEndpoint: string
 }
 
 export const resolveEmbed = createServerFn({ method: 'POST' })
-  .inputValidator((data: { url: string }) => data)
+  .inputValidator((data: unknown) => resolveEmbedInput.parse(data))
   .handler(async ({ data: { url } }): Promise<OEmbedResult> => {
     const detected = detectPlatform(url)
     if (!detected) return { platform: 'other', embedHtml: null }

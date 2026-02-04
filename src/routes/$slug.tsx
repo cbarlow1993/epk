@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { getPublicProfile } from '~/server/public-profile'
 import { submitBookingRequestForSlug } from '~/server/booking-requests'
 import { Nav } from '~/components/Nav'
-import { sanitize } from '~/utils/sanitize'
+import { sanitize, sanitizeEmbed } from '~/utils/sanitize'
 import { EPKSection } from '~/components/EPKSection'
 import type { MixRow, EventRow, SocialLinkRow, PressAssetRow } from '~/types/database'
 
@@ -261,7 +261,7 @@ function PublicEPK() {
                       {mix.embed_html ? (
                         <div
                           className="w-full [&_iframe]:w-full [&_iframe]:rounded-none"
-                          dangerouslySetInnerHTML={{ __html: mix.embed_html }}
+                          dangerouslySetInnerHTML={{ __html: sanitizeEmbed(mix.embed_html) }}
                         />
                       ) : (
                         <a href={mix.url} target="_blank" rel="noopener noreferrer"

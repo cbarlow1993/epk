@@ -177,7 +177,7 @@ function ProfileEditor() {
               placeholder="Min"
               min={60}
               max={200}
-              {...register('bpm_min', { valueAsNumber: true })}
+              {...register('bpm_min', { setValueAs: (v: string) => v === '' || v === undefined ? null : Number(v) })}
               className={`${FORM_INPUT} w-24`}
             />
             <span className="text-text-secondary">&mdash;</span>
@@ -186,7 +186,7 @@ function ProfileEditor() {
               placeholder="Max"
               min={60}
               max={200}
-              {...register('bpm_max', { valueAsNumber: true })}
+              {...register('bpm_max', { setValueAs: (v: string) => v === '' || v === undefined ? null : Number(v) })}
               className={`${FORM_INPUT} w-24`}
             />
             <span className="text-text-secondary text-sm">BPM</span>

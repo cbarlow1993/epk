@@ -13,3 +13,18 @@ const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
 export function sanitize(html: string): string {
   return sanitizeHtml(html, SANITIZE_OPTIONS)
 }
+
+const EMBED_SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
+  allowedTags: ['iframe'],
+  allowedAttributes: {
+    iframe: ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'style', 'title'],
+  },
+  allowedIframeHostnames: [
+    'w.soundcloud.com', 'open.spotify.com', 'www.mixcloud.com',
+    'www.youtube.com', 'www.youtube-nocookie.com', 'bandcamp.com',
+  ],
+}
+
+export function sanitizeEmbed(html: string): string {
+  return sanitizeHtml(html, EMBED_SANITIZE_OPTIONS)
+}

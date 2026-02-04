@@ -1,15 +1,18 @@
 import { createServerFn } from '@tanstack/react-start'
+import { z } from 'zod'
 import { bookingRequestSubmitSchema, bookingRequestStatusSchema } from '~/schemas/booking-request'
 import { getSupabaseServerClient } from '~/utils/supabase'
 import { withAuth } from './utils'
 import { sendBookingNotification, sendBookingConfirmation } from './email'
 
+const submitBookingInput = z.object({
+  slug: z.string().min(1).max(100),
+  request: bookingRequestSubmitSchema,
+})
+
 // Public — accepts slug to find the profile
 export const submitBookingRequestForSlug = createServerFn({ method: 'POST' })
-  .inputValidator((data: { slug: string; request: unknown }) => ({
-    slug: data.slug,
-    request: bookingRequestSubmitSchema.parse(data.request),
-  }))
+  .inputValidator((data: unknown) => submitBookingInput.parse(data))
   .handler(async ({ data: { slug, request } }) => {
     const supabase = getSupabaseServerClient()
 
