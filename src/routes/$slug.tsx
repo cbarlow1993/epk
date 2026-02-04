@@ -1,5 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react'
 import { getPublicProfile } from '~/server/public-profile'
+import { submitBookingRequestForSlug } from '~/server/booking-requests'
 import { Nav } from '~/components/Nav'
 import { sanitize } from '~/utils/sanitize'
 import { EPKSection } from '~/components/EPKSection'
@@ -47,6 +49,93 @@ export const Route = createFileRoute('/$slug')({
     </div>
   ),
 })
+
+function BookingForm({ slug }: { slug: string }) {
+  const [submitting, setSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState('')
+  const [formData, setFormData] = useState({
+    name: '', email: '', event_name: '', event_date: '', venue_location: '',
+    budget_range: '', message: '', honeypot: '',
+  })
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (formData.honeypot) return
+    setSubmitting(true)
+    setError('')
+
+    const result = await submitBookingRequestForSlug({
+      data: { slug, request: formData },
+    })
+
+    if ('error' in result && result.error) {
+      setError(result.error)
+      setSubmitting(false)
+      return
+    }
+
+    setSubmitted(true)
+    setSubmitting(false)
+  }
+
+  if (submitted) {
+    return (
+      <div className="bg-dark-card border border-accent/20 rounded-xl p-8 text-center">
+        <p className="text-accent font-bold text-lg mb-2">Inquiry Sent!</p>
+        <p className="text-text-secondary text-sm">Thanks for reaching out. You'll hear back soon.</p>
+      </div>
+    )
+  }
+
+  const inputClass = 'w-full bg-dark-surface border border-white/10 rounded-lg px-4 py-3 text-white placeholder-text-secondary/50 focus:border-accent focus:outline-none transition-colors text-sm'
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-dark-card border border-white/5 rounded-xl p-6 mt-8">
+      <h3 className="text-sm uppercase tracking-widest font-bold mb-6">Send Booking Inquiry</h3>
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 mb-4 text-red-400 text-sm">{error}</div>
+      )}
+      <input
+        type="text"
+        name="website"
+        value={formData.honeypot}
+        onChange={(e) => setFormData(prev => ({ ...prev, honeypot: e.target.value }))}
+        className="absolute -left-[9999px]"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+      />
+      <div className="grid sm:grid-cols-2 gap-4 mb-4">
+        <input type="text" placeholder="Your Name *" required value={formData.name}
+          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+          className={inputClass} />
+        <input type="email" placeholder="Your Email *" required value={formData.email}
+          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+          className={inputClass} />
+        <input type="text" placeholder="Event Name" value={formData.event_name}
+          onChange={(e) => setFormData(prev => ({ ...prev, event_name: e.target.value }))}
+          className={inputClass} />
+        <input type="date" placeholder="Event Date" value={formData.event_date}
+          onChange={(e) => setFormData(prev => ({ ...prev, event_date: e.target.value }))}
+          className={inputClass} />
+        <input type="text" placeholder="Venue / Location" value={formData.venue_location}
+          onChange={(e) => setFormData(prev => ({ ...prev, venue_location: e.target.value }))}
+          className={inputClass} />
+        <input type="text" placeholder="Budget Range" value={formData.budget_range}
+          onChange={(e) => setFormData(prev => ({ ...prev, budget_range: e.target.value }))}
+          className={inputClass} />
+      </div>
+      <textarea placeholder="Your Message *" required rows={4} value={formData.message}
+        onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+        className={`${inputClass} mb-4`} />
+      <button type="submit" disabled={submitting}
+        className="bg-accent hover:bg-accent/80 disabled:opacity-50 text-black font-bold uppercase tracking-widest py-3 px-8 rounded-lg transition-colors text-sm">
+        {submitting ? 'Sending...' : 'Send Inquiry'}
+      </button>
+    </form>
+  )
+}
 
 function PublicEPK() {
   const data = Route.useLoaderData()
@@ -248,6 +337,7 @@ function PublicEPK() {
               {bookingContact.email && <p><strong>Email:</strong> {bookingContact.email}</p>}
               {bookingContact.phone && <p><strong>Phone:</strong> {bookingContact.phone}</p>}
             </div>
+            <BookingForm slug={profile.slug as string} />
           </EPKSection>
         )}
       </main>
