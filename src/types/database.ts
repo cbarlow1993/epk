@@ -101,6 +101,27 @@ export interface BookingRequestRow {
   created_at: string
 }
 
+export interface FolderRow {
+  id: string
+  profile_id: string
+  name: string
+  parent_id: string | null
+  created_at: string
+}
+
+export interface FileRow {
+  id: string
+  profile_id: string
+  folder_id: string | null
+  name: string
+  file_url: string
+  file_type: string
+  file_size: number
+  mime_type: string | null
+  created_at: string
+  tags?: string[]
+}
+
 export interface PublicProfileData {
   profile: Omit<ProfileRow, 'id' | 'stripe_customer_id' | 'stripe_subscription_id' | 'custom_css'>
   socialLinks: SocialLinkRow[]

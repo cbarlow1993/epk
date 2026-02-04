@@ -235,3 +235,40 @@ CREATE POLICY "Owner can update booking requests" ON booking_requests
 -- Migration: Add BPM range columns to profiles
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS bpm_min INTEGER;
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS bpm_max INTEGER;
+
+-- File repository
+CREATE TABLE folders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  parent_id UUID REFERENCES folders(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE files (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  folder_id UUID REFERENCES folders(id) ON DELETE SET NULL,
+  name TEXT NOT NULL,
+  file_url TEXT NOT NULL,
+  file_type TEXT NOT NULL,
+  file_size BIGINT NOT NULL DEFAULT 0,
+  mime_type TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE file_tags (
+  file_id UUID NOT NULL REFERENCES files(id) ON DELETE CASCADE,
+  tag TEXT NOT NULL,
+  PRIMARY KEY (file_id, tag)
+);
+
+ALTER TABLE folders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE files ENABLE ROW LEVEL SECURITY;
+ALTER TABLE file_tags ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Owner CRUD on folders" ON folders FOR ALL USING (is_profile_owner(profile_id));
+CREATE POLICY "Owner CRUD on files" ON files FOR ALL USING (is_profile_owner(profile_id));
+CREATE POLICY "Owner CRUD on file_tags" ON file_tags FOR ALL USING (
+  EXISTS (SELECT 1 FROM files WHERE files.id = file_tags.file_id AND is_profile_owner(files.profile_id))
+);
