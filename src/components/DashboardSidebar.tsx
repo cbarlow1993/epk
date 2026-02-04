@@ -24,6 +24,8 @@ const NAV_ITEMS = [
 const AGENCY_NAV_ITEMS = [
   { label: 'Roster', href: '/dashboard/roster' },
   { label: 'Team', href: '/dashboard/team' },
+  { label: 'Billing', href: '/dashboard/billing' },
+  { label: 'Agency Analytics', href: '/dashboard/analytics-overview' },
 ]
 
 export function DashboardSidebar({ profile, isAgency = false }: { profile: SidebarProfile; isAgency?: boolean }) {

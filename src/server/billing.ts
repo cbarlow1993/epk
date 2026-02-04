@@ -21,6 +21,20 @@ export const createCheckoutSession = createServerFn({ method: 'POST' })
 
     if (!profile) return { error: 'Profile not found' }
 
+    // Verify user has access to this profile
+    if (data.profileId && data.profileId !== user.id) {
+      const { data: membership } = await supabase
+        .from('organization_members')
+        .select('organization_id, role')
+        .eq('user_id', user.id)
+        .in('role', ['owner', 'admin'])
+        .single()
+
+      if (!membership || profile.organization_id !== membership.organization_id) {
+        return { error: 'Not authorized to manage billing for this profile' }
+      }
+    }
+
     let customerId: string | undefined
 
     // For org profiles, use org's Stripe customer

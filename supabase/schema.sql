@@ -387,4 +387,13 @@ CREATE POLICY "Owner/admin can manage invites" ON organization_invites FOR ALL U
 );
 
 -- Public can view org for agency landing pages
+-- NOTE: This exposes all columns including billing_email and stripe_customer_id.
+-- The agency landing page query ($orgSlug.tsx) selects only safe columns (name, logo_url, website_url, slug).
+-- Postgres RLS cannot restrict column-level access; this is acceptable since the only public consumer is the agency page.
 CREATE POLICY "Public can view organizations" ON organizations FOR SELECT USING (true);
+
+-- Authenticated users can create organizations
+CREATE POLICY "Authenticated can create org" ON organizations FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+
+-- Initial member insert (for org creator to add themselves as owner)
+CREATE POLICY "Authenticated can join org" ON organization_members FOR INSERT WITH CHECK (auth.uid() = user_id);

@@ -1,15 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
+import { z } from 'zod'
 import { getSupabaseServerClient } from '~/utils/supabase.server'
 
 const getAgencyPage = createServerFn({ method: 'GET' })
-  .inputValidator((slug: string) => slug)
+  .inputValidator((data: unknown) => z.string().min(1).max(50).regex(/^[a-z0-9][a-z0-9-]*[a-z0-9]$/).parse(data))
   .handler(async ({ data: slug }) => {
     const supabase = getSupabaseServerClient()
 
     const { data: org } = await supabase
       .from('organizations')
-      .select('*')
+      .select('name, logo_url, website_url, slug')
       .eq('slug', slug)
       .single()
 

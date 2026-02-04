@@ -83,6 +83,11 @@ export const acceptInvite = createServerFn({ method: 'POST' })
 
     if (!invite) return { error: 'Invalid or expired invite' }
 
+    // Verify the invite was sent to this user's email
+    if (invite.email !== user.email) {
+      return { error: 'This invite was sent to a different email address' }
+    }
+
     // Add user to organization
     const { error: memberError } = await supabase
       .from('organization_members')

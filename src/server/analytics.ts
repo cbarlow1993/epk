@@ -112,38 +112,36 @@ export const getAggregatedAnalytics = createServerFn({ method: 'POST' })
     const dateFrom = new Date()
     dateFrom.setDate(dateFrom.getDate() - days)
 
-    // Query PostHog for each slug
-    const perArtist: { slug: string; name: string; views: number; visitors: number }[] = []
-    let totalViews = 0
-    let totalVisitors = 0
-
-    for (const profile of profiles) {
-      try {
+    // Query PostHog for each slug in parallel
+    const results = await Promise.allSettled(
+      profiles.map(async (profile: { slug: string | null; display_name: string | null }) => {
         const response = await fetch(
           `${POSTHOG_HOST}/api/projects/${POSTHOG_PROJECT_ID}/events?event=epk_page_view&properties=[{"key":"slug","value":"${profile.slug}","operator":"exact"}]&after=${dateFrom.toISOString()}&limit=10000`,
           { headers: { Authorization: `Bearer ${POSTHOG_API_KEY}` } }
         )
 
-        if (response.ok) {
-          const { results } = await response.json()
-          const visitors = new Set<string>()
-          for (const event of results) {
-            visitors.add(event.distinct_id)
-          }
-          const views = results.length
-          const uniqueVisitors = visitors.size
-          perArtist.push({ slug: profile.slug!, name: profile.display_name || '', views, visitors: uniqueVisitors })
-          totalViews += views
-          totalVisitors += uniqueVisitors
-        } else {
-          perArtist.push({ slug: profile.slug!, name: profile.display_name || '', views: 0, visitors: 0 })
+        if (!response.ok) return { slug: profile.slug!, name: profile.display_name || '', views: 0, visitors: 0 }
+
+        const { results } = await response.json()
+        const visitors = new Set<string>()
+        for (const event of results) {
+          visitors.add(event.distinct_id)
         }
-      } catch {
-        perArtist.push({ slug: profile.slug!, name: profile.display_name || '', views: 0, visitors: 0 })
-      }
+        return { slug: profile.slug!, name: profile.display_name || '', views: results.length, visitors: visitors.size }
+      })
+    )
+
+    const perArtist = results.map((r) =>
+      r.status === 'fulfilled' ? r.value : { slug: '', name: '', views: 0, visitors: 0 }
+    ).filter((a) => a.slug)
+
+    let totalViews = 0
+    let totalVisitors = 0
+    for (const a of perArtist) {
+      totalViews += a.views
+      totalVisitors += a.visitors
     }
 
-    // Sort by views descending
     perArtist.sort((a, b) => b.views - a.views)
 
     return {
