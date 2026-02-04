@@ -23,15 +23,15 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'auth',
-      testMatch: 'auth.spec.ts',
-    },
-    {
       name: 'dashboard',
       testMatch: 'dashboard-*.spec.ts',
       use: {
         storageState: path.resolve(__dirname, '.auth/user.json'),
       },
+    },
+    {
+      name: 'auth',
+      testMatch: 'auth.spec.ts',
     },
   ],
   webServer: {

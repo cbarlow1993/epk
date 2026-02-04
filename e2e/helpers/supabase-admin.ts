@@ -48,6 +48,23 @@ export async function deleteTestUser(email: string) {
   await admin.auth.admin.deleteUser(user.id)
 }
 
+export async function confirmTestUserEmail(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found for email confirmation`)
+  await admin.auth.admin.updateUserById(user.id, { email_confirm: true })
+}
+
+export async function getTestProfileData(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found`)
+  const { data } = await admin.from('profiles').select('display_name, tagline, published, genres').eq('id', user.id).single()
+  return data
+}
+
 export async function resetTestProfile(email: string) {
   const admin = getAdminClient()
   const { data: { users } } = await admin.auth.admin.listUsers()
