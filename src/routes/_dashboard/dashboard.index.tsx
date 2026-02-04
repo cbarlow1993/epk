@@ -5,7 +5,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { getProfile, updateProfile } from '~/server/profile'
 import { uploadFileFromInput } from '~/utils/upload'
 import { profileUpdateSchema, type ProfileUpdate } from '~/schemas/profile'
-import { FormInput, FORM_LABEL, FORM_ERROR_MSG, FORM_FILE_INPUT } from '~/components/forms'
+import { FormInput, FORM_LABEL, FORM_INPUT, FORM_ERROR_MSG, FORM_FILE_INPUT } from '~/components/forms'
+import { PREDEFINED_GENRES } from '~/utils/genres'
 import { useDashboardSave } from '~/hooks/useDashboardSave'
 import { DashboardHeader } from '~/components/DashboardHeader'
 
@@ -32,6 +33,8 @@ function ProfileEditor() {
       profile_image_url: initialProfile?.profile_image_url || '',
       hero_image_url: initialProfile?.hero_image_url || '',
       published: initialProfile?.published || false,
+      bpm_min: initialProfile?.bpm_min ?? null,
+      bpm_max: initialProfile?.bpm_max ?? null,
     },
   })
 
@@ -95,20 +98,99 @@ function ProfileEditor() {
           placeholder="e.g. Presskit / EPK"
         />
 
+        {/* Genres */}
         <div>
           <label className={FORM_LABEL}>Genres</label>
-          <input
-            type="text"
-            value={(genres || []).join(', ')}
-            onChange={(e) => {
-              const parsed = e.target.value.split(',').map((g: string) => g.trim()).filter(Boolean)
-              setValue('genres', parsed, { shouldValidate: true, shouldDirty: true })
-            }}
-            className="w-full bg-dark-card border border-white/10 rounded-lg px-4 py-3 text-white focus:border-accent focus:outline-none transition-colors"
-            placeholder="House, Tech House, Melodic House"
-          />
-          <p className="text-xs text-text-secondary mt-1">Comma-separated</p>
+          <div className="flex flex-wrap gap-2 mb-2">
+            {PREDEFINED_GENRES.map((genre) => {
+              const current = watch('genres') || []
+              const isSelected = current.includes(genre)
+              return (
+                <button
+                  key={genre}
+                  type="button"
+                  onClick={() => {
+                    const updated = isSelected
+                      ? current.filter((g: string) => g !== genre)
+                      : [...current, genre]
+                    setValue('genres', updated, { shouldDirty: true })
+                  }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
+                    isSelected
+                      ? 'bg-accent text-black'
+                      : 'bg-dark-card border border-white/10 text-text-secondary hover:border-accent/30'
+                  }`}
+                >
+                  {genre}
+                </button>
+              )
+            })}
+          </div>
+          {/* Custom genres (non-predefined) shown as removable pills */}
+          {(genres || []).filter((g: string) => !(PREDEFINED_GENRES as readonly string[]).includes(g)).length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-2">
+              {(genres || []).filter((g: string) => !(PREDEFINED_GENRES as readonly string[]).includes(g)).map((genre: string) => (
+                <button
+                  key={genre}
+                  type="button"
+                  onClick={() => {
+                    const current = watch('genres') || []
+                    setValue('genres', current.filter((g: string) => g !== genre), { shouldDirty: true })
+                  }}
+                  className="px-3 py-1.5 rounded-full text-xs font-bold bg-accent text-black transition-colors"
+                >
+                  {genre} &times;
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="flex gap-2 mt-2">
+            <input
+              type="text"
+              placeholder="Add custom genre..."
+              className={FORM_INPUT}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  const input = e.currentTarget
+                  const value = input.value.trim()
+                  if (value) {
+                    const current = watch('genres') || []
+                    if (!current.includes(value)) {
+                      setValue('genres', [...current, value], { shouldDirty: true })
+                    }
+                    input.value = ''
+                  }
+                }
+              }}
+            />
+          </div>
           {errors.genres && <p className={FORM_ERROR_MSG}>{errors.genres.message}</p>}
+        </div>
+
+        {/* BPM Range */}
+        <div>
+          <label className={FORM_LABEL}>BPM Range</label>
+          <div className="flex items-center gap-3">
+            <input
+              type="number"
+              placeholder="Min"
+              min={60}
+              max={200}
+              {...register('bpm_min', { valueAsNumber: true })}
+              className={`${FORM_INPUT} w-24`}
+            />
+            <span className="text-text-secondary">&mdash;</span>
+            <input
+              type="number"
+              placeholder="Max"
+              min={60}
+              max={200}
+              {...register('bpm_max', { valueAsNumber: true })}
+              className={`${FORM_INPUT} w-24`}
+            />
+            <span className="text-text-secondary text-sm">BPM</span>
+          </div>
         </div>
 
         <div>

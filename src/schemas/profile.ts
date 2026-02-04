@@ -12,6 +12,8 @@ export const profileUpdateSchema = z.object({
     .refine((s) => !RESERVED_SLUGS.has(s), 'This URL is reserved')
     .optional(),
   genres: z.array(z.string().max(50)).max(20, 'Max 20 genres').optional(),
+  bpm_min: z.number().int().min(60).max(200).nullable().optional(),
+  bpm_max: z.number().int().min(60).max(200).nullable().optional(),
   profile_image_url: z.string().url('Invalid URL').optional().or(z.literal('')),
   hero_image_url: z.string().url('Invalid URL').optional().or(z.literal('')),
   published: z.boolean().optional(),

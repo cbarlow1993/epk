@@ -231,3 +231,7 @@ CREATE POLICY "Owner can view booking requests" ON booking_requests
 
 CREATE POLICY "Owner can update booking requests" ON booking_requests
   FOR UPDATE USING (is_profile_owner(profile_id));
+
+-- Migration: Add BPM range columns to profiles
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS bpm_min INTEGER;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS bpm_max INTEGER;

@@ -23,6 +23,8 @@ export interface ProfileRow {
   stripe_subscription_id: string | null
   custom_domain: string | null
   custom_css: string | null
+  bpm_min: number | null
+  bpm_max: number | null
   created_at: string
 }
 

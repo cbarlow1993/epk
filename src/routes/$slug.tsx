@@ -194,6 +194,22 @@ function PublicEPK() {
                 {profile.tagline}
               </p>
             )}
+            {profile.genres && (profile.genres as string[]).length > 0 && (
+              <div className="flex flex-wrap justify-center gap-2 mt-4">
+                {(profile.genres as string[]).map((genre) => (
+                  <span key={genre} className="px-3 py-1 rounded-full text-xs font-bold bg-accent/20 text-accent">
+                    {genre}
+                  </span>
+                ))}
+              </div>
+            )}
+            {(profile.bpm_min || profile.bpm_max) && (
+              <p className="text-sm text-text-secondary mt-3">
+                {profile.bpm_min && profile.bpm_max
+                  ? `${profile.bpm_min}\u2013${profile.bpm_max} BPM`
+                  : profile.bpm_min ? `${profile.bpm_min}+ BPM` : `Up to ${profile.bpm_max} BPM`}
+              </p>
+            )}
             {socialLinks.length > 0 && (
               <div className="flex items-center justify-center gap-4 mt-4">
                 {socialLinks.map((link: SocialLinkRow) => (
