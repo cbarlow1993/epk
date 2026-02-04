@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { loginWithEmail } from '~/server/auth'
 import { AuthForm } from '~/components/AuthForm'
 
@@ -22,6 +22,11 @@ function LoginPage() {
         return {}
       }}
       footer={{ text: "Don't have an account?", linkText: 'Sign up', linkTo: '/signup' }}
+      extraFooter={
+        <Link to="/forgot-password" className="text-accent hover:underline text-sm">
+          Forgot your password?
+        </Link>
+      }
     />
   )
 }
