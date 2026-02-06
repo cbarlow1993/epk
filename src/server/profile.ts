@@ -32,6 +32,8 @@ const ALLOWED_PROFILE_FIELDS = new Set([
   'mix_category_order',
   'event_category_order',
   'hero_style',
+  'hero_video_url',
+  'animate_sections',
   'bio_layout',
   'press_kit_url',
   'checklist_progress',
@@ -71,7 +73,7 @@ export const updateProfile = createServerFn({ method: 'POST' })
     }
 
     // Coerce empty strings to null for nullable text fields
-    for (const key of ['og_title', 'og_description', 'og_image_url', 'hero_image_url', 'press_kit_url']) {
+    for (const key of ['og_title', 'og_description', 'og_image_url', 'hero_image_url', 'hero_video_url', 'press_kit_url']) {
       if (key in sanitized && sanitized[key] === '') {
         sanitized[key] = null
       }

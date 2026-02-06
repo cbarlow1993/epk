@@ -4,6 +4,7 @@ import { withAuth } from './utils'
 import { checkStorageQuota } from './storage'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+const MAX_VIDEO_SIZE = 50 * 1024 * 1024 // 50MB
 const ALLOWED_CONTENT_TYPES = new Set([
   'image/jpeg',
   'image/png',
@@ -12,8 +13,10 @@ const ALLOWED_CONTENT_TYPES = new Set([
   'application/pdf',
   'audio/mpeg',
   'audio/wav',
+  'video/mp4',
+  'video/webm',
 ])
-const ALLOWED_FOLDERS = new Set(['images', 'press', 'audio', 'profile', 'hero', 'events'])
+const ALLOWED_FOLDERS = new Set(['images', 'press', 'audio', 'profile', 'hero', 'events', 'photos'])
 
 export const uploadFile = createServerFn({ method: 'POST' })
   .inputValidator((data: unknown) => z.object({
@@ -38,8 +41,9 @@ export const uploadFile = createServerFn({ method: 'POST' })
     const buffer = Buffer.from(data.base64, 'base64')
 
     // Validate file size
-    if (buffer.byteLength > MAX_FILE_SIZE) {
-      return { error: 'File exceeds 10MB limit' }
+    const maxSize = data.contentType.startsWith('video/') ? MAX_VIDEO_SIZE : MAX_FILE_SIZE
+    if (buffer.byteLength > maxSize) {
+      return { error: `File exceeds ${data.contentType.startsWith('video/') ? '50MB' : '10MB'} limit` }
     }
 
     // Check storage quota
