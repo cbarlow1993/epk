@@ -7,8 +7,9 @@ export const Route = createFileRoute('/blog/')({
     meta: [
       { title: 'Blog | DJ EPK — Tips for DJs & Artists' },
       { name: 'description', content: 'Guides and tips for DJs: how to make a press kit, what to include, how to get booked, and more.' },
-      { name: 'og:title', content: 'Blog | DJ EPK' },
-      { name: 'og:type', content: 'website' },
+      { property: 'og:title', content: 'Blog | DJ EPK' },
+      { property: 'og:description', content: 'Guides and tips for DJs: how to make a press kit, what to include, how to get booked, and more.' },
+      { property: 'og:type', content: 'website' },
     ],
   }),
 })
@@ -58,7 +59,7 @@ function BlogIndex() {
                 params={{ slug: post.slug }}
                 className="bg-bg p-8 group hover:bg-gray-50 transition-colors"
               >
-                <time className="text-xs text-text-secondary uppercase tracking-wider">
+                <time dateTime={post.publishedDate} className="text-xs text-text-secondary uppercase tracking-wider">
                   {new Date(post.publishedDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </time>
                 <span className="text-xs text-text-secondary ml-3">{post.readTime}</span>

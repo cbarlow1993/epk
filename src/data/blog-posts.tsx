@@ -324,7 +324,7 @@ export const BLOG_POSTS: BlogPost[] = [
     slug: 'dj-bio-examples',
     excerpt: 'Your bio is the first thing promoters read. Here\'s how to write one that actually works.',
     metaDescription: 'DJ bio examples and a simple formula for writing one that gets you booked. Common mistakes, what to include, and 3 example bios you can adapt.',
-    publishedDate: '2026-02-12',
+    publishedDate: '2026-02-05',
     readTime: '5 min read',
     content: () => (
       <>

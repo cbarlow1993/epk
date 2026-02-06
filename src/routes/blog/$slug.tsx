@@ -3,6 +3,15 @@ import { BLOG_POSTS } from '~/data/blog-posts'
 
 export const Route = createFileRoute('/blog/$slug')({
   component: BlogPost,
+  notFoundComponent: () => (
+    <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-8 text-center">
+      <h1 className="font-display font-extrabold text-4xl tracking-tighter mb-4">Post not found</h1>
+      <p className="text-text-secondary mb-8">The blog post you're looking for doesn't exist.</p>
+      <Link to="/blog" className="text-xs font-semibold uppercase tracking-wider text-accent hover:underline">
+        &larr; Back to blog
+      </Link>
+    </div>
+  ),
   head: ({ params }) => {
     const post = BLOG_POSTS.find((p) => p.slug === params.slug)
     if (!post) return { meta: [{ title: 'Post Not Found | DJ EPK' }] }
@@ -10,9 +19,10 @@ export const Route = createFileRoute('/blog/$slug')({
       meta: [
         { title: `${post.title} | DJ EPK` },
         { name: 'description', content: post.metaDescription },
-        { name: 'og:title', content: post.title },
-        { name: 'og:description', content: post.metaDescription },
-        { name: 'og:type', content: 'article' },
+        { property: 'og:title', content: post.title },
+        { property: 'og:description', content: post.metaDescription },
+        { property: 'og:type', content: 'article' },
+        { property: 'article:published_time', content: post.publishedDate },
       ],
     }
   },
@@ -53,7 +63,7 @@ function BlogPost() {
           {/* Header */}
           <header className="mb-12">
             <div className="flex items-center gap-3 text-xs text-text-secondary uppercase tracking-wider mb-4">
-              <time>
+              <time dateTime={post.publishedDate}>
                 {new Date(post.publishedDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
               </time>
               <span>&middot;</span>
@@ -65,7 +75,7 @@ function BlogPost() {
           </header>
 
           {/* Content */}
-          <div className="prose prose-lg max-w-none
+          <div className="max-w-none
             [&>p]:text-text-secondary [&>p]:leading-relaxed [&>p]:mb-6
             [&>h2]:font-display [&>h2]:font-bold [&>h2]:text-2xl [&>h2]:tracking-tight [&>h2]:mt-12 [&>h2]:mb-4 [&>h2]:text-text-primary
             [&>ul]:text-text-secondary [&>ul]:leading-relaxed [&>ul]:mb-6 [&>ul]:pl-6 [&>ul]:list-disc
