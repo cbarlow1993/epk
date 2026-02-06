@@ -268,7 +268,7 @@ function PublicEPK() {
     mixes.length > 0 && { label: 'Music', href: '#music' },
     events.length > 0 && { label: 'Events', href: '#events' },
     technicalRider && (technicalRider.deck_model || technicalRider.mixer_model || technicalRider.monitor_type || technicalRider.additional_notes) && { label: 'Technical', href: '#technical' },
-    pressAssets.length > 0 && { label: 'Press', href: '#press' },
+    (pressAssets.length > 0 || profile.press_kit_url) && { label: 'Press', href: '#press' },
     bookingContact && bookingContact.manager_name && { label: 'Contact', href: '#contact' },
     (data?.integrations || []).some((i: { type: string }) => ['soundcloud', 'spotify', 'mixcloud'].includes(i.type)) && { label: 'Listen', href: '#listen-embeds' },
     (data?.integrations || []).some((i: { type: string }) => ['mailchimp', 'custom_embed'].includes(i.type)) && { label: 'Newsletter', href: '#newsletter' },
@@ -454,8 +454,8 @@ function PublicEPK() {
             ) : null,
 
             technical: technicalRider && (technicalRider.deck_model || technicalRider.mixer_model || technicalRider.monitor_type || technicalRider.additional_notes) ? (
-              <EPKSection key="technical" id="technical" heading="Technical Rider" maxWidth="max-w-4xl">
-                <div className={`${cardBgClass} backdrop-blur-sm border ${borderClass} overflow-hidden`}>
+              <EPKSection key="technical" id="technical" heading="Technical Rider">
+                <div className={`${cardBgClass} backdrop-blur-sm border ${borderClass} overflow-hidden max-w-4xl`}>
                   <dl className="divide-y divide-current/5">
                     {technicalRider.deck_model && (
                       <div className="px-6 py-4 flex justify-between items-baseline">
@@ -502,23 +502,38 @@ function PublicEPK() {
               </EPKSection>
             ) : null,
 
-            press: pressAssets && pressAssets.length > 0 ? (
+            press: (pressAssets.length > 0 || profile.press_kit_url) ? (
               <EPKSection key="press" id="press" heading="Press Assets">
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {pressAssets.map((asset: FileRow) => (
+                {profile.press_kit_url && (
+                  <div className="mb-6">
                     <a
-                      key={asset.id}
-                      href={asset.file_url}
-                      download
+                      href={profile.press_kit_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`${cardBgClass} border ${borderClass} p-4 hover:border-accent/30 transition-colors group`}
+                      className={`inline-flex items-center gap-2 ${cardBgClass} border ${borderClass} px-5 py-3 hover:border-accent/30 transition-colors group`}
                     >
-                      <p className="font-semibold text-sm mb-1">{asset.press_title || asset.name}</p>
-                      <p className={`text-xs ${textSecClass} group-hover:text-accent transition-colors`}>Download</p>
+                      <span className="font-semibold text-sm">Download Press Kit</span>
+                      <span className={`text-xs ${textSecClass} group-hover:text-accent transition-colors`}>&rarr;</span>
                     </a>
-                  ))}
-                </div>
+                  </div>
+                )}
+                {pressAssets.length > 0 && (
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {pressAssets.map((asset: FileRow) => (
+                      <a
+                        key={asset.id}
+                        href={asset.file_url}
+                        download
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`${cardBgClass} border ${borderClass} p-4 hover:border-accent/30 transition-colors group`}
+                      >
+                        <p className="font-semibold text-sm mb-1">{asset.press_title || asset.name}</p>
+                        <p className={`text-xs ${textSecClass} group-hover:text-accent transition-colors`}>Download</p>
+                      </a>
+                    ))}
+                  </div>
+                )}
               </EPKSection>
             ) : null,
 
