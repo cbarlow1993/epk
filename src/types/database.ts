@@ -27,6 +27,7 @@ export interface ProfileRow {
   hide_platform_branding: boolean
   meta_description: string | null
   press_kit_url: string | null
+  checklist_progress: Record<string, boolean> | null
   template: string
   section_order: string[] | null
   section_visibility: Record<string, boolean> | null

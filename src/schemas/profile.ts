@@ -50,6 +50,7 @@ export const profileUpdateSchema = z.object({
   hero_style: z.enum(['fullbleed', 'contained', 'minimal']).optional(),
   bio_layout: z.enum(['two-column', 'single-column']).optional(),
   press_kit_url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+  checklist_progress: z.record(z.string(), z.boolean()).optional(),
 })
 
 export type ProfileUpdate = z.infer<typeof profileUpdateSchema>

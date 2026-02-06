@@ -34,6 +34,7 @@ const ALLOWED_PROFILE_FIELDS = new Set([
   'hero_style',
   'bio_layout',
   'press_kit_url',
+  'checklist_progress',
 ])
 
 export const getProfile = createServerFn({ method: 'GET' }).handler(async () => {
