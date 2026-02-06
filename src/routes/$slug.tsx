@@ -10,6 +10,8 @@ import { getTemplate } from '~/utils/templates'
 import { isLightBackground } from '~/utils/color'
 import type { MixRow, EventRow, SocialLinkRow, FileRow } from '~/types/database'
 
+type PhotoRow = { id: string; image_url: string; caption: string | null; sort_order: number }
+
 export const Route = createFileRoute('/$slug')({
   validateSearch: (search: Record<string, unknown>) => ({
     preview: search.preview === 'true',
@@ -187,7 +189,8 @@ function PublicEPK() {
     </div>
   )
 
-  const { profile, socialLinks, mixes, events, technicalRider, bookingContact, pressAssets } = data
+  const { profile, socialLinks, mixes, events, technicalRider, bookingContact, pressAssets, photos: rawPhotos } = data
+  const photos = (rawPhotos || []) as PhotoRow[]
 
   const templateConfig = getTemplate(profile.template || 'default')
 
@@ -204,6 +207,8 @@ function PublicEPK() {
   const font = search.font || profile.font_family || 'Instrument Sans'
   const name = profile.display_name || 'DJ'
   const isLight = isLightBackground(bg)
+
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
   // Track section views via IntersectionObserver
   const mainRef = useRef<HTMLElement>(null)
@@ -481,6 +486,33 @@ function PublicEPK() {
               </EPKSection>
             ) : null,
 
+            photos: photos.length > 0 ? (
+              <EPKSection key="photos" id="photos" heading="Photos">
+                <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
+                  {photos.map((photo: PhotoRow, index: number) => (
+                    <button
+                      key={photo.id}
+                      type="button"
+                      onClick={() => setLightboxIndex(index)}
+                      className="w-full break-inside-avoid overflow-hidden border border-current/5 hover:border-accent/30 transition-all cursor-pointer group block"
+                    >
+                      <img
+                        src={photo.image_url}
+                        alt={photo.caption || ''}
+                        className="w-full h-auto group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                      />
+                      {photo.caption && (
+                        <div className={`px-3 py-2 ${cardBgClass}`}>
+                          <p className={`text-xs ${textSecClass}`}>{photo.caption}</p>
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </EPKSection>
+            ) : null,
+
             technical: technicalRider && (technicalRider.deck_model || technicalRider.mixer_model || technicalRider.monitor_type || technicalRider.additional_notes) ? (
               <EPKSection key="technical" id="technical" heading="Technical Rider">
                 <div className={`${cardBgClass} backdrop-blur-sm border ${borderClass} overflow-hidden max-w-4xl mx-auto`}>
@@ -627,6 +659,71 @@ function PublicEPK() {
           )
         })()}
       </main>
+
+      {/* Photo Lightbox */}
+      {lightboxIndex !== null && photos.length > 0 && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+          onClick={() => setLightboxIndex(null)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') setLightboxIndex(null)
+            if (e.key === 'ArrowLeft') setLightboxIndex((prev) => prev !== null && prev > 0 ? prev - 1 : prev)
+            if (e.key === 'ArrowRight') setLightboxIndex((prev) => prev !== null && prev < photos.length - 1 ? prev + 1 : prev)
+          }}
+          tabIndex={0}
+          role="dialog"
+          aria-modal="true"
+          ref={(el) => el?.focus()}
+        >
+          {/* Close button */}
+          <button
+            onClick={() => setLightboxIndex(null)}
+            className="absolute top-4 right-4 text-white/70 hover:text-white text-2xl z-10"
+            aria-label="Close lightbox"
+          >
+            ✕
+          </button>
+
+          {/* Previous arrow */}
+          {lightboxIndex > 0 && (
+            <button
+              onClick={(e) => { e.stopPropagation(); setLightboxIndex(lightboxIndex - 1) }}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white text-3xl z-10"
+              aria-label="Previous photo"
+            >
+              ‹
+            </button>
+          )}
+
+          {/* Next arrow */}
+          {lightboxIndex < photos.length - 1 && (
+            <button
+              onClick={(e) => { e.stopPropagation(); setLightboxIndex(lightboxIndex + 1) }}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white text-3xl z-10"
+              aria-label="Next photo"
+            >
+              ›
+            </button>
+          )}
+
+          {/* Image + caption */}
+          <div onClick={(e) => e.stopPropagation()} className="max-w-5xl max-h-[90vh] flex flex-col items-center">
+            <img
+              src={photos[lightboxIndex].image_url}
+              alt={photos[lightboxIndex].caption || ''}
+              className="max-w-full max-h-[80vh] object-contain"
+            />
+            {photos[lightboxIndex].caption && (
+              <p className="text-white/70 text-sm mt-3 text-center px-4">
+                {photos[lightboxIndex].caption}
+              </p>
+            )}
+            <p className="text-white/40 text-xs mt-2">
+              {lightboxIndex + 1} / {photos.length}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Agency Branding */}
       {data.organization && (
