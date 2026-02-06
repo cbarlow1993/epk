@@ -69,8 +69,8 @@ export const profileUpdateSchema = z.object({
   theme_text_color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().nullable(),
   theme_heading_color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().nullable(),
   theme_link_color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().nullable(),
-  theme_card_bg: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().nullable(),
-  theme_border_color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().nullable(),
+  theme_card_bg: z.string().max(50).optional().nullable(), // allows hex, rgba(), hex+alpha
+  theme_border_color: z.string().max(50).optional().nullable(), // allows hex, rgba(), hex+alpha
   // Theme — Spacing & Layout
   theme_section_padding: z.enum(['compact', 'default', 'spacious']).optional().nullable(),
   theme_content_width: z.enum(['narrow', 'default', 'wide']).optional().nullable(),

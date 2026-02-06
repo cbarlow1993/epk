@@ -474,12 +474,13 @@ function ThemeEditor() {
     setValue('theme_body_size', d.body.size, { shouldDirty: true })
     setValue('theme_body_weight', d.body.weight, { shouldDirty: true })
 
-    // Colors
-    setValue('theme_text_color', d.text_color, { shouldDirty: true })
-    setValue('theme_heading_color', d.heading_color, { shouldDirty: true })
-    setValue('theme_link_color', d.link_color, { shouldDirty: true })
-    setValue('theme_card_bg', d.card_bg, { shouldDirty: true })
-    setValue('theme_border_color', d.border_color, { shouldDirty: true })
+    // Colors — set to null so resolveTheme() picks up template defaults
+    // (template defaults may use rgba/8-char hex that the color picker can't handle)
+    setValue('theme_text_color', null, { shouldDirty: true })
+    setValue('theme_heading_color', null, { shouldDirty: true })
+    setValue('theme_link_color', null, { shouldDirty: true })
+    setValue('theme_card_bg', null, { shouldDirty: true })
+    setValue('theme_border_color', null, { shouldDirty: true })
 
     // Spacing
     setValue('theme_section_padding', d.section_padding, { shouldDirty: true })
