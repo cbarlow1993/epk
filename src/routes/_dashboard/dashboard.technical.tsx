@@ -81,7 +81,7 @@ function TechnicalRiderEditor() {
             />
             <FormSelect
               label="Quantity"
-              registration={register('deck_quantity', { valueAsNumber: true })}
+              registration={register('deck_quantity')}
               error={errors.deck_quantity}
               options={qtyOptions}
               placeholder="Qty"
@@ -133,7 +133,7 @@ function TechnicalRiderEditor() {
             {showMonitorQty && (
               <FormInput
                 label="Quantity"
-                registration={register('monitor_quantity', { valueAsNumber: true })}
+                registration={register('monitor_quantity')}
                 error={errors.monitor_quantity}
                 type="number"
                 placeholder="2"
