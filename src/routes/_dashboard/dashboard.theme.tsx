@@ -30,18 +30,20 @@ function ThemeEditor() {
   const initial = Route.useLoaderData()
   const { saving, saved, error, onSave: save } = useDashboardSave(updateProfile)
 
-  const { register, handleSubmit, watch, formState: { errors, isDirty }, setValue } = useForm<Pick<ProfileUpdate, 'accent_color' | 'bg_color' | 'font_family' | 'template'>>({
-    resolver: zodResolver(profileUpdateSchema.pick({ accent_color: true, bg_color: true, font_family: true, template: true }).partial()),
+  const { register, handleSubmit, watch, formState: { errors, isDirty }, setValue } = useForm<Pick<ProfileUpdate, 'accent_color' | 'bg_color' | 'font_family' | 'template' | 'animate_sections'>>({
+    resolver: zodResolver(profileUpdateSchema.pick({ accent_color: true, bg_color: true, font_family: true, template: true, animate_sections: true }).partial()),
     defaultValues: {
       accent_color: initial?.accent_color || '#3b82f6',
       bg_color: initial?.bg_color || '#0a0a0f',
       font_family: initial?.font_family || 'Inter',
       template: (initial?.template as ProfileUpdate['template']) || 'default',
+      animate_sections: initial?.animate_sections !== false,
     },
   })
 
   const onSave = handleSubmit(save)
 
+  const animateSections = watch('animate_sections') !== false
   const selectedTemplate = watch('template') || 'default'
   const accentColor = watch('accent_color') || '#3b82f6'
   const bgColor = watch('bg_color') || '#0a0a0f'
@@ -144,6 +146,29 @@ function ThemeEditor() {
               Set a URL slug on the Profile page to enable live preview.
             </div>
           )}
+        </div>
+      </div>
+
+      <div className="mt-8 pt-8 border-t border-border">
+        <label className={FORM_LABEL}>Animation</label>
+        <div className="flex items-center justify-between bg-white border border-border p-4">
+          <div>
+            <p className="text-sm font-medium">Animate sections on scroll</p>
+            <p className="text-xs text-text-secondary mt-0.5">Sections fade in as visitors scroll down your EPK</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setValue('animate_sections', !animateSections, { shouldDirty: true })}
+            className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
+              animateSections ? 'bg-accent' : 'bg-text-secondary/30'
+            }`}
+          >
+            <span
+              className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${
+                animateSections ? 'translate-x-[18px]' : 'translate-x-[3px]'
+              }`}
+            />
+          </button>
         </div>
       </div>
     </form>
