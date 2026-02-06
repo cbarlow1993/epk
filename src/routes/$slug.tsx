@@ -35,10 +35,13 @@ export const Route = createFileRoute('/$slug')({
       genres?.length ? genres.join(', ') : null,
     ].filter(Boolean).join(' — ')
 
-    const ogTitle = profile?.og_title || autoTitle
-    const ogDescription = profile?.og_description || profile?.meta_description || autoDescription
+    const isPro = profile?.tier === 'pro'
+    const ogTitle = isPro ? (profile?.og_title || autoTitle) : `${name} | djepk.com`
+    const ogDescription = isPro
+      ? (profile?.og_description || profile?.meta_description || autoDescription)
+      : (profile?.meta_description || autoDescription)
     const ogImage = profile?.og_image_url || profile?.profile_image_url || ''
-    const twitterCard = profile?.twitter_card_type || 'summary_large_image'
+    const twitterCard = isPro ? (profile?.twitter_card_type || 'summary_large_image') : 'summary_large_image'
     const siteBase = import.meta.env.VITE_SITE_URL || 'https://djepk.com'
     const ogUrl = profile?.custom_domain
       ? `https://${profile.custom_domain}`
@@ -46,7 +49,7 @@ export const Route = createFileRoute('/$slug')({
 
     return {
       meta: [
-        { title: autoTitle },
+        { title: isPro ? autoTitle : `${name} | djepk.com` },
         { name: 'description', content: profile?.meta_description || autoDescription },
         { property: 'og:title', content: ogTitle },
         { property: 'og:description', content: ogDescription },
@@ -264,7 +267,7 @@ function PublicEPK() {
     profile.bio && { label: 'Bio', href: '#bio' },
     mixes.length > 0 && { label: 'Music', href: '#music' },
     events.length > 0 && { label: 'Events', href: '#events' },
-    technicalRider && (technicalRider.preferred_setup || technicalRider.alternative_setup) && { label: 'Technical', href: '#technical' },
+    technicalRider && (technicalRider.deck_model || technicalRider.mixer_model || technicalRider.monitor_type || technicalRider.additional_notes) && { label: 'Technical', href: '#technical' },
     pressAssets.length > 0 && { label: 'Press', href: '#press' },
     bookingContact && bookingContact.manager_name && { label: 'Contact', href: '#contact' },
     (data?.integrations || []).some((i: { type: string }) => ['soundcloud', 'spotify', 'mixcloud'].includes(i.type)) && { label: 'Listen', href: '#listen-embeds' },
@@ -450,20 +453,50 @@ function PublicEPK() {
               </EPKSection>
             ) : null,
 
-            technical: technicalRider && (technicalRider.preferred_setup || technicalRider.alternative_setup) ? (
+            technical: technicalRider && (technicalRider.deck_model || technicalRider.mixer_model || technicalRider.monitor_type || technicalRider.additional_notes) ? (
               <EPKSection key="technical" id="technical" heading="Technical Rider" maxWidth="max-w-4xl">
                 <div className={`${cardBgClass} backdrop-blur-sm border ${borderClass} overflow-hidden`}>
-                  {technicalRider.preferred_setup && (
-                    <div className={`px-6 py-4 border-b ${borderClass}`}>
-                      <p className="text-sm font-medium mb-3">Preferred Setup</p>
-                      <BlockRenderer data={technicalRider.preferred_setup as import('@editorjs/editorjs').OutputData} className={`${proseClass} ${textSecClass}`} />
-                    </div>
-                  )}
-                  {technicalRider.alternative_setup && (
-                    <div className="px-6 py-4">
-                      <p className="text-sm font-medium mb-3">Alternative Setup</p>
-                      <BlockRenderer data={technicalRider.alternative_setup as import('@editorjs/editorjs').OutputData} className={`${proseClass} ${textSecClass}`} />
-                    </div>
+                  <dl className="divide-y divide-current/5">
+                    {technicalRider.deck_model && (
+                      <div className="px-6 py-4 flex justify-between items-baseline">
+                        <dt className="text-sm font-medium">Decks</dt>
+                        <dd className={`text-sm ${textSecClass}`}>
+                          {technicalRider.deck_quantity ? `${technicalRider.deck_quantity}x ` : ''}
+                          {technicalRider.deck_model === 'Other' ? technicalRider.deck_model_other : technicalRider.deck_model}
+                        </dd>
+                      </div>
+                    )}
+                    {technicalRider.mixer_model && (
+                      <div className="px-6 py-4 flex justify-between items-baseline">
+                        <dt className="text-sm font-medium">Mixer</dt>
+                        <dd className={`text-sm ${textSecClass}`}>
+                          {technicalRider.mixer_model === 'Other' ? technicalRider.mixer_model_other : technicalRider.mixer_model}
+                        </dd>
+                      </div>
+                    )}
+                    {technicalRider.monitor_type && (
+                      <div className="px-6 py-4 flex justify-between items-baseline">
+                        <dt className="text-sm font-medium">Monitoring</dt>
+                        <dd className={`text-sm ${textSecClass} text-right`}>
+                          <span>
+                            {technicalRider.monitor_quantity ? `${technicalRider.monitor_quantity}x ` : ''}
+                            {technicalRider.monitor_type}
+                          </span>
+                          {technicalRider.monitor_notes && (
+                            <span className="block text-xs mt-1 italic">{technicalRider.monitor_notes}</span>
+                          )}
+                        </dd>
+                      </div>
+                    )}
+                  </dl>
+                  {technicalRider.additional_notes && (
+                    <>
+                      <div className={`border-t ${borderClass}`} />
+                      <div className="px-6 py-4">
+                        <p className="text-sm font-medium mb-2">Additional Notes</p>
+                        <p className={`text-sm ${textSecClass} whitespace-pre-line`}>{technicalRider.additional_notes}</p>
+                      </div>
+                    </>
                   )}
                 </div>
               </EPKSection>
