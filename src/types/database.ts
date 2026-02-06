@@ -35,6 +35,39 @@ export interface ProfileRow {
   event_category_order: string[] | null
   hero_style: 'fullbleed' | 'contained' | 'minimal' | null
   bio_layout: 'two-column' | 'single-column' | null
+  // Theme — Typography
+  theme_display_font: string | null
+  theme_display_size: string | null
+  theme_display_weight: string | null
+  theme_heading_font: string | null
+  theme_heading_size: string | null
+  theme_heading_weight: string | null
+  theme_subheading_font: string | null
+  theme_subheading_size: string | null
+  theme_subheading_weight: string | null
+  theme_body_font: string | null
+  theme_body_size: string | null
+  theme_body_weight: string | null
+  // Theme — Colors
+  theme_text_color: string | null
+  theme_heading_color: string | null
+  theme_link_color: string | null
+  theme_card_bg: string | null
+  theme_border_color: string | null
+  // Theme — Spacing & Layout
+  theme_section_padding: 'compact' | 'default' | 'spacious' | null
+  theme_content_width: 'narrow' | 'default' | 'wide' | null
+  theme_card_radius: 'none' | 'sm' | 'md' | 'lg' | 'full' | null
+  theme_element_gap: 'tight' | 'default' | 'relaxed' | null
+  // Theme — Buttons & Links
+  theme_button_style: 'rounded' | 'square' | 'pill' | null
+  theme_link_style: 'underline' | 'none' | 'hover-underline' | null
+  // Theme — Effects
+  theme_card_border: 'none' | 'subtle' | 'solid' | null
+  theme_shadow: 'none' | 'sm' | 'md' | 'lg' | null
+  theme_divider_style: 'none' | 'line' | 'accent' | 'gradient' | null
+  // Theme — Custom Fonts
+  theme_custom_fonts: Array<{ name: string; url: string; weight: string }> | null
   og_title: string | null
   og_description: string | null
   og_image_url: string | null

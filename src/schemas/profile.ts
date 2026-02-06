@@ -52,6 +52,43 @@ export const profileUpdateSchema = z.object({
   animate_sections: z.boolean().optional(),
   bio_layout: z.enum(['two-column', 'single-column']).optional(),
   press_kit_url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+  // Theme — Typography (4 tiers)
+  theme_display_font: z.string().max(100).optional().nullable(),
+  theme_display_size: z.string().max(10).optional().nullable(),
+  theme_display_weight: z.string().max(3).optional().nullable(),
+  theme_heading_font: z.string().max(100).optional().nullable(),
+  theme_heading_size: z.string().max(10).optional().nullable(),
+  theme_heading_weight: z.string().max(3).optional().nullable(),
+  theme_subheading_font: z.string().max(100).optional().nullable(),
+  theme_subheading_size: z.string().max(10).optional().nullable(),
+  theme_subheading_weight: z.string().max(3).optional().nullable(),
+  theme_body_font: z.string().max(100).optional().nullable(),
+  theme_body_size: z.string().max(10).optional().nullable(),
+  theme_body_weight: z.string().max(3).optional().nullable(),
+  // Theme — Colors
+  theme_text_color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().nullable(),
+  theme_heading_color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().nullable(),
+  theme_link_color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().nullable(),
+  theme_card_bg: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().nullable(),
+  theme_border_color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional().nullable(),
+  // Theme — Spacing & Layout
+  theme_section_padding: z.enum(['compact', 'default', 'spacious']).optional().nullable(),
+  theme_content_width: z.enum(['narrow', 'default', 'wide']).optional().nullable(),
+  theme_card_radius: z.enum(['none', 'sm', 'md', 'lg', 'full']).optional().nullable(),
+  theme_element_gap: z.enum(['tight', 'default', 'relaxed']).optional().nullable(),
+  // Theme — Buttons & Links
+  theme_button_style: z.enum(['rounded', 'square', 'pill']).optional().nullable(),
+  theme_link_style: z.enum(['underline', 'none', 'hover-underline']).optional().nullable(),
+  // Theme — Effects
+  theme_card_border: z.enum(['none', 'subtle', 'solid']).optional().nullable(),
+  theme_shadow: z.enum(['none', 'sm', 'md', 'lg']).optional().nullable(),
+  theme_divider_style: z.enum(['none', 'line', 'accent', 'gradient']).optional().nullable(),
+  // Theme — Custom Fonts
+  theme_custom_fonts: z.array(z.object({
+    name: z.string().max(100),
+    url: z.string().url(),
+    weight: z.string().max(3),
+  })).max(4).optional().nullable(),
   checklist_progress: z.record(z.string(), z.boolean()).optional(),
 })
 

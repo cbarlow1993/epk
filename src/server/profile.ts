@@ -37,6 +37,39 @@ const ALLOWED_PROFILE_FIELDS = new Set([
   'bio_layout',
   'press_kit_url',
   'checklist_progress',
+  // Theme — Typography
+  'theme_display_font',
+  'theme_display_size',
+  'theme_display_weight',
+  'theme_heading_font',
+  'theme_heading_size',
+  'theme_heading_weight',
+  'theme_subheading_font',
+  'theme_subheading_size',
+  'theme_subheading_weight',
+  'theme_body_font',
+  'theme_body_size',
+  'theme_body_weight',
+  // Theme — Colors
+  'theme_text_color',
+  'theme_heading_color',
+  'theme_link_color',
+  'theme_card_bg',
+  'theme_border_color',
+  // Theme — Spacing & Layout
+  'theme_section_padding',
+  'theme_content_width',
+  'theme_card_radius',
+  'theme_element_gap',
+  // Theme — Buttons & Links
+  'theme_button_style',
+  'theme_link_style',
+  // Theme — Effects
+  'theme_card_border',
+  'theme_shadow',
+  'theme_divider_style',
+  // Theme — Custom Fonts
+  'theme_custom_fonts',
 ])
 
 export const getProfile = createServerFn({ method: 'GET' }).handler(async () => {
@@ -73,7 +106,17 @@ export const updateProfile = createServerFn({ method: 'POST' })
     }
 
     // Coerce empty strings to null for nullable text fields
-    for (const key of ['og_title', 'og_description', 'og_image_url', 'hero_image_url', 'hero_video_url', 'press_kit_url']) {
+    for (const key of [
+      'og_title', 'og_description', 'og_image_url', 'hero_image_url', 'hero_video_url', 'press_kit_url',
+      'theme_display_font', 'theme_display_size', 'theme_display_weight',
+      'theme_heading_font', 'theme_heading_size', 'theme_heading_weight',
+      'theme_subheading_font', 'theme_subheading_size', 'theme_subheading_weight',
+      'theme_body_font', 'theme_body_size', 'theme_body_weight',
+      'theme_text_color', 'theme_heading_color', 'theme_link_color', 'theme_card_bg', 'theme_border_color',
+      'theme_section_padding', 'theme_content_width', 'theme_card_radius', 'theme_element_gap',
+      'theme_button_style', 'theme_link_style',
+      'theme_card_border', 'theme_shadow', 'theme_divider_style',
+    ]) {
       if (key in sanitized && sanitized[key] === '') {
         sanitized[key] = null
       }
