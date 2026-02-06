@@ -6,11 +6,12 @@ interface EPKSectionProps {
   heading: React.ReactNode
   maxWidth?: 'max-w-4xl' | 'max-w-6xl'
   children: React.ReactNode
+  animate?: boolean
 }
 
-export function EPKSection({ id, heading, maxWidth = 'max-w-6xl', children }: EPKSectionProps) {
+export function EPKSection({ id, heading, maxWidth = 'max-w-6xl', children, animate = true }: EPKSectionProps) {
   return (
-    <FadeIn>
+    <FadeIn enabled={animate}>
       <section id={id} className="py-20 px-4">
         <div className={`${maxWidth} mx-auto`}>
           <SectionHeading>{heading}</SectionHeading>
