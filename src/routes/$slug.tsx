@@ -201,6 +201,7 @@ function PublicEPK() {
     ? search.sections.split(',')
     : profile.section_order || templateConfig.sectionOrder
   const sectionVisibility = (profile.section_visibility || {}) as Record<string, boolean>
+  const animateSections = profile.animate_sections !== false
 
   const accent = search.accent || profile.accent_color || '#FF0000'
   const bg = search.bg || profile.bg_color || '#FFFFFF'
@@ -390,7 +391,7 @@ function PublicEPK() {
           return visibleSections.map((sectionId: string) => {
           const sectionRenderers: Record<string, React.ReactNode> = {
             bio: profile.bio || profile.short_bio ? (
-              <EPKSection key="bio" id="bio" heading="Bio">
+              <EPKSection key="bio" id="bio" heading="Bio" animate={animateSections}>
                 <div className={bioLayout === 'two-column' && profile.profile_image_url ? 'grid md:grid-cols-[200px_1fr] gap-8 items-start' : ''}>
                   {bioLayout === 'two-column' && profile.profile_image_url && (
                     <img
@@ -417,7 +418,7 @@ function PublicEPK() {
             ) : null,
 
             music: mixes.length > 0 ? (
-              <EPKSection key="music" id="music" heading="Listen">
+              <EPKSection key="music" id="music" heading="Listen" animate={animateSections}>
                 {Object.entries(
                   mixes.reduce((acc: Record<string, MixRow[]>, mix) => {
                     const cat = mix.category || 'other'
@@ -462,7 +463,7 @@ function PublicEPK() {
             ) : null,
 
             events: events.length > 0 ? (
-              <EPKSection key="events" id="events" heading={<>Events <span className="text-accent">&amp;</span> Brands</>}>
+              <EPKSection key="events" id="events" heading={<>Events <span className="text-accent">&amp;</span> Brands</>} animate={animateSections}>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                   {events.map((event: EventRow) => (
                     <a
@@ -487,7 +488,7 @@ function PublicEPK() {
             ) : null,
 
             photos: photos.length > 0 ? (
-              <EPKSection key="photos" id="photos" heading="Photos">
+              <EPKSection key="photos" id="photos" heading="Photos" animate={animateSections}>
                 <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
                   {photos.map((photo: PhotoRow, index: number) => (
                     <button
@@ -514,7 +515,7 @@ function PublicEPK() {
             ) : null,
 
             technical: technicalRider && (technicalRider.deck_model || technicalRider.mixer_model || technicalRider.monitor_type || technicalRider.additional_notes) ? (
-              <EPKSection key="technical" id="technical" heading="Technical Rider">
+              <EPKSection key="technical" id="technical" heading="Technical Rider" animate={animateSections}>
                 <div className={`${cardBgClass} backdrop-blur-sm border ${borderClass} overflow-hidden max-w-4xl mx-auto`}>
                   <dl className="divide-y divide-current/5">
                     {technicalRider.deck_model && (
@@ -563,7 +564,7 @@ function PublicEPK() {
             ) : null,
 
             press: (pressAssets.length > 0 || profile.press_kit_url) ? (
-              <EPKSection key="press" id="press" heading="Press Assets">
+              <EPKSection key="press" id="press" heading="Press Assets" animate={animateSections}>
                 {profile.press_kit_url && (
                   <div className="mb-6">
                     <a
@@ -598,7 +599,7 @@ function PublicEPK() {
             ) : null,
 
             contact: bookingContact && bookingContact.manager_name ? (
-              <EPKSection key="contact" id="contact" heading="Booking Contact" maxWidth="max-w-4xl">
+              <EPKSection key="contact" id="contact" heading="Booking Contact" maxWidth="max-w-4xl" animate={animateSections}>
                 <div className={`${textSecClass} space-y-2`}>
                   <p><strong>Management:</strong> {bookingContact.manager_name}</p>
                   {bookingContact.email && <p><strong>Email:</strong> {bookingContact.email}</p>}
@@ -624,7 +625,7 @@ function PublicEPK() {
           return (
             <>
               {embedIntegrations.length > 0 && (
-                <EPKSection id="listen-embeds" heading="Listen">
+                <EPKSection id="listen-embeds" heading="Listen" animate={animateSections}>
                   <div className="space-y-6">
                     {embedIntegrations.map((integration: { id: string; config: Record<string, string> }) => (
                       integration.config.embed_html ? (
@@ -641,7 +642,7 @@ function PublicEPK() {
 
               {marketingIntegrations.length > 0 && marketingIntegrations.map((integration: { id: string; type: string; config: Record<string, string> }) => (
                 integration.type === 'mailchimp' ? (
-                  <EPKSection key={integration.id} id="newsletter" heading={integration.config.form_heading || 'Newsletter'}>
+                  <EPKSection key={integration.id} id="newsletter" heading={integration.config.form_heading || 'Newsletter'} animate={animateSections}>
                     <MailchimpForm
                       profileId={data!.profileId}
                       heading={integration.config.form_heading || 'Join my mailing list'}
@@ -650,7 +651,7 @@ function PublicEPK() {
                     />
                   </EPKSection>
                 ) : integration.type === 'custom_embed' && integration.config.embed_html ? (
-                  <EPKSection key={integration.id} id="newsletter" heading={integration.config.label || 'Newsletter'}>
+                  <EPKSection key={integration.id} id="newsletter" heading={integration.config.label || 'Newsletter'} animate={animateSections}>
                     <div dangerouslySetInnerHTML={{ __html: sanitize(integration.config.embed_html) }} />
                   </EPKSection>
                 ) : null
