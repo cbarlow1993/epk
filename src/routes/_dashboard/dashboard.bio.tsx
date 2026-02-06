@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { getProfile, updateProfile } from '~/server/profile'
-import { BlockEditor, type BlockEditorHandle, FORM_LABEL, FORM_INPUT, FORM_ERROR_MSG, FORM_FILE_INPUT } from '~/components/forms'
+import { BlockEditor, type BlockEditorHandle, FORM_LABEL, FORM_FILE_INPUT } from '~/components/forms'
 import { BlockRenderer } from '~/components/BlockRenderer'
 import { useDashboardSave } from '~/hooks/useDashboardSave'
 import { DashboardHeader } from '~/components/DashboardHeader'
@@ -12,7 +12,6 @@ import { uploadFileFromInput } from '~/utils/upload'
 import type { OutputData } from '@editorjs/editorjs'
 
 const bioFormSchema = z.object({
-  short_bio: z.string().max(200, 'Max 200 characters').optional(),
   profile_image_url: z.string().url('Invalid URL').optional().or(z.literal('')),
   bio_layout: z.enum(['two-column', 'single-column']).optional(),
 })
@@ -32,31 +31,35 @@ function BioEditor() {
   const [previewing, setPreviewing] = useState(false)
   const [previewData, setPreviewData] = useState<OutputData | null>(null)
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
+  const [uploadError, setUploadError] = useState('')
 
   const { register, handleSubmit, watch, formState: { errors, isDirty }, setValue } = useForm<BioFormValues>({
     resolver: zodResolver(bioFormSchema) as never,
     defaultValues: {
-      short_bio: initialProfile?.short_bio || '',
       profile_image_url: initialProfile?.profile_image_url || '',
       bio_layout: (initialProfile?.bio_layout as BioFormValues['bio_layout']) || 'two-column',
     },
   })
 
-  const shortBio = watch('short_bio') || ''
   const profileImageUrl = watch('profile_image_url')
   const bioLayout = watch('bio_layout') || 'two-column'
 
   const handleSave = handleSubmit(async (formData) => {
     if (!editorRef.current) return
     const bio = await editorRef.current.save()
-    await onSave({ short_bio: formData.short_bio, profile_image_url: formData.profile_image_url, bio_layout: formData.bio_layout, bio } as Record<string, unknown>)
+    await onSave({ profile_image_url: formData.profile_image_url, bio_layout: formData.bio_layout, bio } as Record<string, unknown>)
   })
 
   const handleProfileImage = async (file: File) => {
     setUploadingPhoto(true)
+    setUploadError('')
     const result = await uploadFileFromInput(file, 'profile')
     setUploadingPhoto(false)
-    if (result) setValue('profile_image_url', result.url, { shouldDirty: true })
+    if (result) {
+      setValue('profile_image_url', result.url, { shouldDirty: true })
+    } else {
+      setUploadError('Upload failed. Please try again.')
+    }
   }
 
   const handlePreviewToggle = async () => {
@@ -94,6 +97,7 @@ function BioEditor() {
                 className={FORM_FILE_INPUT}
               />
               {uploadingPhoto && <p className="text-xs text-accent mt-1">Uploading...</p>}
+              {uploadError && <p className="text-xs text-red-500 mt-1">{uploadError}</p>}
             </div>
           </div>
         </div>
@@ -101,39 +105,58 @@ function BioEditor() {
         {/* Bio Layout */}
         <div>
           <label className={FORM_LABEL}>Bio Layout</label>
-          <p className="text-xs text-text-secondary mb-3">How the bio section appears on your public page</p>
-          <div className="flex gap-4">
-            {(['two-column', 'single-column'] as const).map((layout) => (
-              <label key={layout} className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  value={layout}
-                  checked={bioLayout === layout}
-                  onChange={() => setValue('bio_layout', layout, { shouldDirty: true })}
-                  className="w-4 h-4 accent-accent"
-                />
-                <span className="text-sm">{layout === 'two-column' ? 'Two Column (photo + text)' : 'Single Column'}</span>
-              </label>
-            ))}
-          </div>
-        </div>
+          <div className="grid grid-cols-2 gap-3">
+            {/* Two Column Card */}
+            <button
+              type="button"
+              onClick={() => setValue('bio_layout', 'two-column', { shouldDirty: true })}
+              className={`border p-4 text-left transition-all ${
+                bioLayout === 'two-column'
+                  ? 'border-accent bg-accent/5 ring-1 ring-accent'
+                  : 'border-border hover:border-text-secondary'
+              }`}
+            >
+              {/* Wireframe */}
+              <div className="flex gap-2 mb-3">
+                <div className="w-10 h-10 rounded bg-text-secondary/20 shrink-0" />
+                <div className="flex-1 space-y-1.5">
+                  <div className="h-1.5 rounded-full bg-text-secondary/20 w-full" />
+                  <div className="h-1.5 rounded-full bg-text-secondary/20 w-4/5" />
+                  <div className="h-1.5 rounded-full bg-text-secondary/20 w-3/5" />
+                </div>
+              </div>
+              <p className="text-sm font-medium">Two Column</p>
+              <p className="text-xs text-text-secondary mt-0.5">Photo beside bio text</p>
+            </button>
 
-        {/* Short Bio */}
-        <div>
-          <label className={FORM_LABEL}>Short Bio</label>
-          <textarea
-            rows={3}
-            placeholder="A brief introduction (max 200 characters)"
-            {...register('short_bio')}
-            className={`${errors.short_bio ? FORM_INPUT + ' border-red-500' : FORM_INPUT} resize-none leading-relaxed`}
-            maxLength={200}
-          />
-          <div className="flex justify-between mt-1">
-            {errors.short_bio && <p className={FORM_ERROR_MSG}>{errors.short_bio.message}</p>}
-            <p className={`text-xs ml-auto ${shortBio.length > 180 ? 'text-red-500' : 'text-text-secondary'}`}>
-              {shortBio.length}/200
-            </p>
+            {/* Single Column Card */}
+            <button
+              type="button"
+              onClick={() => setValue('bio_layout', 'single-column', { shouldDirty: true })}
+              className={`border p-4 text-left transition-all ${
+                bioLayout === 'single-column'
+                  ? 'border-accent bg-accent/5 ring-1 ring-accent'
+                  : 'border-border hover:border-text-secondary'
+              }`}
+            >
+              {/* Wireframe */}
+              <div className="space-y-1.5 mb-3">
+                <div className="h-1.5 rounded-full bg-text-secondary/20 w-full" />
+                <div className="h-1.5 rounded-full bg-text-secondary/20 w-4/5" />
+                <div className="h-1.5 rounded-full bg-text-secondary/20 w-full" />
+                <div className="h-1.5 rounded-full bg-text-secondary/20 w-3/5" />
+              </div>
+              <p className="text-sm font-medium">Single Column</p>
+              <p className="text-xs text-text-secondary mt-0.5">Stacked bio text only</p>
+            </button>
           </div>
+
+          {/* Nudge: two-column selected but no photo */}
+          {bioLayout === 'two-column' && !profileImageUrl && (
+            <p className="text-xs text-amber-600 mt-2">
+              Upload a profile photo above to use the two-column layout.
+            </p>
+          )}
         </div>
 
         {/* Full Bio Editor */}
