@@ -147,7 +147,7 @@ function ThemeEditor() {
           {previewUrl ? (
             <div className="border border-border overflow-hidden bg-white h-[70vh]">
               <iframe
-                src={`${previewUrl}?preview=true&accent=${encodeURIComponent(accentColor)}&bg=${encodeURIComponent(bgColor)}&font=${encodeURIComponent(fontFamily)}`}
+                src={`${previewUrl}?preview=true&accent=${encodeURIComponent(accentColor)}&bg=${encodeURIComponent(bgColor)}&font=${encodeURIComponent(fontFamily)}&hero=${heroStyle}&bioLayout=${bioLayout}&sections=${sectionOrder.filter(s => sectionVisibility[s] !== false).join(',')}`}
                 className="w-full h-full"
                 title="EPK Preview"
               />
