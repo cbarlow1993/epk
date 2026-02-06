@@ -61,6 +61,15 @@ CREATE TABLE technical_rider (
   profile_id UUID NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
   preferred_setup JSONB,
   alternative_setup JSONB,
+  deck_model TEXT,
+  deck_model_other TEXT,
+  deck_quantity SMALLINT,
+  mixer_model TEXT,
+  mixer_model_other TEXT,
+  monitor_type TEXT,
+  monitor_quantity SMALLINT,
+  monitor_notes TEXT,
+  additional_notes TEXT,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
@@ -396,3 +405,10 @@ CREATE POLICY "Authenticated can create org" ON organizations FOR INSERT WITH CH
 
 -- Initial member insert (for org creator to add themselves as owner)
 CREATE POLICY "Authenticated can join org" ON organization_members FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Social Preview (Open Graph) columns
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS og_title TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS og_description TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS og_image_url TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS twitter_card_type TEXT DEFAULT 'summary_large_image'
+  CHECK (twitter_card_type IN ('summary', 'summary_large_image'));
