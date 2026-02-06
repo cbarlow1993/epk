@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { label: 'Bio', href: '/dashboard/bio' },
   { label: 'Music', href: '/dashboard/music' },
   { label: 'Events', href: '/dashboard/events' },
+  { label: 'Photos', href: '/dashboard/photos' },
   { label: 'Technical', href: '/dashboard/technical' },
   { label: 'Press Assets', href: '/dashboard/press' },
   { label: 'Contact', href: '/dashboard/contact' },
@@ -72,7 +73,7 @@ export function DashboardSidebar({ profile, isAgency = false }: { profile: Sideb
       {/* Nav */}
       <nav className="flex-1 py-4 overflow-y-auto">
         {navItems.map((item) => {
-          const isActive = matchRoute({ to: item.href, fuzzy: true })
+          const isActive = matchRoute({ to: item.href, fuzzy: item.href !== '/dashboard' })
           return (
             <Link
               key={item.href}
