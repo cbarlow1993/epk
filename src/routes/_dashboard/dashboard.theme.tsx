@@ -7,7 +7,6 @@ import { FormColorInput, FORM_LABEL } from '~/components/forms'
 import { useDashboardSave } from '~/hooks/useDashboardSave'
 import { DashboardHeader } from '~/components/DashboardHeader'
 import { TEMPLATES } from '~/utils/templates'
-import { SortableSectionList } from '~/components/SortableSectionList'
 
 export const Route = createFileRoute('/_dashboard/dashboard/theme')({
   loader: () => getProfile(),
@@ -31,16 +30,13 @@ function ThemeEditor() {
   const initial = Route.useLoaderData()
   const { saving, saved, error, onSave: save } = useDashboardSave(updateProfile)
 
-  const { register, handleSubmit, watch, formState: { errors, isDirty }, setValue } = useForm<Pick<ProfileUpdate, 'accent_color' | 'bg_color' | 'font_family' | 'template' | 'hero_style' | 'section_order' | 'section_visibility'>>({
-    resolver: zodResolver(profileUpdateSchema.pick({ accent_color: true, bg_color: true, font_family: true, template: true, hero_style: true, section_order: true, section_visibility: true }).partial()),
+  const { register, handleSubmit, watch, formState: { errors, isDirty }, setValue } = useForm<Pick<ProfileUpdate, 'accent_color' | 'bg_color' | 'font_family' | 'template'>>({
+    resolver: zodResolver(profileUpdateSchema.pick({ accent_color: true, bg_color: true, font_family: true, template: true }).partial()),
     defaultValues: {
       accent_color: initial?.accent_color || '#3b82f6',
       bg_color: initial?.bg_color || '#0a0a0f',
       font_family: initial?.font_family || 'Inter',
       template: (initial?.template as ProfileUpdate['template']) || 'default',
-      hero_style: (initial?.hero_style as ProfileUpdate['hero_style']) || 'fullbleed',
-      section_order: initial?.section_order || ['bio', 'music', 'events', 'technical', 'press', 'contact'],
-      section_visibility: (initial?.section_visibility as Record<string, boolean>) || {},
     },
   })
 
@@ -50,9 +46,6 @@ function ThemeEditor() {
   const accentColor = watch('accent_color') || '#3b82f6'
   const bgColor = watch('bg_color') || '#0a0a0f'
   const fontFamily = watch('font_family') || 'Inter'
-  const heroStyle = watch('hero_style') || 'fullbleed'
-  const sectionOrder = watch('section_order') || ['bio', 'music', 'events', 'technical', 'press', 'contact']
-  const sectionVisibility = watch('section_visibility') || {}
 
   const previewUrl = initial?.slug ? `/${initial.slug}` : null
 
@@ -73,9 +66,6 @@ function ThemeEditor() {
                 setValue('accent_color', tpl.defaults.accent_color, { shouldDirty: true })
                 setValue('bg_color', tpl.defaults.bg_color, { shouldDirty: true })
                 setValue('font_family', tpl.defaults.font_family, { shouldDirty: true })
-                setValue('hero_style', tpl.heroStyle, { shouldDirty: true })
-                setValue('section_order', tpl.sectionOrder, { shouldDirty: true })
-                setValue('section_visibility', {}, { shouldDirty: true })
               }}
               className={`relative border p-4 text-left transition-all ${
                 selectedTemplate === tpl.id
@@ -144,7 +134,7 @@ function ThemeEditor() {
           {previewUrl ? (
             <div className="border border-border overflow-hidden bg-white h-[70vh]">
               <iframe
-                src={`${previewUrl}?preview=true&accent=${encodeURIComponent(accentColor)}&bg=${encodeURIComponent(bgColor)}&font=${encodeURIComponent(fontFamily)}&hero=${heroStyle}&sections=${sectionOrder.filter(s => sectionVisibility[s] !== false).join(',')}`}
+                src={`${previewUrl}?preview=true&accent=${encodeURIComponent(accentColor)}&bg=${encodeURIComponent(bgColor)}&font=${encodeURIComponent(fontFamily)}`}
                 className="w-full h-full"
                 title="EPK Preview"
               />
@@ -154,43 +144,6 @@ function ThemeEditor() {
               Set a URL slug on the Profile page to enable live preview.
             </div>
           )}
-        </div>
-      </div>
-
-      {/* Layout Section */}
-      <div className="mt-8 border-t border-border pt-8">
-        <h2 className="text-sm uppercase tracking-widest font-bold mb-6">Layout</h2>
-
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Hero Style */}
-          <div>
-            <label className={FORM_LABEL}>Hero Style</label>
-            <div className="space-y-2">
-              {(['fullbleed', 'contained', 'minimal'] as const).map((style) => (
-                <label key={style} className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="radio"
-                    value={style}
-                    checked={heroStyle === style}
-                    onChange={() => setValue('hero_style', style, { shouldDirty: true })}
-                    className="w-4 h-4 accent-accent"
-                  />
-                  <span className="text-sm capitalize">{style}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Section Order */}
-          <div>
-            <label className={FORM_LABEL}>Section Order</label>
-            <SortableSectionList
-              order={sectionOrder}
-              visibility={sectionVisibility}
-              onOrderChange={(newOrder) => setValue('section_order', newOrder, { shouldDirty: true })}
-              onVisibilityChange={(newVis) => setValue('section_visibility', newVis, { shouldDirty: true })}
-            />
-          </div>
         </div>
       </div>
     </form>

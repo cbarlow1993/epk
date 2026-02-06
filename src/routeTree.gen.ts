@@ -25,9 +25,11 @@ import { Route as DashboardDashboardThemeRouteImport } from './routes/_dashboard
 import { Route as DashboardDashboardTechnicalRouteImport } from './routes/_dashboard/dashboard.technical'
 import { Route as DashboardDashboardTeamRouteImport } from './routes/_dashboard/dashboard.team'
 import { Route as DashboardDashboardSocialsRouteImport } from './routes/_dashboard/dashboard.socials'
+import { Route as DashboardDashboardSocialPreviewRouteImport } from './routes/_dashboard/dashboard.social-preview'
 import { Route as DashboardDashboardSettingsRouteImport } from './routes/_dashboard/dashboard.settings'
 import { Route as DashboardDashboardRosterRouteImport } from './routes/_dashboard/dashboard.roster'
 import { Route as DashboardDashboardPressRouteImport } from './routes/_dashboard/dashboard.press'
+import { Route as DashboardDashboardPagesRouteImport } from './routes/_dashboard/dashboard.pages'
 import { Route as DashboardDashboardMusicRouteImport } from './routes/_dashboard/dashboard.music'
 import { Route as DashboardDashboardIntegrationsRouteImport } from './routes/_dashboard/dashboard.integrations'
 import { Route as DashboardDashboardFilesRouteImport } from './routes/_dashboard/dashboard.files'
@@ -119,6 +121,12 @@ const DashboardDashboardSocialsRoute =
     path: '/socials',
     getParentRoute: () => DashboardDashboardRoute,
   } as any)
+const DashboardDashboardSocialPreviewRoute =
+  DashboardDashboardSocialPreviewRouteImport.update({
+    id: '/social-preview',
+    path: '/social-preview',
+    getParentRoute: () => DashboardDashboardRoute,
+  } as any)
 const DashboardDashboardSettingsRoute =
   DashboardDashboardSettingsRouteImport.update({
     id: '/settings',
@@ -134,6 +142,11 @@ const DashboardDashboardRosterRoute =
 const DashboardDashboardPressRoute = DashboardDashboardPressRouteImport.update({
   id: '/press',
   path: '/press',
+  getParentRoute: () => DashboardDashboardRoute,
+} as any)
+const DashboardDashboardPagesRoute = DashboardDashboardPagesRouteImport.update({
+  id: '/pages',
+  path: '/pages',
   getParentRoute: () => DashboardDashboardRoute,
 } as any)
 const DashboardDashboardMusicRoute = DashboardDashboardMusicRouteImport.update({
@@ -208,9 +221,11 @@ export interface FileRoutesByFullPath {
   '/dashboard/files': typeof DashboardDashboardFilesRoute
   '/dashboard/integrations': typeof DashboardDashboardIntegrationsRoute
   '/dashboard/music': typeof DashboardDashboardMusicRoute
+  '/dashboard/pages': typeof DashboardDashboardPagesRoute
   '/dashboard/press': typeof DashboardDashboardPressRoute
   '/dashboard/roster': typeof DashboardDashboardRosterRoute
   '/dashboard/settings': typeof DashboardDashboardSettingsRoute
+  '/dashboard/social-preview': typeof DashboardDashboardSocialPreviewRoute
   '/dashboard/socials': typeof DashboardDashboardSocialsRoute
   '/dashboard/team': typeof DashboardDashboardTeamRoute
   '/dashboard/technical': typeof DashboardDashboardTechnicalRoute
@@ -236,9 +251,11 @@ export interface FileRoutesByTo {
   '/dashboard/files': typeof DashboardDashboardFilesRoute
   '/dashboard/integrations': typeof DashboardDashboardIntegrationsRoute
   '/dashboard/music': typeof DashboardDashboardMusicRoute
+  '/dashboard/pages': typeof DashboardDashboardPagesRoute
   '/dashboard/press': typeof DashboardDashboardPressRoute
   '/dashboard/roster': typeof DashboardDashboardRosterRoute
   '/dashboard/settings': typeof DashboardDashboardSettingsRoute
+  '/dashboard/social-preview': typeof DashboardDashboardSocialPreviewRoute
   '/dashboard/socials': typeof DashboardDashboardSocialsRoute
   '/dashboard/team': typeof DashboardDashboardTeamRoute
   '/dashboard/technical': typeof DashboardDashboardTechnicalRoute
@@ -267,9 +284,11 @@ export interface FileRoutesById {
   '/_dashboard/dashboard/files': typeof DashboardDashboardFilesRoute
   '/_dashboard/dashboard/integrations': typeof DashboardDashboardIntegrationsRoute
   '/_dashboard/dashboard/music': typeof DashboardDashboardMusicRoute
+  '/_dashboard/dashboard/pages': typeof DashboardDashboardPagesRoute
   '/_dashboard/dashboard/press': typeof DashboardDashboardPressRoute
   '/_dashboard/dashboard/roster': typeof DashboardDashboardRosterRoute
   '/_dashboard/dashboard/settings': typeof DashboardDashboardSettingsRoute
+  '/_dashboard/dashboard/social-preview': typeof DashboardDashboardSocialPreviewRoute
   '/_dashboard/dashboard/socials': typeof DashboardDashboardSocialsRoute
   '/_dashboard/dashboard/team': typeof DashboardDashboardTeamRoute
   '/_dashboard/dashboard/technical': typeof DashboardDashboardTechnicalRoute
@@ -298,9 +317,11 @@ export interface FileRouteTypes {
     | '/dashboard/files'
     | '/dashboard/integrations'
     | '/dashboard/music'
+    | '/dashboard/pages'
     | '/dashboard/press'
     | '/dashboard/roster'
     | '/dashboard/settings'
+    | '/dashboard/social-preview'
     | '/dashboard/socials'
     | '/dashboard/team'
     | '/dashboard/technical'
@@ -326,9 +347,11 @@ export interface FileRouteTypes {
     | '/dashboard/files'
     | '/dashboard/integrations'
     | '/dashboard/music'
+    | '/dashboard/pages'
     | '/dashboard/press'
     | '/dashboard/roster'
     | '/dashboard/settings'
+    | '/dashboard/social-preview'
     | '/dashboard/socials'
     | '/dashboard/team'
     | '/dashboard/technical'
@@ -356,9 +379,11 @@ export interface FileRouteTypes {
     | '/_dashboard/dashboard/files'
     | '/_dashboard/dashboard/integrations'
     | '/_dashboard/dashboard/music'
+    | '/_dashboard/dashboard/pages'
     | '/_dashboard/dashboard/press'
     | '/_dashboard/dashboard/roster'
     | '/_dashboard/dashboard/settings'
+    | '/_dashboard/dashboard/social-preview'
     | '/_dashboard/dashboard/socials'
     | '/_dashboard/dashboard/team'
     | '/_dashboard/dashboard/technical'
@@ -493,6 +518,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardSocialsRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
+    '/_dashboard/dashboard/social-preview': {
+      id: '/_dashboard/dashboard/social-preview'
+      path: '/social-preview'
+      fullPath: '/dashboard/social-preview'
+      preLoaderRoute: typeof DashboardDashboardSocialPreviewRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
     '/_dashboard/dashboard/settings': {
       id: '/_dashboard/dashboard/settings'
       path: '/settings'
@@ -512,6 +544,13 @@ declare module '@tanstack/react-router' {
       path: '/press'
       fullPath: '/dashboard/press'
       preLoaderRoute: typeof DashboardDashboardPressRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
+    '/_dashboard/dashboard/pages': {
+      id: '/_dashboard/dashboard/pages'
+      path: '/pages'
+      fullPath: '/dashboard/pages'
+      preLoaderRoute: typeof DashboardDashboardPagesRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
     '/_dashboard/dashboard/music': {
@@ -590,9 +629,11 @@ interface DashboardDashboardRouteChildren {
   DashboardDashboardFilesRoute: typeof DashboardDashboardFilesRoute
   DashboardDashboardIntegrationsRoute: typeof DashboardDashboardIntegrationsRoute
   DashboardDashboardMusicRoute: typeof DashboardDashboardMusicRoute
+  DashboardDashboardPagesRoute: typeof DashboardDashboardPagesRoute
   DashboardDashboardPressRoute: typeof DashboardDashboardPressRoute
   DashboardDashboardRosterRoute: typeof DashboardDashboardRosterRoute
   DashboardDashboardSettingsRoute: typeof DashboardDashboardSettingsRoute
+  DashboardDashboardSocialPreviewRoute: typeof DashboardDashboardSocialPreviewRoute
   DashboardDashboardSocialsRoute: typeof DashboardDashboardSocialsRoute
   DashboardDashboardTeamRoute: typeof DashboardDashboardTeamRoute
   DashboardDashboardTechnicalRoute: typeof DashboardDashboardTechnicalRoute
@@ -611,9 +652,11 @@ const DashboardDashboardRouteChildren: DashboardDashboardRouteChildren = {
   DashboardDashboardFilesRoute: DashboardDashboardFilesRoute,
   DashboardDashboardIntegrationsRoute: DashboardDashboardIntegrationsRoute,
   DashboardDashboardMusicRoute: DashboardDashboardMusicRoute,
+  DashboardDashboardPagesRoute: DashboardDashboardPagesRoute,
   DashboardDashboardPressRoute: DashboardDashboardPressRoute,
   DashboardDashboardRosterRoute: DashboardDashboardRosterRoute,
   DashboardDashboardSettingsRoute: DashboardDashboardSettingsRoute,
+  DashboardDashboardSocialPreviewRoute: DashboardDashboardSocialPreviewRoute,
   DashboardDashboardSocialsRoute: DashboardDashboardSocialsRoute,
   DashboardDashboardTeamRoute: DashboardDashboardTeamRoute,
   DashboardDashboardTechnicalRoute: DashboardDashboardTechnicalRoute,

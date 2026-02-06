@@ -15,6 +15,8 @@ const NAV_ITEMS = [
   { label: 'Contact', href: '/dashboard/contact' },
   { label: 'Social Links', href: '/dashboard/socials' },
   { label: 'Theme', href: '/dashboard/theme' },
+  { label: 'Pages', href: '/dashboard/pages' },
+  { label: 'Social Preview', href: '/dashboard/social-preview' },
   { label: 'Files', href: '/dashboard/files' },
   { label: 'Analytics', href: '/dashboard/analytics' },
   { label: 'Integrations', href: '/dashboard/integrations' },
