@@ -23,6 +23,14 @@ const ALLOWED_PROFILE_FIELDS = new Set([
   'hide_platform_branding',
   'meta_description',
   'template',
+  'og_title',
+  'og_description',
+  'og_image_url',
+  'twitter_card_type',
+  'section_order',
+  'section_visibility',
+  'hero_style',
+  'bio_layout',
 ])
 
 export const getProfile = createServerFn({ method: 'GET' }).handler(async () => {
@@ -56,6 +64,13 @@ export const updateProfile = createServerFn({ method: 'POST' })
 
     if (Object.keys(sanitized).length === 0) {
       return { error: 'No valid fields provided' }
+    }
+
+    // Coerce empty strings to null for nullable text fields
+    for (const key of ['og_title', 'og_description', 'og_image_url']) {
+      if (key in sanitized && sanitized[key] === '') {
+        sanitized[key] = null
+      }
     }
 
     // Validate slug if being updated
