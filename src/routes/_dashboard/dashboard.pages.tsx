@@ -13,7 +13,7 @@ export const Route = createFileRoute('/_dashboard/dashboard/pages')({
   component: PagesEditor,
 })
 
-const ALL_SECTIONS = ['bio', 'music', 'events', 'technical', 'press', 'contact']
+const ALL_SECTIONS = ['bio', 'music', 'events', 'photos', 'technical', 'press', 'contact']
 
 function PagesEditor() {
   const initial = Route.useLoaderData()

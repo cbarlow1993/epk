@@ -20,6 +20,7 @@ const SECTION_LABELS: Record<string, string> = {
   bio: 'Bio',
   music: 'Music',
   events: 'Events & Brands',
+  photos: 'Photos',
   technical: 'Technical Rider',
   press: 'Press Assets',
   contact: 'Booking Contact',
@@ -44,7 +45,9 @@ function SortableItem({ id, visible, onToggleVisibility }: SortableItemProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-3 p-3 border border-border bg-white ${isDragging ? 'shadow-lg' : ''}`}
+      className={`flex items-center gap-3 p-3 border bg-white transition-colors ${isDragging ? 'shadow-lg' : ''} ${
+        visible ? 'border-border' : 'border-border/50 opacity-60'
+      }`}
     >
       <button
         type="button"
@@ -56,16 +59,22 @@ function SortableItem({ id, visible, onToggleVisibility }: SortableItemProps) {
           <path d="M7 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM7 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM7 14a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM13 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM13 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM13 14a2 2 0 1 0 0 4 2 2 0 0 0 0-4z" />
         </svg>
       </button>
-      <span className="flex-1 text-sm font-medium">{SECTION_LABELS[id] || id}</span>
-      <label className="flex items-center gap-2 text-xs text-text-secondary">
-        <input
-          type="checkbox"
-          checked={visible}
-          onChange={() => onToggleVisibility(id)}
-          className="w-4 h-4 accent-accent"
+      <span className={`flex-1 text-sm font-medium ${visible ? '' : 'line-through text-text-secondary'}`}>
+        {SECTION_LABELS[id] || id}
+      </span>
+      <button
+        type="button"
+        onClick={() => onToggleVisibility(id)}
+        className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
+          visible ? 'bg-accent' : 'bg-text-secondary/30'
+        }`}
+      >
+        <span
+          className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${
+            visible ? 'translate-x-[18px]' : 'translate-x-[3px]'
+          }`}
         />
-        {visible ? 'Visible' : 'Hidden'}
-      </label>
+      </button>
     </div>
   )
 }
