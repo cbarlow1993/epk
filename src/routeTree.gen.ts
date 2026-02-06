@@ -32,6 +32,7 @@ import { Route as DashboardDashboardPressRouteImport } from './routes/_dashboard
 import { Route as DashboardDashboardPagesRouteImport } from './routes/_dashboard/dashboard.pages'
 import { Route as DashboardDashboardMusicRouteImport } from './routes/_dashboard/dashboard.music'
 import { Route as DashboardDashboardIntegrationsRouteImport } from './routes/_dashboard/dashboard.integrations'
+import { Route as DashboardDashboardHeroRouteImport } from './routes/_dashboard/dashboard.hero'
 import { Route as DashboardDashboardFilesRouteImport } from './routes/_dashboard/dashboard.files'
 import { Route as DashboardDashboardEventsRouteImport } from './routes/_dashboard/dashboard.events'
 import { Route as DashboardDashboardContactRouteImport } from './routes/_dashboard/dashboard.contact'
@@ -160,6 +161,11 @@ const DashboardDashboardIntegrationsRoute =
     path: '/integrations',
     getParentRoute: () => DashboardDashboardRoute,
   } as any)
+const DashboardDashboardHeroRoute = DashboardDashboardHeroRouteImport.update({
+  id: '/hero',
+  path: '/hero',
+  getParentRoute: () => DashboardDashboardRoute,
+} as any)
 const DashboardDashboardFilesRoute = DashboardDashboardFilesRouteImport.update({
   id: '/files',
   path: '/files',
@@ -219,6 +225,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/contact': typeof DashboardDashboardContactRoute
   '/dashboard/events': typeof DashboardDashboardEventsRoute
   '/dashboard/files': typeof DashboardDashboardFilesRoute
+  '/dashboard/hero': typeof DashboardDashboardHeroRoute
   '/dashboard/integrations': typeof DashboardDashboardIntegrationsRoute
   '/dashboard/music': typeof DashboardDashboardMusicRoute
   '/dashboard/pages': typeof DashboardDashboardPagesRoute
@@ -249,6 +256,7 @@ export interface FileRoutesByTo {
   '/dashboard/contact': typeof DashboardDashboardContactRoute
   '/dashboard/events': typeof DashboardDashboardEventsRoute
   '/dashboard/files': typeof DashboardDashboardFilesRoute
+  '/dashboard/hero': typeof DashboardDashboardHeroRoute
   '/dashboard/integrations': typeof DashboardDashboardIntegrationsRoute
   '/dashboard/music': typeof DashboardDashboardMusicRoute
   '/dashboard/pages': typeof DashboardDashboardPagesRoute
@@ -282,6 +290,7 @@ export interface FileRoutesById {
   '/_dashboard/dashboard/contact': typeof DashboardDashboardContactRoute
   '/_dashboard/dashboard/events': typeof DashboardDashboardEventsRoute
   '/_dashboard/dashboard/files': typeof DashboardDashboardFilesRoute
+  '/_dashboard/dashboard/hero': typeof DashboardDashboardHeroRoute
   '/_dashboard/dashboard/integrations': typeof DashboardDashboardIntegrationsRoute
   '/_dashboard/dashboard/music': typeof DashboardDashboardMusicRoute
   '/_dashboard/dashboard/pages': typeof DashboardDashboardPagesRoute
@@ -315,6 +324,7 @@ export interface FileRouteTypes {
     | '/dashboard/contact'
     | '/dashboard/events'
     | '/dashboard/files'
+    | '/dashboard/hero'
     | '/dashboard/integrations'
     | '/dashboard/music'
     | '/dashboard/pages'
@@ -345,6 +355,7 @@ export interface FileRouteTypes {
     | '/dashboard/contact'
     | '/dashboard/events'
     | '/dashboard/files'
+    | '/dashboard/hero'
     | '/dashboard/integrations'
     | '/dashboard/music'
     | '/dashboard/pages'
@@ -377,6 +388,7 @@ export interface FileRouteTypes {
     | '/_dashboard/dashboard/contact'
     | '/_dashboard/dashboard/events'
     | '/_dashboard/dashboard/files'
+    | '/_dashboard/dashboard/hero'
     | '/_dashboard/dashboard/integrations'
     | '/_dashboard/dashboard/music'
     | '/_dashboard/dashboard/pages'
@@ -567,6 +579,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardIntegrationsRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
+    '/_dashboard/dashboard/hero': {
+      id: '/_dashboard/dashboard/hero'
+      path: '/hero'
+      fullPath: '/dashboard/hero'
+      preLoaderRoute: typeof DashboardDashboardHeroRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
     '/_dashboard/dashboard/files': {
       id: '/_dashboard/dashboard/files'
       path: '/files'
@@ -627,6 +646,7 @@ interface DashboardDashboardRouteChildren {
   DashboardDashboardContactRoute: typeof DashboardDashboardContactRoute
   DashboardDashboardEventsRoute: typeof DashboardDashboardEventsRoute
   DashboardDashboardFilesRoute: typeof DashboardDashboardFilesRoute
+  DashboardDashboardHeroRoute: typeof DashboardDashboardHeroRoute
   DashboardDashboardIntegrationsRoute: typeof DashboardDashboardIntegrationsRoute
   DashboardDashboardMusicRoute: typeof DashboardDashboardMusicRoute
   DashboardDashboardPagesRoute: typeof DashboardDashboardPagesRoute
@@ -650,6 +670,7 @@ const DashboardDashboardRouteChildren: DashboardDashboardRouteChildren = {
   DashboardDashboardContactRoute: DashboardDashboardContactRoute,
   DashboardDashboardEventsRoute: DashboardDashboardEventsRoute,
   DashboardDashboardFilesRoute: DashboardDashboardFilesRoute,
+  DashboardDashboardHeroRoute: DashboardDashboardHeroRoute,
   DashboardDashboardIntegrationsRoute: DashboardDashboardIntegrationsRoute,
   DashboardDashboardMusicRoute: DashboardDashboardMusicRoute,
   DashboardDashboardPagesRoute: DashboardDashboardPagesRoute,

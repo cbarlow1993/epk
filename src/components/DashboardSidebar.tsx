@@ -1,12 +1,14 @@
-import { Link, useMatchRoute } from '@tanstack/react-router'
+import { Link, useMatchRoute, useRouter } from '@tanstack/react-router'
 import { logout } from '~/server/auth'
+import { updateProfile } from '~/server/profile'
 import { useState } from 'react'
 import type { ProfileRow } from '~/types/database'
 
-type SidebarProfile = Pick<ProfileRow, 'slug' | 'display_name' | 'profile_image_url'>
+type SidebarProfile = Pick<ProfileRow, 'slug' | 'display_name' | 'profile_image_url' | 'published'>
 
 const NAV_ITEMS = [
   { label: 'Profile', href: '/dashboard' },
+  { label: 'Hero', href: '/dashboard/hero' },
   { label: 'Bio', href: '/dashboard/bio' },
   { label: 'Music', href: '/dashboard/music' },
   { label: 'Events', href: '/dashboard/events' },
@@ -32,7 +34,9 @@ const AGENCY_NAV_ITEMS = [
 
 export function DashboardSidebar({ profile, isAgency = false }: { profile: SidebarProfile; isAgency?: boolean }) {
   const matchRoute = useMatchRoute()
+  const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [published, setPublished] = useState(profile.published)
 
   const navItems = isAgency
     ? [...NAV_ITEMS.slice(0, 1), ...AGENCY_NAV_ITEMS, ...NAV_ITEMS.slice(1)]
@@ -41,6 +45,13 @@ export function DashboardSidebar({ profile, isAgency = false }: { profile: Sideb
   const handleLogout = async () => {
     await logout()
     window.location.href = '/login'
+  }
+
+  const handleTogglePublished = async () => {
+    const next = !published
+    setPublished(next)
+    await updateProfile({ data: { published: next } })
+    router.invalidate()
   }
 
   const navContent = (
@@ -79,14 +90,40 @@ export function DashboardSidebar({ profile, isAgency = false }: { profile: Sideb
         })}
       </nav>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-text-primary">
-        <button
-          onClick={handleLogout}
-          className="w-full text-xs text-text-secondary hover:text-accent transition-colors text-left px-2 py-1 uppercase tracking-wider"
-        >
-          Log out
-        </button>
+      {/* Published + Logout */}
+      <div className="border-t border-text-primary">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">Published</span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleTogglePublished}
+                className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
+                  published ? 'bg-accent' : 'bg-text-secondary/30'
+                }`}
+                aria-label={published ? 'Unpublish EPK' : 'Publish EPK'}
+              >
+                <span
+                  className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${
+                    published ? 'translate-x-[18px]' : 'translate-x-[3px]'
+                  }`}
+                />
+              </button>
+              <span className={`text-xs font-medium ${published ? 'text-accent' : 'text-text-secondary'}`}>
+                {published ? 'Live' : 'Draft'}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="px-4 pb-4">
+          <button
+            onClick={handleLogout}
+            className="w-full text-xs text-text-secondary hover:text-accent transition-colors text-left px-2 py-1 uppercase tracking-wider"
+          >
+            Log out
+          </button>
+        </div>
       </div>
     </>
   )

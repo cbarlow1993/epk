@@ -1,11 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { getProfile, updateProfile } from '~/server/profile'
-import { uploadFileFromInput } from '~/utils/upload'
 import { profileUpdateSchema, type ProfileUpdate } from '~/schemas/profile'
-import { FormInput, FORM_LABEL, FORM_INPUT, FORM_ERROR_MSG, FORM_FILE_INPUT } from '~/components/forms'
+import { FormInput, FORM_LABEL, FORM_INPUT, FORM_ERROR_MSG } from '~/components/forms'
 import { PREDEFINED_GENRES } from '~/utils/genres'
 import { useDashboardSave } from '~/hooks/useDashboardSave'
 import { DashboardHeader } from '~/components/DashboardHeader'
@@ -18,21 +16,12 @@ export const Route = createFileRoute('/_dashboard/dashboard/')({
 function ProfileEditor() {
   const initialProfile = Route.useLoaderData()
   const { saving, saved, error, onSave: save } = useDashboardSave(updateProfile)
-  const [uploadingProfile, setUploadingProfile] = useState(false)
-  const [uploadingHero, setUploadingHero] = useState(false)
-  const profileInputRef = useRef<HTMLInputElement>(null)
-  const heroInputRef = useRef<HTMLInputElement>(null)
-
-  const { register, handleSubmit, watch, formState: { errors, isDirty }, setValue, getValues } = useForm<ProfileUpdate>({
+  const { register, handleSubmit, watch, formState: { errors, isDirty }, setValue } = useForm<ProfileUpdate>({
     resolver: zodResolver(profileUpdateSchema.partial()) as never,
     defaultValues: {
       display_name: initialProfile?.display_name || '',
       slug: initialProfile?.slug || '',
-      tagline: initialProfile?.tagline || '',
       genres: initialProfile?.genres || [],
-      profile_image_url: initialProfile?.profile_image_url || '',
-      hero_image_url: initialProfile?.hero_image_url || '',
-      published: initialProfile?.published || false,
       bpm_min: initialProfile?.bpm_min ?? null,
       bpm_max: initialProfile?.bpm_max ?? null,
     },
@@ -40,23 +29,6 @@ function ProfileEditor() {
 
   const onSave = handleSubmit(save)
 
-  const handleProfileImage = async (file: File) => {
-    setUploadingProfile(true)
-    const result = await uploadFileFromInput(file, 'profile')
-    setUploadingProfile(false)
-    if (result) setValue('profile_image_url', result.url, { shouldDirty: true })
-  }
-
-  const handleHeroImage = async (file: File) => {
-    setUploadingHero(true)
-    const result = await uploadFileFromInput(file, 'hero')
-    setUploadingHero(false)
-    if (result) setValue('hero_image_url', result.url, { shouldDirty: true })
-  }
-
-  const profileImageUrl = watch('profile_image_url')
-  const heroImageUrl = watch('hero_image_url')
-  const published = watch('published')
   const genres = watch('genres')
 
   return (
@@ -90,13 +62,6 @@ function ProfileEditor() {
           </div>
           {errors.slug && <p className={FORM_ERROR_MSG}>{errors.slug.message}</p>}
         </div>
-
-        <FormInput
-          label="Tagline"
-          registration={register('tagline')}
-          error={errors.tagline}
-          placeholder="e.g. Presskit / EPK"
-        />
 
         {/* Genres */}
         <div>
@@ -193,62 +158,6 @@ function ProfileEditor() {
           </div>
         </div>
 
-        <div>
-          <label className={FORM_LABEL}>Profile Photo</label>
-          <div className="flex items-center gap-4">
-            {profileImageUrl && (
-              <img src={profileImageUrl} alt="Profile" className="w-24 h-24 rounded-full object-cover border border-border" />
-            )}
-            <div>
-              <input
-                ref={profileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0]
-                  if (file) handleProfileImage(file)
-                }}
-                className={FORM_FILE_INPUT}
-              />
-              {uploadingProfile && <p className="text-xs text-accent mt-1">Uploading...</p>}
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <label className={FORM_LABEL}>Hero Image</label>
-          {heroImageUrl && (
-            <img src={heroImageUrl} alt="Hero" className="w-full h-32  object-cover border border-border mb-3" />
-          )}
-          <input
-            ref={heroInputRef}
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0]
-              if (file) handleHeroImage(file)
-            }}
-            className={FORM_FILE_INPUT}
-          />
-          {uploadingHero && <p className="text-xs text-accent mt-1">Uploading...</p>}
-        </div>
-
-        <div className="flex items-center gap-3">
-          <label className="font-medium text-text-secondary text-sm">Published</label>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={published}
-            aria-label="Toggle published status"
-            onClick={() => {
-              setValue('published', !published, { shouldDirty: true })
-            }}
-            className={`w-12 h-6 rounded-full transition-colors relative ${published ? 'bg-accent' : 'bg-border'}`}
-          >
-            <div className={`w-5 h-5 rounded-full bg-white absolute top-0.5 transition-transform ${published ? 'translate-x-6' : 'translate-x-0.5'}`} />
-          </button>
-          <span className="text-xs text-text-secondary">{published ? 'Live' : 'Hidden'}</span>
-        </div>
       </div>
     </form>
   )

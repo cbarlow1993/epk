@@ -67,7 +67,7 @@ export const updateProfile = createServerFn({ method: 'POST' })
     }
 
     // Coerce empty strings to null for nullable text fields
-    for (const key of ['og_title', 'og_description', 'og_image_url']) {
+    for (const key of ['og_title', 'og_description', 'og_image_url', 'hero_image_url']) {
       if (key in sanitized && sanitized[key] === '') {
         sanitized[key] = null
       }
