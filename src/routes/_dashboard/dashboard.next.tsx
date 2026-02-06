@@ -53,9 +53,12 @@ function WhatToDoNext() {
   const initialState = Route.useLoaderData()
   const [state, setState] = useState<ChecklistState>(initialState!)
 
+  const MANUAL_KEYS = new Set<keyof ChecklistState>(['shared_social', 'added_to_bio', 'sent_to_promoter', 'added_to_email_sig', 'included_in_demo'])
+
   const handleToggle = async (key: keyof ChecklistState, checked: boolean) => {
+    if (!MANUAL_KEYS.has(key)) return
     setState((prev) => ({ ...prev, [key]: checked }))
-    const result = await toggleChecklistItem({ data: { key: key as never, checked } })
+    const result = await toggleChecklistItem({ data: { key: key as 'shared_social', checked } })
     if ('error' in result) {
       setState((prev) => ({ ...prev, [key]: !checked }))
     }
@@ -131,7 +134,7 @@ function PhaseCard({
       <button
         type="button"
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between px-6 py-4 text-left"
+        className="w-full flex items-center justify-between px-6 py-4 text-left focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
       >
         <div className="flex items-center gap-3">
           {isFullyComplete ? (
@@ -179,7 +182,7 @@ function PhaseCard({
                   <button
                     type="button"
                     onClick={() => onToggle(item.key, !checked)}
-                    className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded border-2 transition-colors flex items-center justify-center ${
+                    className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded border-2 transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-1 ${
                       checked ? 'bg-accent border-accent' : 'border-border hover:border-accent/50'
                     }`}
                     aria-label={checked ? `Uncheck: ${item.label}` : `Check: ${item.label}`}
