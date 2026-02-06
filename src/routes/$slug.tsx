@@ -16,6 +16,9 @@ export const Route = createFileRoute('/$slug')({
     accent: (search.accent as string) || undefined,
     bg: (search.bg as string) || undefined,
     font: (search.font as string) || undefined,
+    hero: (search.hero as string) || undefined,
+    bioLayout: (search.bioLayout as string) || undefined,
+    sections: (search.sections as string) || undefined,
   }),
   loader: ({ params }) => getPublicProfile({ data: params.slug }),
   head: ({ loaderData }) => {
@@ -25,20 +28,35 @@ export const Route = createFileRoute('/$slug')({
     const fontParam = font.replace(/ /g, '+')
     const tagline = profile?.tagline
     const genres = profile?.genres as string[] | undefined
+    const autoTitle = `${name} | DJ - Official Press Kit`
     const autoDescription = [
       `Official Electronic Press Kit for ${name}.`,
       tagline,
       genres?.length ? genres.join(', ') : null,
     ].filter(Boolean).join(' — ')
-    const description = profile?.meta_description || autoDescription
+
+    const ogTitle = profile?.og_title || autoTitle
+    const ogDescription = profile?.og_description || profile?.meta_description || autoDescription
+    const ogImage = profile?.og_image_url || profile?.profile_image_url || ''
+    const twitterCard = profile?.twitter_card_type || 'summary_large_image'
+    const siteBase = import.meta.env.VITE_SITE_URL || 'https://djepk.com'
+    const ogUrl = profile?.custom_domain
+      ? `https://${profile.custom_domain}`
+      : `${siteBase}/${profile?.slug || ''}`
+
     return {
       meta: [
-        { title: `${name} | DJ - Official Press Kit` },
-        { name: 'description', content: description },
-        { name: 'og:title', content: `${name} | DJ - Official Press Kit` },
-        { name: 'og:description', content: description },
-        { name: 'og:type', content: 'website' },
-        ...(profile?.profile_image_url ? [{ name: 'og:image', content: profile.profile_image_url }] : []),
+        { title: autoTitle },
+        { name: 'description', content: profile?.meta_description || autoDescription },
+        { property: 'og:title', content: ogTitle },
+        { property: 'og:description', content: ogDescription },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:url', content: ogUrl },
+        ...(ogImage ? [{ property: 'og:image', content: ogImage }] : []),
+        { name: 'twitter:card', content: twitterCard },
+        { name: 'twitter:title', content: ogTitle },
+        { name: 'twitter:description', content: ogDescription },
+        ...(ogImage ? [{ name: 'twitter:image', content: ogImage }] : []),
       ],
       links: [
         ...(profile?.favicon_url ? [{ rel: 'icon', href: profile.favicon_url }] : []),
@@ -168,7 +186,16 @@ function PublicEPK() {
 
   const { profile, socialLinks, mixes, events, technicalRider, bookingContact, pressAssets } = data
 
-  const template = getTemplate(profile.template || 'default')
+  const templateConfig = getTemplate(profile.template || 'default')
+
+  // Layout settings from profile (with preview overrides and template fallbacks)
+  const heroStyle = search.hero || profile.hero_style || templateConfig.heroStyle
+  const bioLayout = search.bioLayout || profile.bio_layout || templateConfig.bioLayout
+  const sectionOrder = search.sections
+    ? search.sections.split(',')
+    : profile.section_order || templateConfig.sectionOrder
+  const sectionVisibility = (profile.section_visibility || {}) as Record<string, boolean>
+
   const accent = search.accent || profile.accent_color || '#FF0000'
   const bg = search.bg || profile.bg_color || '#FFFFFF'
   const font = search.font || profile.font_family || 'Instrument Sans'
@@ -267,11 +294,11 @@ function PublicEPK() {
       <main ref={mainRef}>
         {/* Hero */}
         <section className={`relative flex items-center justify-center overflow-hidden ${
-          template.heroStyle === 'fullbleed' ? 'h-screen' :
-          template.heroStyle === 'contained' ? 'h-[60vh]' :
+          heroStyle === 'fullbleed' ? 'h-screen' :
+          heroStyle === 'contained' ? 'h-[60vh]' :
           'py-32'
         }`}>
-          {template.heroStyle !== 'minimal' && (
+          {heroStyle !== 'minimal' && (
             <>
               {profile.hero_image_url ? (
                 <img src={profile.hero_image_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
@@ -328,21 +355,36 @@ function PublicEPK() {
         </section>
 
         {/* Template-ordered sections */}
-        {template.sectionOrder.map((sectionId) => {
+        {(() => {
+          const visibleSections = sectionOrder.filter(
+            (id: string) => sectionVisibility[id] !== false
+          )
+          return visibleSections.map((sectionId: string) => {
           const sectionRenderers: Record<string, React.ReactNode> = {
             bio: profile.bio || profile.short_bio ? (
               <EPKSection key="bio" id="bio" heading="Bio">
-                {profile.short_bio && (
-                  <p className={`text-lg leading-relaxed mb-6 ${textSecClass}`}>{profile.short_bio}</p>
-                )}
-                {profile.bio && (
-                  <BioContent
-                    bio={profile.bio as import('@editorjs/editorjs').OutputData}
-                    proseClass={proseClass}
-                    textSecClass={textSecClass}
-                    accentColor={accent}
-                  />
-                )}
+                <div className={bioLayout === 'two-column' && profile.profile_image_url ? 'grid md:grid-cols-[200px_1fr] gap-8 items-start' : ''}>
+                  {bioLayout === 'two-column' && profile.profile_image_url && (
+                    <img
+                      src={profile.profile_image_url}
+                      alt={profile.display_name || 'Artist'}
+                      className="w-full aspect-square object-cover"
+                    />
+                  )}
+                  <div>
+                    {profile.short_bio && (
+                      <p className={`text-lg leading-relaxed mb-6 ${textSecClass}`}>{profile.short_bio}</p>
+                    )}
+                    {profile.bio && (
+                      <BioContent
+                        bio={profile.bio as import('@editorjs/editorjs').OutputData}
+                        proseClass={proseClass}
+                        textSecClass={textSecClass}
+                        accentColor={accent}
+                      />
+                    )}
+                  </div>
+                </div>
               </EPKSection>
             ) : null,
 
@@ -458,7 +500,8 @@ function PublicEPK() {
             ) : null,
           }
           return sectionRenderers[sectionId] || null
-        })}
+        })
+        })()}
 
         {/* Integration sections */}
         {(() => {
