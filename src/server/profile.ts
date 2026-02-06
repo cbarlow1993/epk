@@ -36,7 +36,6 @@ const ALLOWED_PROFILE_FIELDS = new Set([
   'animate_sections',
   'bio_layout',
   'press_kit_url',
-  'checklist_progress',
   // Theme — Typography
   'theme_display_font',
   'theme_display_size',

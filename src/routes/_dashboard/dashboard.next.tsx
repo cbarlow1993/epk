@@ -51,7 +51,23 @@ const PHASES: { title: string; items: ChecklistItem[] }[] = [
 
 function WhatToDoNext() {
   const initialState = Route.useLoaderData()
-  const [state, setState] = useState<ChecklistState>(initialState!)
+
+  if (!initialState) {
+    return (
+      <div>
+        <div className="mb-8 pb-6 border-b border-border">
+          <h1 className="font-display font-extrabold text-2xl tracking-tight uppercase">What to do next</h1>
+        </div>
+        <p className="text-sm text-text-secondary">Unable to load checklist. Please try refreshing the page.</p>
+      </div>
+    )
+  }
+
+  return <WhatToDoNextContent initialState={initialState} />
+}
+
+function WhatToDoNextContent({ initialState }: { initialState: ChecklistState }) {
+  const [state, setState] = useState<ChecklistState>(initialState)
 
   const MANUAL_KEYS = new Set<keyof ChecklistState>(['shared_social', 'added_to_bio', 'sent_to_promoter', 'added_to_email_sig', 'included_in_demo'])
 

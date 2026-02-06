@@ -89,7 +89,6 @@ export const profileUpdateSchema = z.object({
     url: z.string().url(),
     weight: z.string().max(3),
   })).max(4).optional().nullable(),
-  checklist_progress: z.record(z.string(), z.boolean()).optional(),
 })
 
 export type ProfileUpdate = z.infer<typeof profileUpdateSchema>

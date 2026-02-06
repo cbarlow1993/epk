@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { getCurrentUser } from '~/server/auth'
-import { getChecklistState } from '~/server/checklist'
+import { getChecklistBadge } from '~/server/checklist'
 import { DashboardSidebar } from '~/components/DashboardSidebar'
 
 export const Route = createFileRoute('/_dashboard')({
@@ -10,9 +10,7 @@ export const Route = createFileRoute('/_dashboard')({
       throw redirect({ to: '/login' })
     }
 
-    const checklist = await getChecklistState()
-    const phase1Keys = ['has_display_name', 'has_profile_image', 'has_bio', 'has_hero_image', 'has_mixes', 'has_contact', 'has_socials'] as const
-    const showNextBadge = checklist ? phase1Keys.some((k) => !checklist[k]) : false
+    const showNextBadge = result.profile ? await getChecklistBadge({ data: { profileId: result.profile.id } }) : false
 
     return { user: result.user, profile: result.profile, showNextBadge }
   },
