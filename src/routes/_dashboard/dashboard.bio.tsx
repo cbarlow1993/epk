@@ -14,6 +14,7 @@ import type { OutputData } from '@editorjs/editorjs'
 const bioFormSchema = z.object({
   short_bio: z.string().max(200, 'Max 200 characters').optional(),
   profile_image_url: z.string().url('Invalid URL').optional().or(z.literal('')),
+  bio_layout: z.enum(['two-column', 'single-column']).optional(),
 })
 
 type BioFormValues = z.infer<typeof bioFormSchema>
@@ -37,16 +38,18 @@ function BioEditor() {
     defaultValues: {
       short_bio: initialProfile?.short_bio || '',
       profile_image_url: initialProfile?.profile_image_url || '',
+      bio_layout: (initialProfile?.bio_layout as BioFormValues['bio_layout']) || 'two-column',
     },
   })
 
   const shortBio = watch('short_bio') || ''
   const profileImageUrl = watch('profile_image_url')
+  const bioLayout = watch('bio_layout') || 'two-column'
 
   const handleSave = handleSubmit(async (formData) => {
     if (!editorRef.current) return
     const bio = await editorRef.current.save()
-    await onSave({ ...formData, bio } as Record<string, unknown>)
+    await onSave({ short_bio: formData.short_bio, profile_image_url: formData.profile_image_url, bio_layout: formData.bio_layout, bio } as Record<string, unknown>)
   })
 
   const handleProfileImage = async (file: File) => {
@@ -92,6 +95,26 @@ function BioEditor() {
               />
               {uploadingPhoto && <p className="text-xs text-accent mt-1">Uploading...</p>}
             </div>
+          </div>
+        </div>
+
+        {/* Bio Layout */}
+        <div>
+          <label className={FORM_LABEL}>Bio Layout</label>
+          <p className="text-xs text-text-secondary mb-3">How the bio section appears on your public page</p>
+          <div className="flex gap-4">
+            {(['two-column', 'single-column'] as const).map((layout) => (
+              <label key={layout} className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  value={layout}
+                  checked={bioLayout === layout}
+                  onChange={() => setValue('bio_layout', layout, { shouldDirty: true })}
+                  className="w-4 h-4 accent-accent"
+                />
+                <span className="text-sm">{layout === 'two-column' ? 'Two Column (photo + text)' : 'Single Column'}</span>
+              </label>
+            ))}
           </div>
         </div>
 

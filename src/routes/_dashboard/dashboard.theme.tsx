@@ -31,15 +31,14 @@ function ThemeEditor() {
   const initial = Route.useLoaderData()
   const { saving, saved, error, onSave: save } = useDashboardSave(updateProfile)
 
-  const { register, handleSubmit, watch, formState: { errors, isDirty }, setValue } = useForm<Pick<ProfileUpdate, 'accent_color' | 'bg_color' | 'font_family' | 'template' | 'hero_style' | 'bio_layout' | 'section_order' | 'section_visibility'>>({
-    resolver: zodResolver(profileUpdateSchema.pick({ accent_color: true, bg_color: true, font_family: true, template: true, hero_style: true, bio_layout: true, section_order: true, section_visibility: true }).partial()),
+  const { register, handleSubmit, watch, formState: { errors, isDirty }, setValue } = useForm<Pick<ProfileUpdate, 'accent_color' | 'bg_color' | 'font_family' | 'template' | 'hero_style' | 'section_order' | 'section_visibility'>>({
+    resolver: zodResolver(profileUpdateSchema.pick({ accent_color: true, bg_color: true, font_family: true, template: true, hero_style: true, section_order: true, section_visibility: true }).partial()),
     defaultValues: {
       accent_color: initial?.accent_color || '#3b82f6',
       bg_color: initial?.bg_color || '#0a0a0f',
       font_family: initial?.font_family || 'Inter',
       template: (initial?.template as ProfileUpdate['template']) || 'default',
       hero_style: (initial?.hero_style as ProfileUpdate['hero_style']) || 'fullbleed',
-      bio_layout: (initial?.bio_layout as ProfileUpdate['bio_layout']) || 'two-column',
       section_order: initial?.section_order || ['bio', 'music', 'events', 'technical', 'press', 'contact'],
       section_visibility: (initial?.section_visibility as Record<string, boolean>) || {},
     },
@@ -52,7 +51,6 @@ function ThemeEditor() {
   const bgColor = watch('bg_color') || '#0a0a0f'
   const fontFamily = watch('font_family') || 'Inter'
   const heroStyle = watch('hero_style') || 'fullbleed'
-  const bioLayout = watch('bio_layout') || 'two-column'
   const sectionOrder = watch('section_order') || ['bio', 'music', 'events', 'technical', 'press', 'contact']
   const sectionVisibility = watch('section_visibility') || {}
 
@@ -76,7 +74,6 @@ function ThemeEditor() {
                 setValue('bg_color', tpl.defaults.bg_color, { shouldDirty: true })
                 setValue('font_family', tpl.defaults.font_family, { shouldDirty: true })
                 setValue('hero_style', tpl.heroStyle, { shouldDirty: true })
-                setValue('bio_layout', tpl.bioLayout, { shouldDirty: true })
                 setValue('section_order', tpl.sectionOrder, { shouldDirty: true })
                 setValue('section_visibility', {}, { shouldDirty: true })
               }}
@@ -147,7 +144,7 @@ function ThemeEditor() {
           {previewUrl ? (
             <div className="border border-border overflow-hidden bg-white h-[70vh]">
               <iframe
-                src={`${previewUrl}?preview=true&accent=${encodeURIComponent(accentColor)}&bg=${encodeURIComponent(bgColor)}&font=${encodeURIComponent(fontFamily)}&hero=${heroStyle}&bioLayout=${bioLayout}&sections=${sectionOrder.filter(s => sectionVisibility[s] !== false).join(',')}`}
+                src={`${previewUrl}?preview=true&accent=${encodeURIComponent(accentColor)}&bg=${encodeURIComponent(bgColor)}&font=${encodeURIComponent(fontFamily)}&hero=${heroStyle}&sections=${sectionOrder.filter(s => sectionVisibility[s] !== false).join(',')}`}
                 className="w-full h-full"
                 title="EPK Preview"
               />
@@ -164,7 +161,7 @@ function ThemeEditor() {
       <div className="mt-8 border-t border-border pt-8">
         <h2 className="text-sm uppercase tracking-widest font-bold mb-6">Layout</h2>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 gap-8">
           {/* Hero Style */}
           <div>
             <label className={FORM_LABEL}>Hero Style</label>
@@ -184,27 +181,8 @@ function ThemeEditor() {
             </div>
           </div>
 
-          {/* Bio Layout */}
-          <div>
-            <label className={FORM_LABEL}>Bio Layout</label>
-            <div className="space-y-2">
-              {(['two-column', 'single-column'] as const).map((layout) => (
-                <label key={layout} className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="radio"
-                    value={layout}
-                    checked={bioLayout === layout}
-                    onChange={() => setValue('bio_layout', layout, { shouldDirty: true })}
-                    className="w-4 h-4 accent-accent"
-                  />
-                  <span className="text-sm">{layout === 'two-column' ? 'Two Column' : 'Single Column'}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
           {/* Section Order */}
-          <div className="md:col-span-2 lg:col-span-1">
+          <div>
             <label className={FORM_LABEL}>Section Order</label>
             <SortableSectionList
               order={sectionOrder}
