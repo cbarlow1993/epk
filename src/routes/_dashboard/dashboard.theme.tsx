@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { z } from 'zod'
 import { getProfile, updateProfile } from '~/server/profile'
 import { profileUpdateSchema, type ProfileUpdate } from '~/schemas/profile'
-import { FormColorInput, FontPicker, FORM_LABEL } from '~/components/forms'
+import { FormColorInput, FontPicker, FORM_LABEL, FORM_FILE_INPUT } from '~/components/forms'
 import { useDashboardSave } from '~/hooks/useDashboardSave'
 import { DashboardHeader } from '~/components/DashboardHeader'
 import { Accordion } from '~/components/Accordion'
@@ -257,6 +257,112 @@ function ColorField({
         >
           Reset to default
         </button>
+      )}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Font upload section — extracted as standalone component
+// ---------------------------------------------------------------------------
+
+type CustomFont = { name: string; url: string; weight: string }
+
+function FontUploadSection({
+  customFonts,
+  onAddFont,
+  onRemoveFont,
+}: {
+  customFonts: CustomFont[]
+  onAddFont: (font: CustomFont) => void
+  onRemoveFont: (index: number) => void
+}) {
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState('')
+
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (customFonts.length >= 4) {
+      setUploadError('Maximum 4 custom fonts allowed')
+      return
+    }
+
+    setUploading(true)
+    setUploadError('')
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const res = await fetch('/api/upload-font', { method: 'POST', body: formData })
+      const result = await res.json()
+
+      if (!result.success) {
+        setUploadError(result.message || 'Upload failed')
+      } else {
+        const fontName = file.name.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ')
+        onAddFont({ name: fontName, url: result.file.url, weight: '400' })
+      }
+    } catch {
+      setUploadError('Upload failed. Please try again.')
+    }
+
+    setUploading(false)
+    e.target.value = ''
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <label className={FORM_LABEL}>Upload Font</label>
+        <span className="text-[10px] text-text-secondary">
+          {customFonts.length} of 4 slots used
+        </span>
+      </div>
+
+      <input
+        type="file"
+        accept=".woff2,.woff,.ttf,.otf"
+        onChange={handleUpload}
+        disabled={uploading || customFonts.length >= 4}
+        className={FORM_FILE_INPUT}
+      />
+
+      {uploading && (
+        <p className="text-xs text-text-secondary">Uploading...</p>
+      )}
+      {uploadError && (
+        <p className="text-xs text-red-500">{uploadError}</p>
+      )}
+
+      {customFonts.length > 0 && (
+        <div className="space-y-2 mt-3">
+          {customFonts.map((font, i) => (
+            <div key={i} className="flex items-center justify-between border border-border p-3">
+              <div className="flex items-center gap-3">
+                <span
+                  className="text-lg font-medium"
+                  style={{ fontFamily: `'${font.name}', sans-serif` }}
+                >
+                  Aa
+                </span>
+                <div>
+                  <p className="text-sm font-medium text-text-primary">{font.name}</p>
+                  <p className="text-[10px] text-text-secondary">Weight: {font.weight}</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => onRemoveFont(i)}
+                className="text-xs text-red-500 hover:text-red-700 font-semibold uppercase tracking-wider"
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   )
@@ -644,6 +750,26 @@ function ThemeEditor() {
               onChange={(v) => setValue('theme_divider_style', v as ProfileUpdate['theme_divider_style'], { shouldDirty: true })}
             />
           </div>
+        </ProGate>
+      ),
+    },
+    {
+      id: 'fonts',
+      title: 'Custom Fonts',
+      badge: proBadge,
+      children: (
+        <ProGate isPro={isPro} feature="Custom Font Uploads">
+          <FontUploadSection
+            customFonts={customFonts || []}
+            onAddFont={(font) => {
+              const current = customFonts || []
+              setValue('theme_custom_fonts', [...current, font], { shouldDirty: true })
+            }}
+            onRemoveFont={(index) => {
+              const current = customFonts || []
+              setValue('theme_custom_fonts', current.filter((_, i) => i !== index), { shouldDirty: true })
+            }}
+          />
         </ProGate>
       ),
     },
