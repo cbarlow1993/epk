@@ -28,9 +28,37 @@ export interface ProfileRow {
   hide_platform_branding: boolean
   meta_description: string | null
   template: string
+  section_order: string[] | null
+  section_visibility: Record<string, boolean> | null
+  hero_style: 'fullbleed' | 'contained' | 'minimal' | null
+  bio_layout: 'two-column' | 'single-column' | null
+  og_title: string | null
+  og_description: string | null
+  og_image_url: string | null
+  twitter_card_type: 'summary' | 'summary_large_image' | null
   organization_id: string | null
   managed_by: string | null
   created_at: string
+}
+
+export interface DomainOrderRow {
+  id: string
+  profile_id: string
+  domain: string
+  status: 'pending_payment' | 'purchasing' | 'active' | 'renewal_failed' | 'failed' | 'cancelled'
+  vercel_purchase_price: number
+  vercel_renewal_price: number
+  service_fee: number
+  years: number
+  stripe_checkout_session_id: string | null
+  stripe_subscription_id: string | null
+  vercel_order_id: string | null
+  contact_info: Record<string, string> | null
+  purchased_at: string | null
+  expires_at: string | null
+  last_renewed_at: string | null
+  created_at: string
+  updated_at: string
 }
 
 export interface MixRow {
