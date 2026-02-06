@@ -455,7 +455,7 @@ function PublicEPK() {
 
             technical: technicalRider && (technicalRider.deck_model || technicalRider.mixer_model || technicalRider.monitor_type || technicalRider.additional_notes) ? (
               <EPKSection key="technical" id="technical" heading="Technical Rider">
-                <div className={`${cardBgClass} backdrop-blur-sm border ${borderClass} overflow-hidden max-w-4xl`}>
+                <div className={`${cardBgClass} backdrop-blur-sm border ${borderClass} overflow-hidden max-w-4xl mx-auto`}>
                   <dl className="divide-y divide-current/5">
                     {technicalRider.deck_model && (
                       <div className="px-6 py-4 flex justify-between items-baseline">
