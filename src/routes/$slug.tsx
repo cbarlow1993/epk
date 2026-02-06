@@ -6,7 +6,7 @@ import { sanitize, sanitizeEmbed } from '~/utils/sanitize'
 import { BlockRenderer } from '~/components/BlockRenderer'
 import { EPKSection } from '~/components/EPKSection'
 import { Analytics, trackSectionView } from '~/components/Analytics'
-import { getTemplate } from '~/utils/templates'
+import { getTemplate, resolveTheme } from '~/utils/templates'
 import { isLightBackground } from '~/utils/color'
 import type { MixRow, EventRow, SocialLinkRow, FileRow } from '~/types/database'
 
@@ -26,8 +26,18 @@ export const Route = createFileRoute('/$slug')({
   head: ({ loaderData }) => {
     const profile = loaderData?.profile
     const name = profile?.display_name || 'DJ'
-    const font = profile?.font_family || 'Instrument Sans'
-    const fontParam = font.replace(/ /g, '+')
+    const templateConfig = getTemplate(profile?.template || 'default')
+    const theme = resolveTheme(profile as Record<string, unknown> || {}, templateConfig)
+
+    // Collect unique Google Fonts from all tiers
+    const customFontNames = new Set(
+      ((profile?.theme_custom_fonts as Array<{name: string}>) || []).map(f => f.name)
+    )
+    const googleFonts = new Set<string>()
+    for (const font of [theme.displayFont, theme.headingFont, theme.subheadingFont, theme.bodyFont]) {
+      if (!customFontNames.has(font)) googleFonts.add(font)
+    }
+    const fontParam = [...googleFonts].map(f => `family=${f.replace(/ /g, '+')}:wght@300;400;500;600;700;800;900`).join('&')
     const tagline = profile?.tagline
     const genres = profile?.genres as string[] | undefined
     const autoTitle = `${name} | DJ - Official Press Kit`
@@ -66,7 +76,7 @@ export const Route = createFileRoute('/$slug')({
       links: [
         ...(profile?.favicon_url ? [{ rel: 'icon', href: profile.favicon_url }] : []),
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-        { rel: 'stylesheet', href: `https://fonts.googleapis.com/css2?family=${fontParam}:wght@400;700;900&display=swap` },
+        { rel: 'stylesheet', href: `https://fonts.googleapis.com/css2?${fontParam}&display=swap` },
       ],
     }
   },
@@ -193,8 +203,17 @@ function PublicEPK() {
   const photos = (rawPhotos || []) as PhotoRow[]
 
   const templateConfig = getTemplate(profile.template || 'default')
+  const theme = resolveTheme(
+    profile as Record<string, unknown>,
+    templateConfig,
+    {
+      accent_color: search.accent,
+      bg_color: search.bg,
+      theme_display_font: search.font, // backward compat: search.font maps to display font
+      theme_body_font: search.font,
+    } as Record<string, string | undefined>
+  )
 
-  // Layout settings from profile (with preview overrides and template fallbacks)
   const heroStyle = search.hero || profile.hero_style || templateConfig.heroStyle
   const bioLayout = search.bioLayout || profile.bio_layout || templateConfig.bioLayout
   const sectionOrder = search.sections
@@ -203,9 +222,8 @@ function PublicEPK() {
   const sectionVisibility = (profile.section_visibility || {}) as Record<string, boolean>
   const animateSections = profile.animate_sections !== false
 
-  const accent = search.accent || profile.accent_color || '#FF0000'
-  const bg = search.bg || profile.bg_color || '#FFFFFF'
-  const font = search.font || profile.font_family || 'Instrument Sans'
+  const accent = theme.accent
+  const bg = theme.bg
   const name = profile.display_name || 'DJ'
   const isLight = isLightBackground(bg)
 
@@ -291,13 +309,49 @@ function PublicEPK() {
   return (
     <div
       style={{
-        '--color-accent': accent,
-        '--font-display': `'${font}', sans-serif`,
+        '--color-accent': theme.accent,
+        '--theme-display-font': `'${theme.displayFont}', sans-serif`,
+        '--theme-display-size': theme.displaySize,
+        '--theme-display-weight': theme.displayWeight,
+        '--theme-heading-font': `'${theme.headingFont}', sans-serif`,
+        '--theme-heading-size': theme.headingSize,
+        '--theme-heading-weight': theme.headingWeight,
+        '--theme-subheading-font': `'${theme.subheadingFont}', sans-serif`,
+        '--theme-subheading-size': theme.subheadingSize,
+        '--theme-subheading-weight': theme.subheadingWeight,
+        '--theme-body-font': `'${theme.bodyFont}', sans-serif`,
+        '--theme-body-size': theme.bodySize,
+        '--theme-body-weight': theme.bodyWeight,
+        '--theme-text-color': theme.textColor,
+        '--theme-heading-color': theme.headingColor,
+        '--theme-link-color': theme.linkColor,
+        '--theme-card-bg': theme.cardBg,
+        '--theme-border-color': theme.borderColor,
+        '--theme-section-padding': theme.sectionPaddingCss,
+        '--theme-content-width': theme.contentWidthCss,
+        '--theme-card-radius': theme.cardRadiusCss,
+        '--theme-element-gap': theme.elementGapCss,
+        '--theme-button-radius': theme.buttonRadiusCss,
+        '--theme-shadow': theme.shadowCss,
+        '--theme-border-width': theme.borderWidthCss,
         backgroundColor: bg,
-        fontFamily: `'${font}', sans-serif`,
+        fontFamily: `'${theme.bodyFont}', sans-serif`,
+        fontSize: theme.bodySize,
+        fontWeight: theme.bodyWeight,
+        color: theme.textColor,
       } as React.CSSProperties}
-      className={`min-h-screen ${textClass}`}
+      className="min-h-screen"
     >
+      {profile.theme_custom_fonts && (profile.theme_custom_fonts as Array<{name: string; url: string; weight: string}>).length > 0 && (
+        <style dangerouslySetInnerHTML={{ __html: (profile.theme_custom_fonts as Array<{name: string; url: string; weight: string}>).map(f => `
+          @font-face {
+            font-family: '${f.name}';
+            src: url('${f.url}') format('${f.url.endsWith('.woff2') ? 'woff2' : f.url.endsWith('.woff') ? 'woff' : f.url.endsWith('.otf') ? 'opentype' : 'truetype'}');
+            font-weight: ${f.weight};
+            font-display: swap;
+          }
+        `).join('\n') }} />
+      )}
       <Analytics slug={profile.slug as string} />
       <Nav displayName={name} sections={navSections} />
       <main ref={mainRef}>
@@ -339,7 +393,14 @@ function PublicEPK() {
           )}
           <div className="relative z-10 text-center">
             {/* Hero text is always light when there's a media overlay */}
-            <h1 className={`text-6xl md:text-8xl font-bold tracking-tight mb-2 ${profile.hero_image_url || profile.hero_video_url ? 'text-white' : ''}`}>
+            <h1
+              className={`font-bold tracking-tight mb-2 ${profile.hero_image_url || profile.hero_video_url ? 'text-white' : ''}`}
+              style={{
+                fontFamily: `var(--theme-display-font)`,
+                fontSize: `var(--theme-display-size)`,
+                fontWeight: `var(--theme-display-weight)`,
+              }}
+            >
               {profile.display_name || 'DJ'}
             </h1>
             {profile.tagline && (

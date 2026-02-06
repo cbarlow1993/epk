@@ -12,8 +12,8 @@ interface EPKSectionProps {
 export function EPKSection({ id, heading, maxWidth = 'max-w-6xl', children, animate = true }: EPKSectionProps) {
   return (
     <FadeIn enabled={animate}>
-      <section id={id} className="py-20 px-4">
-        <div className={`${maxWidth} mx-auto`}>
+      <section id={id} style={{ paddingBlock: 'var(--theme-section-padding, 5rem)' }} className="px-4">
+        <div style={{ maxWidth: 'var(--theme-content-width, 72rem)' }} className="mx-auto">
           <SectionHeading>{heading}</SectionHeading>
           {children}
         </div>
