@@ -11,7 +11,7 @@ import { ReorderButtons } from '~/components/ReorderButtons'
 import { useListEditor } from '~/hooks/useListEditor'
 import { useSectionToggle } from '~/hooks/useSectionToggle'
 import { uploadFileFromInput } from '~/utils/upload'
-import { BTN_PRIMARY, BTN_DELETE } from '~/components/forms/styles'
+import { BTN_PRIMARY } from '~/components/forms/styles'
 
 type PhotoRow = { id: string; image_url: string; caption: string | null; sort_order: number }
 
@@ -140,11 +140,13 @@ function PhotosEditor() {
                 </div>
               )}
               <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+{handleReorder && (
                 <ReorderButtons
                   index={index}
                   total={photos.length}
-                  onReorder={handleReorder!}
+                  onReorder={handleReorder}
                 />
+              )}
                 <button
                   type="button"
                   onClick={() => openModal(photo)}

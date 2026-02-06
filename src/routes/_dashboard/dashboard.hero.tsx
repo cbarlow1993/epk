@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { z } from 'zod'
 import { createFileRoute } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -9,8 +10,8 @@ import { useDashboardSave } from '~/hooks/useDashboardSave'
 import { DashboardHeader } from '~/components/DashboardHeader'
 import { uploadFileFromInput } from '~/utils/upload'
 
-const heroFormSchema = profileUpdateSchema.pick({ hero_image_url: true, hero_video_url: true, hero_style: true, tagline: true })
-type HeroFormValues = Pick<ProfileUpdate, 'hero_image_url' | 'hero_video_url' | 'hero_style' | 'tagline'>
+const heroFormSchema = profileUpdateSchema.pick({ hero_image_url: true, hero_video_url: true, hero_style: true, tagline: true }).partial()
+type HeroFormValues = z.infer<typeof heroFormSchema>
 
 export const Route = createFileRoute('/_dashboard/dashboard/hero')({
   loader: () => getProfile(),
@@ -48,7 +49,7 @@ function HeroEditor() {
   const videoInputRef = useRef<HTMLInputElement>(null)
 
   const { register, handleSubmit, watch, formState: { errors, isDirty }, setValue } = useForm<HeroFormValues>({
-    resolver: zodResolver(heroFormSchema.partial()) as never,
+    resolver: zodResolver(heroFormSchema),
     defaultValues: {
       hero_image_url: initialProfile?.hero_image_url || '',
       hero_video_url: initialProfile?.hero_video_url || '',

@@ -318,14 +318,14 @@ function PublicEPK() {
                     muted
                     loop
                     playsInline
-                    className="absolute inset-0 w-full h-full object-cover hidden md:block motion-safe:block motion-reduce:hidden"
+                    className="absolute inset-0 w-full h-full object-cover hidden md:motion-safe:block"
                   />
                   {/* Fallback image for mobile / reduced-motion */}
                   {profile.hero_image_url && (
                     <img
                       src={profile.hero_image_url}
                       alt=""
-                      className="absolute inset-0 w-full h-full object-cover md:hidden motion-reduce:block"
+                      className="absolute inset-0 w-full h-full object-cover md:motion-reduce:block md:motion-safe:hidden"
                     />
                   )}
                 </>
@@ -338,12 +338,12 @@ function PublicEPK() {
             </>
           )}
           <div className="relative z-10 text-center">
-            {/* Hero text is always light when there's an image overlay */}
-            <h1 className={`text-6xl md:text-8xl font-bold tracking-tight mb-2 ${profile.hero_image_url ? 'text-white' : ''}`}>
+            {/* Hero text is always light when there's a media overlay */}
+            <h1 className={`text-6xl md:text-8xl font-bold tracking-tight mb-2 ${profile.hero_image_url || profile.hero_video_url ? 'text-white' : ''}`}>
               {profile.display_name || 'DJ'}
             </h1>
             {profile.tagline && (
-              <p className={`text-lg md:text-xl mb-8 ${profile.hero_image_url ? 'text-white/70' : textSecClass}`}>
+              <p className={`text-lg md:text-xl mb-8 ${profile.hero_image_url || profile.hero_video_url ? 'text-white/70' : textSecClass}`}>
                 {profile.tagline}
               </p>
             )}
@@ -357,7 +357,7 @@ function PublicEPK() {
               </div>
             )}
             {(profile.bpm_min || profile.bpm_max) && (
-              <p className={`text-sm mt-3 ${profile.hero_image_url ? 'text-white/50' : textSecClass}`}>
+              <p className={`text-sm mt-3 ${profile.hero_image_url || profile.hero_video_url ? 'text-white/50' : textSecClass}`}>
                 {profile.bpm_min && profile.bpm_max
                   ? `${profile.bpm_min}\u2013${profile.bpm_max} BPM`
                   : profile.bpm_min ? `${profile.bpm_min}+ BPM` : `Up to ${profile.bpm_max} BPM`}
@@ -373,7 +373,7 @@ function PublicEPK() {
                     rel="noopener noreferrer"
                     title={link.platform}
                     aria-label={`${link.platform} profile`}
-                    className={`w-10 h-10 rounded-full border ${profile.hero_image_url ? 'border-white/20 hover:border-accent hover:text-accent' : `${socialBorderClass} hover:border-accent hover:text-accent`} flex items-center justify-center text-sm font-semibold transition-colors`}
+                    className={`w-10 h-10 rounded-full border ${profile.hero_image_url || profile.hero_video_url ? 'border-white/20 hover:border-accent hover:text-accent' : `${socialBorderClass} hover:border-accent hover:text-accent`} flex items-center justify-center text-sm font-semibold transition-colors`}
                   >
                     {link.platform.charAt(0)}
                   </a>
@@ -674,7 +674,7 @@ function PublicEPK() {
           tabIndex={0}
           role="dialog"
           aria-modal="true"
-          ref={(el) => el?.focus()}
+          ref={(el) => { if (el) el.focus() }}
         >
           {/* Close button */}
           <button
@@ -719,7 +719,7 @@ function PublicEPK() {
                 {photos[lightboxIndex].caption}
               </p>
             )}
-            <p className="text-white/40 text-xs mt-2">
+            <p className="text-white/40 text-xs mt-2" aria-live="polite">
               {lightboxIndex + 1} / {photos.length}
             </p>
           </div>
