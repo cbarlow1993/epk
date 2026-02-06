@@ -14,10 +14,13 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as BlogRouteImport } from './routes/blog'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as InviteTokenRouteImport } from './routes/invite/$token'
+import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as AgencyOrgSlugRouteImport } from './routes/agency/$orgSlug'
 import { Route as DashboardDashboardRouteImport } from './routes/_dashboard/dashboard'
 import { Route as DashboardDashboardIndexRouteImport } from './routes/_dashboard/dashboard.index'
@@ -29,7 +32,9 @@ import { Route as DashboardDashboardSocialPreviewRouteImport } from './routes/_d
 import { Route as DashboardDashboardSettingsRouteImport } from './routes/_dashboard/dashboard.settings'
 import { Route as DashboardDashboardRosterRouteImport } from './routes/_dashboard/dashboard.roster'
 import { Route as DashboardDashboardPressRouteImport } from './routes/_dashboard/dashboard.press'
+import { Route as DashboardDashboardPhotosRouteImport } from './routes/_dashboard/dashboard.photos'
 import { Route as DashboardDashboardPagesRouteImport } from './routes/_dashboard/dashboard.pages'
+import { Route as DashboardDashboardNextRouteImport } from './routes/_dashboard/dashboard.next'
 import { Route as DashboardDashboardMusicRouteImport } from './routes/_dashboard/dashboard.music'
 import { Route as DashboardDashboardIntegrationsRouteImport } from './routes/_dashboard/dashboard.integrations'
 import { Route as DashboardDashboardHeroRouteImport } from './routes/_dashboard/dashboard.hero'
@@ -66,6 +71,11 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/_dashboard',
   getParentRoute: () => rootRouteImport,
@@ -80,10 +90,20 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => BlogRoute,
+} as any)
 const InviteTokenRoute = InviteTokenRouteImport.update({
   id: '/invite/$token',
   path: '/invite/$token',
   getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => BlogRoute,
 } as any)
 const AgencyOrgSlugRoute = AgencyOrgSlugRouteImport.update({
   id: '/agency/$orgSlug',
@@ -145,9 +165,20 @@ const DashboardDashboardPressRoute = DashboardDashboardPressRouteImport.update({
   path: '/press',
   getParentRoute: () => DashboardDashboardRoute,
 } as any)
+const DashboardDashboardPhotosRoute =
+  DashboardDashboardPhotosRouteImport.update({
+    id: '/photos',
+    path: '/photos',
+    getParentRoute: () => DashboardDashboardRoute,
+  } as any)
 const DashboardDashboardPagesRoute = DashboardDashboardPagesRouteImport.update({
   id: '/pages',
   path: '/pages',
+  getParentRoute: () => DashboardDashboardRoute,
+} as any)
+const DashboardDashboardNextRoute = DashboardDashboardNextRouteImport.update({
+  id: '/next',
+  path: '/next',
   getParentRoute: () => DashboardDashboardRoute,
 } as any)
 const DashboardDashboardMusicRoute = DashboardDashboardMusicRouteImport.update({
@@ -210,6 +241,7 @@ const DashboardDashboardAnalyticsRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$slug': typeof SlugRoute
+  '/blog': typeof BlogRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
@@ -217,7 +249,9 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/dashboard': typeof DashboardDashboardRouteWithChildren
   '/agency/$orgSlug': typeof AgencyOrgSlugRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/blog/': typeof BlogIndexRoute
   '/dashboard/analytics': typeof DashboardDashboardAnalyticsRoute
   '/dashboard/analytics-overview': typeof DashboardDashboardAnalyticsOverviewRoute
   '/dashboard/billing': typeof DashboardDashboardBillingRoute
@@ -228,7 +262,9 @@ export interface FileRoutesByFullPath {
   '/dashboard/hero': typeof DashboardDashboardHeroRoute
   '/dashboard/integrations': typeof DashboardDashboardIntegrationsRoute
   '/dashboard/music': typeof DashboardDashboardMusicRoute
+  '/dashboard/next': typeof DashboardDashboardNextRoute
   '/dashboard/pages': typeof DashboardDashboardPagesRoute
+  '/dashboard/photos': typeof DashboardDashboardPhotosRoute
   '/dashboard/press': typeof DashboardDashboardPressRoute
   '/dashboard/roster': typeof DashboardDashboardRosterRoute
   '/dashboard/settings': typeof DashboardDashboardSettingsRoute
@@ -248,7 +284,9 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/agency/$orgSlug': typeof AgencyOrgSlugRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/blog': typeof BlogIndexRoute
   '/dashboard/analytics': typeof DashboardDashboardAnalyticsRoute
   '/dashboard/analytics-overview': typeof DashboardDashboardAnalyticsOverviewRoute
   '/dashboard/billing': typeof DashboardDashboardBillingRoute
@@ -259,7 +297,9 @@ export interface FileRoutesByTo {
   '/dashboard/hero': typeof DashboardDashboardHeroRoute
   '/dashboard/integrations': typeof DashboardDashboardIntegrationsRoute
   '/dashboard/music': typeof DashboardDashboardMusicRoute
+  '/dashboard/next': typeof DashboardDashboardNextRoute
   '/dashboard/pages': typeof DashboardDashboardPagesRoute
+  '/dashboard/photos': typeof DashboardDashboardPhotosRoute
   '/dashboard/press': typeof DashboardDashboardPressRoute
   '/dashboard/roster': typeof DashboardDashboardRosterRoute
   '/dashboard/settings': typeof DashboardDashboardSettingsRoute
@@ -275,6 +315,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$slug': typeof SlugRoute
   '/_dashboard': typeof DashboardRouteWithChildren
+  '/blog': typeof BlogRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
@@ -282,7 +323,9 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/_dashboard/dashboard': typeof DashboardDashboardRouteWithChildren
   '/agency/$orgSlug': typeof AgencyOrgSlugRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/blog/': typeof BlogIndexRoute
   '/_dashboard/dashboard/analytics': typeof DashboardDashboardAnalyticsRoute
   '/_dashboard/dashboard/analytics-overview': typeof DashboardDashboardAnalyticsOverviewRoute
   '/_dashboard/dashboard/billing': typeof DashboardDashboardBillingRoute
@@ -293,7 +336,9 @@ export interface FileRoutesById {
   '/_dashboard/dashboard/hero': typeof DashboardDashboardHeroRoute
   '/_dashboard/dashboard/integrations': typeof DashboardDashboardIntegrationsRoute
   '/_dashboard/dashboard/music': typeof DashboardDashboardMusicRoute
+  '/_dashboard/dashboard/next': typeof DashboardDashboardNextRoute
   '/_dashboard/dashboard/pages': typeof DashboardDashboardPagesRoute
+  '/_dashboard/dashboard/photos': typeof DashboardDashboardPhotosRoute
   '/_dashboard/dashboard/press': typeof DashboardDashboardPressRoute
   '/_dashboard/dashboard/roster': typeof DashboardDashboardRosterRoute
   '/_dashboard/dashboard/settings': typeof DashboardDashboardSettingsRoute
@@ -309,6 +354,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$slug'
+    | '/blog'
     | '/forgot-password'
     | '/login'
     | '/onboarding'
@@ -316,7 +362,9 @@ export interface FileRouteTypes {
     | '/signup'
     | '/dashboard'
     | '/agency/$orgSlug'
+    | '/blog/$slug'
     | '/invite/$token'
+    | '/blog/'
     | '/dashboard/analytics'
     | '/dashboard/analytics-overview'
     | '/dashboard/billing'
@@ -327,7 +375,9 @@ export interface FileRouteTypes {
     | '/dashboard/hero'
     | '/dashboard/integrations'
     | '/dashboard/music'
+    | '/dashboard/next'
     | '/dashboard/pages'
+    | '/dashboard/photos'
     | '/dashboard/press'
     | '/dashboard/roster'
     | '/dashboard/settings'
@@ -347,7 +397,9 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/agency/$orgSlug'
+    | '/blog/$slug'
     | '/invite/$token'
+    | '/blog'
     | '/dashboard/analytics'
     | '/dashboard/analytics-overview'
     | '/dashboard/billing'
@@ -358,7 +410,9 @@ export interface FileRouteTypes {
     | '/dashboard/hero'
     | '/dashboard/integrations'
     | '/dashboard/music'
+    | '/dashboard/next'
     | '/dashboard/pages'
+    | '/dashboard/photos'
     | '/dashboard/press'
     | '/dashboard/roster'
     | '/dashboard/settings'
@@ -373,6 +427,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$slug'
     | '/_dashboard'
+    | '/blog'
     | '/forgot-password'
     | '/login'
     | '/onboarding'
@@ -380,7 +435,9 @@ export interface FileRouteTypes {
     | '/signup'
     | '/_dashboard/dashboard'
     | '/agency/$orgSlug'
+    | '/blog/$slug'
     | '/invite/$token'
+    | '/blog/'
     | '/_dashboard/dashboard/analytics'
     | '/_dashboard/dashboard/analytics-overview'
     | '/_dashboard/dashboard/billing'
@@ -391,7 +448,9 @@ export interface FileRouteTypes {
     | '/_dashboard/dashboard/hero'
     | '/_dashboard/dashboard/integrations'
     | '/_dashboard/dashboard/music'
+    | '/_dashboard/dashboard/next'
     | '/_dashboard/dashboard/pages'
+    | '/_dashboard/dashboard/photos'
     | '/_dashboard/dashboard/press'
     | '/_dashboard/dashboard/roster'
     | '/_dashboard/dashboard/settings'
@@ -407,6 +466,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SlugRoute: typeof SlugRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  BlogRoute: typeof BlogRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
@@ -453,6 +513,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_dashboard': {
       id: '/_dashboard'
       path: ''
@@ -474,12 +541,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/': {
+      id: '/blog/'
+      path: '/'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof BlogRoute
+    }
     '/invite/$token': {
       id: '/invite/$token'
       path: '/invite/$token'
       fullPath: '/invite/$token'
       preLoaderRoute: typeof InviteTokenRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof BlogRoute
     }
     '/agency/$orgSlug': {
       id: '/agency/$orgSlug'
@@ -558,11 +639,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardPressRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
+    '/_dashboard/dashboard/photos': {
+      id: '/_dashboard/dashboard/photos'
+      path: '/photos'
+      fullPath: '/dashboard/photos'
+      preLoaderRoute: typeof DashboardDashboardPhotosRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
     '/_dashboard/dashboard/pages': {
       id: '/_dashboard/dashboard/pages'
       path: '/pages'
       fullPath: '/dashboard/pages'
       preLoaderRoute: typeof DashboardDashboardPagesRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
+    '/_dashboard/dashboard/next': {
+      id: '/_dashboard/dashboard/next'
+      path: '/next'
+      fullPath: '/dashboard/next'
+      preLoaderRoute: typeof DashboardDashboardNextRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
     '/_dashboard/dashboard/music': {
@@ -649,7 +744,9 @@ interface DashboardDashboardRouteChildren {
   DashboardDashboardHeroRoute: typeof DashboardDashboardHeroRoute
   DashboardDashboardIntegrationsRoute: typeof DashboardDashboardIntegrationsRoute
   DashboardDashboardMusicRoute: typeof DashboardDashboardMusicRoute
+  DashboardDashboardNextRoute: typeof DashboardDashboardNextRoute
   DashboardDashboardPagesRoute: typeof DashboardDashboardPagesRoute
+  DashboardDashboardPhotosRoute: typeof DashboardDashboardPhotosRoute
   DashboardDashboardPressRoute: typeof DashboardDashboardPressRoute
   DashboardDashboardRosterRoute: typeof DashboardDashboardRosterRoute
   DashboardDashboardSettingsRoute: typeof DashboardDashboardSettingsRoute
@@ -673,7 +770,9 @@ const DashboardDashboardRouteChildren: DashboardDashboardRouteChildren = {
   DashboardDashboardHeroRoute: DashboardDashboardHeroRoute,
   DashboardDashboardIntegrationsRoute: DashboardDashboardIntegrationsRoute,
   DashboardDashboardMusicRoute: DashboardDashboardMusicRoute,
+  DashboardDashboardNextRoute: DashboardDashboardNextRoute,
   DashboardDashboardPagesRoute: DashboardDashboardPagesRoute,
+  DashboardDashboardPhotosRoute: DashboardDashboardPhotosRoute,
   DashboardDashboardPressRoute: DashboardDashboardPressRoute,
   DashboardDashboardRosterRoute: DashboardDashboardRosterRoute,
   DashboardDashboardSettingsRoute: DashboardDashboardSettingsRoute,
@@ -700,10 +799,23 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
   DashboardRouteChildren,
 )
 
+interface BlogRouteChildren {
+  BlogSlugRoute: typeof BlogSlugRoute
+  BlogIndexRoute: typeof BlogIndexRoute
+}
+
+const BlogRouteChildren: BlogRouteChildren = {
+  BlogSlugRoute: BlogSlugRoute,
+  BlogIndexRoute: BlogIndexRoute,
+}
+
+const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SlugRoute: SlugRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  BlogRoute: BlogRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,

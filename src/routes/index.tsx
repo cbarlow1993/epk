@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useEffect, useRef } from 'react'
+import { BLOG_POSTS } from '~/data/blog-posts'
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
@@ -77,6 +78,7 @@ function LandingPage() {
           <div className="flex items-center gap-8">
             <a href="#features" className="hidden sm:inline text-xs font-medium uppercase tracking-wider hover:text-accent transition-colors">Features</a>
             <a href="#pricing" className="hidden sm:inline text-xs font-medium uppercase tracking-wider hover:text-accent transition-colors">Pricing</a>
+            <Link to="/blog" className="hidden sm:inline text-xs font-medium uppercase tracking-wider hover:text-accent transition-colors">Blog</Link>
             <Link to="/login" className="text-xs font-medium uppercase tracking-wider hover:text-accent transition-colors">Log in</Link>
             <Link to="/signup" className="text-xs font-semibold uppercase tracking-wider bg-text-primary text-white px-5 py-2 hover:bg-accent transition-colors">
               Get Started
@@ -215,6 +217,49 @@ function LandingPage() {
               </tr>
             </tfoot>
           </table>
+        </div>
+      </section>
+
+      {/* Blog */}
+      <section id="blog" className="border-b border-text-primary">
+        <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,4vw,4rem)]">
+          <div className="flex items-baseline gap-8 pt-16 pb-8">
+            <span className="font-display font-bold text-sm tracking-wider text-text-secondary">03</span>
+            <h2 className="font-display font-extrabold text-[clamp(2rem,5vw,4rem)] tracking-tighter uppercase leading-none">From the Blog</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-px bg-border mb-12">
+            {BLOG_POSTS.slice(0, 3).map((post, i) => (
+              <Link
+                key={post.slug}
+                to="/blog/$slug"
+                params={{ slug: post.slug }}
+                data-reveal
+                className="bg-bg p-8 group hover:bg-gray-50 transition-colors"
+                style={{ opacity: 0, transform: 'translateX(-30px)', transition: 'opacity 0.6s ease, transform 0.6s ease' }}
+              >
+                <span className="font-display font-bold text-xs text-text-secondary">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <h3 className="font-display font-bold text-lg tracking-tight mt-3 mb-3 group-hover:text-accent transition-colors">
+                  {post.title}
+                </h3>
+                <p className="text-sm text-text-secondary leading-relaxed mb-4">
+                  {post.excerpt}
+                </p>
+                <span className="text-xs font-semibold uppercase tracking-wider text-accent">
+                  Read &rarr;
+                </span>
+              </Link>
+            ))}
+          </div>
+          <div className="pb-12">
+            <Link
+              to="/blog"
+              className="text-xs font-semibold uppercase tracking-wider hover:text-accent transition-colors"
+            >
+              View all posts &rarr;
+            </Link>
+          </div>
         </div>
       </section>
 
