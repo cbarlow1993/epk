@@ -1,4 +1,3 @@
-import type { MIX_CATEGORIES } from '~/schemas/mix'
 import type { SOCIAL_PLATFORMS } from '~/schemas/social-link'
 
 /** Row types representing what Supabase returns from select('*') queries */
@@ -27,9 +26,12 @@ export interface ProfileRow {
   favicon_url: string | null
   hide_platform_branding: boolean
   meta_description: string | null
+  press_kit_url: string | null
   template: string
   section_order: string[] | null
   section_visibility: Record<string, boolean> | null
+  mix_category_order: string[] | null
+  event_category_order: string[] | null
   hero_style: 'fullbleed' | 'contained' | 'minimal' | null
   bio_layout: 'two-column' | 'single-column' | null
   og_title: string | null
@@ -66,22 +68,26 @@ export interface MixRow {
   profile_id: string
   title: string
   url: string
-  category: (typeof MIX_CATEGORIES)[number]
+  category: string
   thumbnail_url: string | null
   sort_order: number
   created_at: string
   platform: string | null
   embed_html: string | null
+  description: string | null
+  image_url: string | null
 }
 
 export interface EventRow {
   id: string
   profile_id: string
   name: string
+  category: string
   image_url: string | null
   link_url: string | null
   sort_order: number
   created_at: string
+  description: string | null
 }
 
 export interface SocialLinkRow {

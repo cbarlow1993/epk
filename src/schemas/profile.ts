@@ -45,8 +45,11 @@ export const profileUpdateSchema = z.object({
   twitter_card_type: z.enum(['summary', 'summary_large_image']).optional(),
   section_order: z.array(z.string()).max(10).optional(),
   section_visibility: z.record(z.string(), z.boolean()).optional(),
+  mix_category_order: z.array(z.string()).max(50).optional(),
+  event_category_order: z.array(z.string()).max(50).optional(),
   hero_style: z.enum(['fullbleed', 'contained', 'minimal']).optional(),
   bio_layout: z.enum(['two-column', 'single-column']).optional(),
+  press_kit_url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
 })
 
 export type ProfileUpdate = z.infer<typeof profileUpdateSchema>
