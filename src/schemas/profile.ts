@@ -39,6 +39,14 @@ export const profileUpdateSchema = z.object({
   hide_platform_branding: z.boolean().optional(),
   meta_description: z.string().max(300).optional(),
   template: z.enum(['default', 'minimal', 'festival', 'underground']).optional(),
+  og_title: z.string().max(100, 'Max 100 characters').optional().or(z.literal('')),
+  og_description: z.string().max(300, 'Max 300 characters').optional().or(z.literal('')),
+  og_image_url: z.string().url('Invalid URL').optional().or(z.literal('')),
+  twitter_card_type: z.enum(['summary', 'summary_large_image']).optional(),
+  section_order: z.array(z.string()).max(10).optional(),
+  section_visibility: z.record(z.string(), z.boolean()).optional(),
+  hero_style: z.enum(['fullbleed', 'contained', 'minimal']).optional(),
+  bio_layout: z.enum(['two-column', 'single-column']).optional(),
 })
 
 export type ProfileUpdate = z.infer<typeof profileUpdateSchema>
