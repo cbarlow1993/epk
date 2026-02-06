@@ -303,7 +303,27 @@ function PublicEPK() {
         }`}>
           {heroStyle !== 'minimal' && (
             <>
-              {profile.hero_image_url ? (
+              {profile.hero_video_url ? (
+                <>
+                  {/* Video hero — hidden on mobile and reduced-motion for perf/a11y */}
+                  <video
+                    src={profile.hero_video_url}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover hidden md:block motion-safe:block motion-reduce:hidden"
+                  />
+                  {/* Fallback image for mobile / reduced-motion */}
+                  {profile.hero_image_url && (
+                    <img
+                      src={profile.hero_image_url}
+                      alt=""
+                      className="absolute inset-0 w-full h-full object-cover md:hidden motion-reduce:block"
+                    />
+                  )}
+                </>
+              ) : profile.hero_image_url ? (
                 <img src={profile.hero_image_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
               ) : (
                 <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, ${bg}, ${isLight ? '#f0ede8' : '#111'}, ${bg})` }} />
@@ -415,9 +435,17 @@ function PublicEPK() {
                             />
                           ) : (
                             <a href={mix.url} target="_blank" rel="noopener noreferrer"
-                              className="block p-4 hover:border-accent/30 transition-colors">
-                              <p className="font-semibold text-sm mb-1">{mix.title}</p>
-                              <p className={`text-xs ${textSecClass} truncate`}>{mix.url}</p>
+                              className="block hover:border-accent/30 transition-colors">
+                              {mix.image_url && (
+                                <img src={mix.image_url} alt={mix.title} className="w-full aspect-video object-cover" loading="lazy" />
+                              )}
+                              <div className="p-4">
+                                <p className="font-semibold text-sm mb-1">{mix.title}</p>
+                                {mix.description && (
+                                  <p className={`text-xs ${textSecClass} mb-1`}>{mix.description}</p>
+                                )}
+                                <p className={`text-xs ${textSecClass} truncate`}>{mix.url}</p>
+                              </div>
                             </a>
                           )}
                         </div>
