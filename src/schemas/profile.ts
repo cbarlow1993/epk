@@ -38,7 +38,7 @@ export const profileUpdateSchema = z.object({
   favicon_url: z.string().url().optional().or(z.literal('')),
   hide_platform_branding: z.boolean().optional(),
   meta_description: z.string().max(300).optional(),
-  template: z.enum(['default', 'minimal', 'festival', 'underground']).optional(),
+  template: z.enum(['default', 'minimal', 'festival', 'underground', 'neon', 'warehouse', 'sunset', 'haze', 'acid', 'festival-main', 'monochrome', 'tropicalia', 'strobe']).optional(),
   og_title: z.string().max(100, 'Max 100 characters').optional().or(z.literal('')),
   og_description: z.string().max(300, 'Max 300 characters').optional().or(z.literal('')),
   og_image_url: z.string().url('Invalid URL').optional().or(z.literal('')),

@@ -264,6 +264,348 @@ export const TEMPLATES: TemplateConfig[] = [
     heroStyle: 'contained',
     bioLayout: 'two-column',
   },
+
+  // -- Neon ------------------------------------------------------------------
+  {
+    id: 'neon',
+    name: 'Neon',
+    description: 'Cyberpunk pink on dark — Berlin techno energy',
+    defaults: {
+      accent_color: '#FF2D9B',
+      bg_color: '#0A0A14',
+      font_family: 'Space Grotesk',
+
+      display: { font: 'Space Grotesk', size: '5rem', weight: '800' },
+      heading: { font: 'Space Grotesk', size: '2rem', weight: '700' },
+      subheading: { font: 'DM Sans', size: '1.125rem', weight: '500' },
+      body: { font: 'DM Sans', size: '1rem', weight: '400' },
+
+      text_color: '#E0E0E0',
+      heading_color: null,
+      link_color: null,
+      card_bg: 'rgba(255,255,255,0.04)',
+      border_color: 'rgba(255,255,255,0.08)',
+
+      section_padding: 'default',
+      content_width: 'default',
+      card_radius: 'sm',
+      element_gap: 'default',
+
+      button_style: 'pill',
+      link_style: 'hover-underline',
+
+      card_border: 'subtle',
+      shadow: 'md',
+      divider_style: 'accent',
+    },
+    sectionOrder: ['music', 'bio', 'events', 'photos', 'technical', 'press', 'contact'],
+    heroStyle: 'fullbleed',
+    bioLayout: 'two-column',
+  },
+
+  // -- Warehouse -------------------------------------------------------------
+  {
+    id: 'warehouse',
+    name: 'Warehouse',
+    description: 'Raw industrial — stripped back and monumental',
+    defaults: {
+      accent_color: '#8A8A8A',
+      bg_color: '#141414',
+      font_family: 'Bebas Neue',
+
+      display: { font: 'Bebas Neue', size: '6rem', weight: '400' },
+      heading: { font: 'Oswald', size: '2rem', weight: '400' },
+      subheading: { font: 'Inter', size: '1rem', weight: '500' },
+      body: { font: 'Inter', size: '1rem', weight: '400' },
+
+      text_color: '#C0C0C0',
+      heading_color: null,
+      link_color: null,
+      card_bg: 'rgba(255,255,255,0.03)',
+      border_color: 'rgba(255,255,255,0.06)',
+
+      section_padding: 'compact',
+      content_width: 'narrow',
+      card_radius: 'none',
+      element_gap: 'default',
+
+      button_style: 'square',
+      link_style: 'none',
+
+      card_border: 'none',
+      shadow: 'none',
+      divider_style: 'line',
+    },
+    sectionOrder: ['music', 'bio', 'technical', 'events', 'photos', 'press', 'contact'],
+    heroStyle: 'minimal',
+    bioLayout: 'single-column',
+  },
+
+  // -- Sunset ----------------------------------------------------------------
+  {
+    id: 'sunset',
+    name: 'Sunset',
+    description: 'Warm coral on cream — golden hour melodic vibes',
+    defaults: {
+      accent_color: '#FF6B4A',
+      bg_color: '#FFF8F0',
+      font_family: 'Cormorant Garamond',
+
+      display: { font: 'Cormorant Garamond', size: '4.5rem', weight: '600' },
+      heading: { font: 'Cormorant Garamond', size: '2rem', weight: '600' },
+      subheading: { font: 'DM Sans', size: '1.125rem', weight: '500' },
+      body: { font: 'DM Sans', size: '1rem', weight: '400' },
+
+      text_color: '#3D2E1F',
+      heading_color: null,
+      link_color: null,
+      card_bg: '#FFFFFF',
+      border_color: '#E8DDD0',
+
+      section_padding: 'spacious',
+      content_width: 'narrow',
+      card_radius: 'md',
+      element_gap: 'default',
+
+      button_style: 'rounded',
+      link_style: 'underline',
+
+      card_border: 'subtle',
+      shadow: 'sm',
+      divider_style: 'accent',
+    },
+    sectionOrder: ['bio', 'music', 'events', 'photos', 'press', 'technical', 'contact'],
+    heroStyle: 'fullbleed',
+    bioLayout: 'single-column',
+  },
+
+  // -- Haze ------------------------------------------------------------------
+  {
+    id: 'haze',
+    name: 'Haze',
+    description: 'Muted lavender on charcoal — dreamy and atmospheric',
+    defaults: {
+      accent_color: '#9B8FCA',
+      bg_color: '#1E1E28',
+      font_family: 'Sora',
+
+      display: { font: 'Sora', size: '4rem', weight: '700' },
+      heading: { font: 'Sora', size: '1.75rem', weight: '600' },
+      subheading: { font: 'Inter', size: '1rem', weight: '500' },
+      body: { font: 'Inter', size: '1rem', weight: '400' },
+
+      text_color: '#C8C4D4',
+      heading_color: null,
+      link_color: null,
+      card_bg: 'rgba(255,255,255,0.04)',
+      border_color: 'rgba(155,143,202,0.15)',
+
+      section_padding: 'spacious',
+      content_width: 'narrow',
+      card_radius: 'md',
+      element_gap: 'default',
+
+      button_style: 'rounded',
+      link_style: 'hover-underline',
+
+      card_border: 'subtle',
+      shadow: 'sm',
+      divider_style: 'none',
+    },
+    sectionOrder: ['music', 'bio', 'photos', 'events', 'technical', 'press', 'contact'],
+    heroStyle: 'contained',
+    bioLayout: 'single-column',
+  },
+
+  // -- Acid ------------------------------------------------------------------
+  {
+    id: 'acid',
+    name: 'Acid',
+    description: 'Acid green on black — 90s rave flyer energy',
+    defaults: {
+      accent_color: '#CCFF00',
+      bg_color: '#000000',
+      font_family: 'Anton',
+
+      display: { font: 'Anton', size: '6rem', weight: '400' },
+      heading: { font: 'Space Grotesk', size: '2.25rem', weight: '700' },
+      subheading: { font: 'Space Mono', size: '1rem', weight: '400' },
+      body: { font: 'Space Mono', size: '1rem', weight: '400' },
+
+      text_color: '#E0E0E0',
+      heading_color: null,
+      link_color: null,
+      card_bg: 'rgba(204,255,0,0.03)',
+      border_color: 'rgba(204,255,0,0.15)',
+
+      section_padding: 'compact',
+      content_width: 'default',
+      card_radius: 'none',
+      element_gap: 'default',
+
+      button_style: 'square',
+      link_style: 'none',
+
+      card_border: 'solid',
+      shadow: 'none',
+      divider_style: 'accent',
+    },
+    sectionOrder: ['music', 'bio', 'events', 'photos', 'technical', 'press', 'contact'],
+    heroStyle: 'fullbleed',
+    bioLayout: 'two-column',
+  },
+
+  // -- Festival (mainstage) --------------------------------------------------
+  {
+    id: 'festival-main',
+    name: 'Festival',
+    description: 'Electric blue on white — bold mainstage energy',
+    defaults: {
+      accent_color: '#0066FF',
+      bg_color: '#FFFFFF',
+      font_family: 'Oswald',
+
+      display: { font: 'Oswald', size: '5.5rem', weight: '700' },
+      heading: { font: 'Oswald', size: '2rem', weight: '700' },
+      subheading: { font: 'Instrument Sans', size: '1.125rem', weight: '500' },
+      body: { font: 'Instrument Sans', size: '1rem', weight: '400' },
+
+      text_color: '#1A1A1A',
+      heading_color: null,
+      link_color: null,
+      card_bg: '#F5F7FA',
+      border_color: '#E2E8F0',
+
+      section_padding: 'default',
+      content_width: 'wide',
+      card_radius: 'sm',
+      element_gap: 'default',
+
+      button_style: 'pill',
+      link_style: 'hover-underline',
+
+      card_border: 'subtle',
+      shadow: 'md',
+      divider_style: 'line',
+    },
+    sectionOrder: ['music', 'events', 'bio', 'photos', 'press', 'technical', 'contact'],
+    heroStyle: 'fullbleed',
+    bioLayout: 'two-column',
+  },
+
+  // -- Monochrome ------------------------------------------------------------
+  {
+    id: 'monochrome',
+    name: 'Monochrome',
+    description: 'Brutalist monospaced — function over form',
+    defaults: {
+      accent_color: '#FFFFFF',
+      bg_color: '#000000',
+      font_family: 'JetBrains Mono',
+
+      display: { font: 'JetBrains Mono', size: '4rem', weight: '700' },
+      heading: { font: 'JetBrains Mono', size: '1.75rem', weight: '700' },
+      subheading: { font: 'Space Mono', size: '1rem', weight: '400' },
+      body: { font: 'Space Mono', size: '1rem', weight: '400' },
+
+      text_color: '#CCCCCC',
+      heading_color: null,
+      link_color: null,
+      card_bg: 'rgba(255,255,255,0.05)',
+      border_color: 'rgba(255,255,255,0.15)',
+
+      section_padding: 'default',
+      content_width: 'narrow',
+      card_radius: 'none',
+      element_gap: 'default',
+
+      button_style: 'square',
+      link_style: 'underline',
+
+      card_border: 'solid',
+      shadow: 'none',
+      divider_style: 'line',
+    },
+    sectionOrder: ['bio', 'music', 'technical', 'events', 'photos', 'press', 'contact'],
+    heroStyle: 'minimal',
+    bioLayout: 'single-column',
+  },
+
+  // -- Tropicália ------------------------------------------------------------
+  {
+    id: 'tropicalia',
+    name: 'Tropicália',
+    description: 'Vibrant yellow on deep teal — afrobeats and tropical heat',
+    defaults: {
+      accent_color: '#FFB800',
+      bg_color: '#0D3B3E',
+      font_family: 'Bebas Neue',
+
+      display: { font: 'Bebas Neue', size: '5.5rem', weight: '400' },
+      heading: { font: 'Poppins', size: '2rem', weight: '600' },
+      subheading: { font: 'Poppins', size: '1.125rem', weight: '500' },
+      body: { font: 'Poppins', size: '1rem', weight: '400' },
+
+      text_color: '#E8E0D0',
+      heading_color: null,
+      link_color: null,
+      card_bg: 'rgba(255,255,255,0.06)',
+      border_color: 'rgba(255,184,0,0.12)',
+
+      section_padding: 'default',
+      content_width: 'default',
+      card_radius: 'md',
+      element_gap: 'default',
+
+      button_style: 'pill',
+      link_style: 'hover-underline',
+
+      card_border: 'subtle',
+      shadow: 'md',
+      divider_style: 'accent',
+    },
+    sectionOrder: ['music', 'events', 'bio', 'photos', 'press', 'technical', 'contact'],
+    heroStyle: 'fullbleed',
+    bioLayout: 'two-column',
+  },
+
+  // -- Strobe ----------------------------------------------------------------
+  {
+    id: 'strobe',
+    name: 'Strobe',
+    description: 'Hot white on deep purple — high-energy stage lights',
+    defaults: {
+      accent_color: '#FFFFFF',
+      bg_color: '#1A0A2E',
+      font_family: 'Anton',
+
+      display: { font: 'Anton', size: '6rem', weight: '400' },
+      heading: { font: 'DM Sans', size: '2rem', weight: '700' },
+      subheading: { font: 'DM Sans', size: '1.125rem', weight: '600' },
+      body: { font: 'DM Sans', size: '1rem', weight: '400' },
+
+      text_color: '#D0C8E0',
+      heading_color: null,
+      link_color: null,
+      card_bg: 'rgba(255,255,255,0.05)',
+      border_color: 'rgba(255,255,255,0.08)',
+
+      section_padding: 'default',
+      content_width: 'wide',
+      card_radius: 'sm',
+      element_gap: 'default',
+
+      button_style: 'square',
+      link_style: 'none',
+
+      card_border: 'none',
+      shadow: 'lg',
+      divider_style: 'gradient',
+    },
+    sectionOrder: ['music', 'events', 'bio', 'photos', 'technical', 'press', 'contact'],
+    heroStyle: 'fullbleed',
+    bioLayout: 'two-column',
+  },
 ]
 
 // ---------------------------------------------------------------------------
