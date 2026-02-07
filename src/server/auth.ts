@@ -44,6 +44,7 @@ export const signupWithEmail = createServerFn({ method: 'POST' })
       password: data.password,
       options: {
         data: { display_name: data.displayName },
+        emailRedirectTo: `${import.meta.env.VITE_SITE_URL || 'http://localhost:3000'}/api/auth/callback?next=/dashboard`,
       },
     })
 
@@ -51,7 +52,15 @@ export const signupWithEmail = createServerFn({ method: 'POST' })
       return { error: error.message }
     }
 
-    return { user: authData.user }
+    // If identities array is empty, email is already taken (Supabase returns fake success)
+    if (authData.user && authData.user.identities?.length === 0) {
+      return { error: 'An account with this email already exists' }
+    }
+
+    // If email_confirmed_at is null, user needs to confirm email
+    const needsConfirmation = !authData.user?.email_confirmed_at
+
+    return { user: authData.user, needsConfirmation }
   })
 
 export const logout = createServerFn({ method: 'POST' }).handler(async () => {

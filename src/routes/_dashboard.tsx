@@ -1,6 +1,5 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { getCurrentUser } from '~/server/auth'
-import { getChecklistBadge } from '~/server/checklist'
 import { DashboardSidebar } from '~/components/DashboardSidebar'
 
 export const Route = createFileRoute('/_dashboard')({
@@ -10,15 +9,18 @@ export const Route = createFileRoute('/_dashboard')({
       throw redirect({ to: '/login' })
     }
 
-    const showNextBadge = result.profile ? await getChecklistBadge({ data: { profileId: result.profile.id } }) : false
+    // Enforce email verification
+    if (!result.user.email_confirmed_at) {
+      throw redirect({ to: '/verify-email' })
+    }
 
-    return { user: result.user, profile: result.profile, showNextBadge }
+    return { user: result.user, profile: result.profile }
   },
   component: DashboardLayout,
 })
 
 function DashboardLayout() {
-  const { profile, showNextBadge } = Route.useRouteContext()
+  const { profile } = Route.useRouteContext()
 
   const safeProfile = {
     slug: profile?.slug || '',
@@ -29,7 +31,7 @@ function DashboardLayout() {
 
   return (
     <div className="min-h-screen bg-bg flex">
-      <DashboardSidebar profile={safeProfile} showNextBadge={showNextBadge} />
+      <DashboardSidebar profile={safeProfile} />
       <main className="flex-1 p-6 pt-20 md:pt-10 md:p-10 md:ml-64">
         <Outlet />
       </main>

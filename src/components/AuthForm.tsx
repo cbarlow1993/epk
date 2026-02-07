@@ -16,17 +16,19 @@ interface AuthFormProps {
   fields: AuthField[]
   submitLabel: string
   loadingLabel: string
-  onSubmit: (values: Record<string, string>) => Promise<{ error?: string }>
+  onSubmit: (values: Record<string, string>) => Promise<{ error?: string; done?: boolean }>
   footer: { text: string; linkText: string; linkTo: string }
   extraFooter?: React.ReactNode
+  successContent?: React.ReactNode
 }
 
-export function AuthForm({ title, fields, submitLabel, loadingLabel, onSubmit, footer, extraFooter }: AuthFormProps) {
+export function AuthForm({ title, fields, submitLabel, loadingLabel, onSubmit, footer, extraFooter, successContent }: AuthFormProps) {
   const [values, setValues] = useState<Record<string, string>>(
     Object.fromEntries(fields.map((f) => [f.id, '']))
   )
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -40,11 +42,24 @@ export function AuthForm({ title, fields, submitLabel, loadingLabel, onSubmit, f
         setLoading(false)
         return
       }
+      if (result.done) {
+        setSuccess(true)
+        setLoading(false)
+        return
+      }
       window.location.href = '/dashboard'
     } catch {
       setError('An unexpected error occurred')
       setLoading(false)
     }
+  }
+
+  if (success && successContent) {
+    return (
+      <div className="min-h-screen bg-bg flex items-center justify-center px-4">
+        <div className="w-full max-w-md">{successContent}</div>
+      </div>
+    )
   }
 
   return (
