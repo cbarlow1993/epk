@@ -20,13 +20,14 @@ interface AuthFormProps {
   footer: { text: string; linkText: string; linkTo: string }
   extraFooter?: React.ReactNode
   successContent?: React.ReactNode
+  initialError?: string
 }
 
-export function AuthForm({ title, fields, submitLabel, loadingLabel, onSubmit, footer, extraFooter, successContent }: AuthFormProps) {
+export function AuthForm({ title, fields, submitLabel, loadingLabel, onSubmit, footer, extraFooter, successContent, initialError }: AuthFormProps) {
   const [values, setValues] = useState<Record<string, string>>(
     Object.fromEntries(fields.map((f) => [f.id, '']))
   )
-  const [error, setError] = useState('')
+  const [error, setError] = useState(initialError || '')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
 

@@ -1,8 +1,14 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { signupWithEmail } from '~/server/auth'
+import { createFileRoute, redirect } from '@tanstack/react-router'
+import { signupWithEmail, getCurrentUser } from '~/server/auth'
 import { AuthForm } from '~/components/AuthForm'
 
 export const Route = createFileRoute('/signup')({
+  beforeLoad: async () => {
+    const result = await getCurrentUser()
+    if (result?.user?.email_confirmed_at) {
+      throw redirect({ to: '/dashboard' })
+    }
+  },
   component: SignupPage,
 })
 
