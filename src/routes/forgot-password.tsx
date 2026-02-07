@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { getSupabaseBrowserClient } from '~/utils/supabase'
 import { FORM_INPUT, FORM_LABEL } from '~/components/forms'
+import { friendlyAuthError } from '~/utils/auth-errors'
 
 export const Route = createFileRoute('/forgot-password')({
   component: ForgotPasswordPage,
@@ -24,7 +25,7 @@ function ForgotPasswordPage() {
     })
 
     if (error) {
-      setError(error.message)
+      setError(friendlyAuthError(error.message))
       setLoading(false)
       return
     }
