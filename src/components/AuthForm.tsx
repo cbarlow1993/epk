@@ -68,7 +68,7 @@ export function AuthForm({ title, fields, submitLabel, loadingLabel, onSubmit, f
                 const supabase = getSupabaseBrowserClient()
                 await supabase.auth.signInWithOAuth({
                   provider,
-                  options: { redirectTo: `${window.location.origin}/dashboard` },
+                  options: { redirectTo: `${window.location.origin}/api/auth/callback?next=/dashboard` },
                 })
               }}
               className="w-full bg-white border border-text-primary/20 hover:border-text-primary text-text-primary font-semibold py-3 transition-colors text-sm uppercase tracking-wider"
