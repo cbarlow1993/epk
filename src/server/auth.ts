@@ -69,7 +69,7 @@ export const exchangeAuthCode = createServerFn({ method: 'POST' })
     const supabase = getSupabaseServerClient()
     const { error } = await supabase.auth.exchangeCodeForSession(data.code)
     if (error) return { error: error.message }
-    return { success: true }
+    return { data: true }
   })
 
 export const logout = createServerFn({ method: 'POST' }).handler(async () => {
