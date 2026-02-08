@@ -17,10 +17,13 @@ export function getSupabaseServerClient() {
       cookies: {
         getAll() {
           const cookies = getCookies()
-          return Object.entries(cookies).map(([name, value]) => ({
-            name,
-            value: decodeURIComponent(value),
-          }))
+          return Object.entries(cookies).map(([name, value]) => {
+            try {
+              return { name, value: decodeURIComponent(value) }
+            } catch {
+              return { name, value }
+            }
+          })
         },
         setAll(cookies) {
           for (const cookie of cookies) {

@@ -1,11 +1,23 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, redirect, isRedirect } from '@tanstack/react-router'
 import { useState } from 'react'
 import { getSupabaseBrowserClient } from '~/utils/supabase'
 import { FORM_INPUT, FORM_LABEL } from '~/components/forms'
 import { PasswordStrength } from '~/components/PasswordStrength'
 import { friendlyAuthError } from '~/utils/auth-errors'
+import { getCurrentUser } from '~/server/auth'
 
 export const Route = createFileRoute('/reset-password')({
+  beforeLoad: async () => {
+    try {
+      const result = await getCurrentUser()
+      if (!result) {
+        throw redirect({ to: '/forgot-password' })
+      }
+    } catch (e) {
+      if (isRedirect(e)) throw e
+      throw redirect({ to: '/forgot-password' })
+    }
+  },
   component: ResetPasswordPage,
 })
 

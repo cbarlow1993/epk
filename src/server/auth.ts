@@ -44,7 +44,7 @@ export const signupWithEmail = createServerFn({ method: 'POST' })
       password: data.password,
       options: {
         data: { display_name: data.displayName },
-        emailRedirectTo: `${import.meta.env.VITE_SITE_URL || 'http://localhost:3000'}/api/auth/callback?next=/dashboard`,
+        emailRedirectTo: `${import.meta.env.VITE_SITE_URL || 'http://localhost:3000'}/auth/callback?next=/dashboard`,
       },
     })
 
@@ -61,6 +61,15 @@ export const signupWithEmail = createServerFn({ method: 'POST' })
     const needsConfirmation = !authData.user?.email_confirmed_at
 
     return { user: authData.user, needsConfirmation }
+  })
+
+export const exchangeAuthCode = createServerFn({ method: 'POST' })
+  .inputValidator((data: unknown) => z.object({ code: z.string() }).parse(data))
+  .handler(async ({ data }) => {
+    const supabase = getSupabaseServerClient()
+    const { error } = await supabase.auth.exchangeCodeForSession(data.code)
+    if (error) return { error: error.message }
+    return { success: true }
   })
 
 export const logout = createServerFn({ method: 'POST' }).handler(async () => {

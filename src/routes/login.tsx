@@ -1,4 +1,4 @@
-import { createFileRoute, Link, redirect } from '@tanstack/react-router'
+import { createFileRoute, Link, redirect, isRedirect } from '@tanstack/react-router'
 import { z } from 'zod'
 import { loginWithEmail, getCurrentUser } from '~/server/auth'
 import { AuthForm } from '~/components/AuthForm'
@@ -8,9 +8,14 @@ export const Route = createFileRoute('/login')({
     error: z.string().optional(),
   }),
   beforeLoad: async () => {
-    const result = await getCurrentUser()
-    if (result?.user?.email_confirmed_at) {
-      throw redirect({ to: '/dashboard' })
+    try {
+      const result = await getCurrentUser()
+      if (result?.user?.email_confirmed_at) {
+        throw redirect({ to: '/dashboard' })
+      }
+    } catch (e) {
+      if (isRedirect(e)) throw e
+      // Swallow other errors — let them see the login page
     }
   },
   component: LoginPage,

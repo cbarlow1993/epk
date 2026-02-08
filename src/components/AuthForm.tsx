@@ -87,13 +87,18 @@ export function AuthForm({ title, fields, submitLabel, loadingLabel, onSubmit, f
               disabled={!!oauthLoading || loading}
               onClick={async () => {
                 setOauthLoading(provider)
+                setError('')
                 const supabase = getSupabaseBrowserClient()
-                await supabase.auth.signInWithOAuth({
+                const { error: oauthError } = await supabase.auth.signInWithOAuth({
                   provider,
                   options: {
-                    redirectTo: `${window.location.origin}/api/auth/callback?next=/dashboard`,
+                    redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
                   },
                 })
+                if (oauthError) {
+                  setError(friendlyAuthError(oauthError.message))
+                  setOauthLoading(null)
+                }
               }}
               className="w-full bg-white border border-text-primary/20 hover:border-text-primary text-text-primary font-semibold py-3 transition-colors text-sm uppercase tracking-wider disabled:opacity-50"
             >

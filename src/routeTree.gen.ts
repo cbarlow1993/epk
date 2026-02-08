@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
@@ -21,6 +22,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as InviteTokenRouteImport } from './routes/invite/$token'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
+import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as AgencyOrgSlugRouteImport } from './routes/agency/$orgSlug'
 import { Route as DashboardDashboardRouteImport } from './routes/_dashboard/dashboard'
 import { Route as DashboardDashboardIndexRouteImport } from './routes/_dashboard/dashboard.index'
@@ -31,10 +33,10 @@ import { Route as DashboardDashboardSocialsRouteImport } from './routes/_dashboa
 import { Route as DashboardDashboardSocialPreviewRouteImport } from './routes/_dashboard/dashboard.social-preview'
 import { Route as DashboardDashboardSettingsRouteImport } from './routes/_dashboard/dashboard.settings'
 import { Route as DashboardDashboardRosterRouteImport } from './routes/_dashboard/dashboard.roster'
+import { Route as DashboardDashboardProfileRouteImport } from './routes/_dashboard/dashboard.profile'
 import { Route as DashboardDashboardPressRouteImport } from './routes/_dashboard/dashboard.press'
 import { Route as DashboardDashboardPhotosRouteImport } from './routes/_dashboard/dashboard.photos'
 import { Route as DashboardDashboardPagesRouteImport } from './routes/_dashboard/dashboard.pages'
-import { Route as DashboardDashboardNextRouteImport } from './routes/_dashboard/dashboard.next'
 import { Route as DashboardDashboardMusicRouteImport } from './routes/_dashboard/dashboard.music'
 import { Route as DashboardDashboardIntegrationsRouteImport } from './routes/_dashboard/dashboard.integrations'
 import { Route as DashboardDashboardHeroRouteImport } from './routes/_dashboard/dashboard.hero'
@@ -46,6 +48,11 @@ import { Route as DashboardDashboardBillingRouteImport } from './routes/_dashboa
 import { Route as DashboardDashboardAnalyticsOverviewRouteImport } from './routes/_dashboard/dashboard.analytics-overview'
 import { Route as DashboardDashboardAnalyticsRouteImport } from './routes/_dashboard/dashboard.analytics'
 
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -105,6 +112,11 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => BlogRoute,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AgencyOrgSlugRoute = AgencyOrgSlugRouteImport.update({
   id: '/agency/$orgSlug',
   path: '/agency/$orgSlug',
@@ -160,6 +172,12 @@ const DashboardDashboardRosterRoute =
     path: '/roster',
     getParentRoute: () => DashboardDashboardRoute,
   } as any)
+const DashboardDashboardProfileRoute =
+  DashboardDashboardProfileRouteImport.update({
+    id: '/profile',
+    path: '/profile',
+    getParentRoute: () => DashboardDashboardRoute,
+  } as any)
 const DashboardDashboardPressRoute = DashboardDashboardPressRouteImport.update({
   id: '/press',
   path: '/press',
@@ -174,11 +192,6 @@ const DashboardDashboardPhotosRoute =
 const DashboardDashboardPagesRoute = DashboardDashboardPagesRouteImport.update({
   id: '/pages',
   path: '/pages',
-  getParentRoute: () => DashboardDashboardRoute,
-} as any)
-const DashboardDashboardNextRoute = DashboardDashboardNextRouteImport.update({
-  id: '/next',
-  path: '/next',
   getParentRoute: () => DashboardDashboardRoute,
 } as any)
 const DashboardDashboardMusicRoute = DashboardDashboardMusicRouteImport.update({
@@ -247,8 +260,10 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/dashboard': typeof DashboardDashboardRouteWithChildren
   '/agency/$orgSlug': typeof AgencyOrgSlugRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$token': typeof InviteTokenRoute
   '/blog/': typeof BlogIndexRoute
@@ -262,10 +277,10 @@ export interface FileRoutesByFullPath {
   '/dashboard/hero': typeof DashboardDashboardHeroRoute
   '/dashboard/integrations': typeof DashboardDashboardIntegrationsRoute
   '/dashboard/music': typeof DashboardDashboardMusicRoute
-  '/dashboard/next': typeof DashboardDashboardNextRoute
   '/dashboard/pages': typeof DashboardDashboardPagesRoute
   '/dashboard/photos': typeof DashboardDashboardPhotosRoute
   '/dashboard/press': typeof DashboardDashboardPressRoute
+  '/dashboard/profile': typeof DashboardDashboardProfileRoute
   '/dashboard/roster': typeof DashboardDashboardRosterRoute
   '/dashboard/settings': typeof DashboardDashboardSettingsRoute
   '/dashboard/social-preview': typeof DashboardDashboardSocialPreviewRoute
@@ -283,7 +298,9 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/agency/$orgSlug': typeof AgencyOrgSlugRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$token': typeof InviteTokenRoute
   '/blog': typeof BlogIndexRoute
@@ -297,10 +314,10 @@ export interface FileRoutesByTo {
   '/dashboard/hero': typeof DashboardDashboardHeroRoute
   '/dashboard/integrations': typeof DashboardDashboardIntegrationsRoute
   '/dashboard/music': typeof DashboardDashboardMusicRoute
-  '/dashboard/next': typeof DashboardDashboardNextRoute
   '/dashboard/pages': typeof DashboardDashboardPagesRoute
   '/dashboard/photos': typeof DashboardDashboardPhotosRoute
   '/dashboard/press': typeof DashboardDashboardPressRoute
+  '/dashboard/profile': typeof DashboardDashboardProfileRoute
   '/dashboard/roster': typeof DashboardDashboardRosterRoute
   '/dashboard/settings': typeof DashboardDashboardSettingsRoute
   '/dashboard/social-preview': typeof DashboardDashboardSocialPreviewRoute
@@ -321,8 +338,10 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/_dashboard/dashboard': typeof DashboardDashboardRouteWithChildren
   '/agency/$orgSlug': typeof AgencyOrgSlugRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$token': typeof InviteTokenRoute
   '/blog/': typeof BlogIndexRoute
@@ -336,10 +355,10 @@ export interface FileRoutesById {
   '/_dashboard/dashboard/hero': typeof DashboardDashboardHeroRoute
   '/_dashboard/dashboard/integrations': typeof DashboardDashboardIntegrationsRoute
   '/_dashboard/dashboard/music': typeof DashboardDashboardMusicRoute
-  '/_dashboard/dashboard/next': typeof DashboardDashboardNextRoute
   '/_dashboard/dashboard/pages': typeof DashboardDashboardPagesRoute
   '/_dashboard/dashboard/photos': typeof DashboardDashboardPhotosRoute
   '/_dashboard/dashboard/press': typeof DashboardDashboardPressRoute
+  '/_dashboard/dashboard/profile': typeof DashboardDashboardProfileRoute
   '/_dashboard/dashboard/roster': typeof DashboardDashboardRosterRoute
   '/_dashboard/dashboard/settings': typeof DashboardDashboardSettingsRoute
   '/_dashboard/dashboard/social-preview': typeof DashboardDashboardSocialPreviewRoute
@@ -360,8 +379,10 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/reset-password'
     | '/signup'
+    | '/verify-email'
     | '/dashboard'
     | '/agency/$orgSlug'
+    | '/auth/callback'
     | '/blog/$slug'
     | '/invite/$token'
     | '/blog/'
@@ -375,10 +396,10 @@ export interface FileRouteTypes {
     | '/dashboard/hero'
     | '/dashboard/integrations'
     | '/dashboard/music'
-    | '/dashboard/next'
     | '/dashboard/pages'
     | '/dashboard/photos'
     | '/dashboard/press'
+    | '/dashboard/profile'
     | '/dashboard/roster'
     | '/dashboard/settings'
     | '/dashboard/social-preview'
@@ -396,7 +417,9 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/reset-password'
     | '/signup'
+    | '/verify-email'
     | '/agency/$orgSlug'
+    | '/auth/callback'
     | '/blog/$slug'
     | '/invite/$token'
     | '/blog'
@@ -410,10 +433,10 @@ export interface FileRouteTypes {
     | '/dashboard/hero'
     | '/dashboard/integrations'
     | '/dashboard/music'
-    | '/dashboard/next'
     | '/dashboard/pages'
     | '/dashboard/photos'
     | '/dashboard/press'
+    | '/dashboard/profile'
     | '/dashboard/roster'
     | '/dashboard/settings'
     | '/dashboard/social-preview'
@@ -433,8 +456,10 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/reset-password'
     | '/signup'
+    | '/verify-email'
     | '/_dashboard/dashboard'
     | '/agency/$orgSlug'
+    | '/auth/callback'
     | '/blog/$slug'
     | '/invite/$token'
     | '/blog/'
@@ -448,10 +473,10 @@ export interface FileRouteTypes {
     | '/_dashboard/dashboard/hero'
     | '/_dashboard/dashboard/integrations'
     | '/_dashboard/dashboard/music'
-    | '/_dashboard/dashboard/next'
     | '/_dashboard/dashboard/pages'
     | '/_dashboard/dashboard/photos'
     | '/_dashboard/dashboard/press'
+    | '/_dashboard/dashboard/profile'
     | '/_dashboard/dashboard/roster'
     | '/_dashboard/dashboard/settings'
     | '/_dashboard/dashboard/social-preview'
@@ -472,12 +497,21 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
+  VerifyEmailRoute: typeof VerifyEmailRoute
   AgencyOrgSlugRoute: typeof AgencyOrgSlugRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
   InviteTokenRoute: typeof InviteTokenRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -562,6 +596,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof BlogRoute
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/agency/$orgSlug': {
       id: '/agency/$orgSlug'
       path: '/agency/$orgSlug'
@@ -632,6 +673,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardRosterRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
+    '/_dashboard/dashboard/profile': {
+      id: '/_dashboard/dashboard/profile'
+      path: '/profile'
+      fullPath: '/dashboard/profile'
+      preLoaderRoute: typeof DashboardDashboardProfileRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
     '/_dashboard/dashboard/press': {
       id: '/_dashboard/dashboard/press'
       path: '/press'
@@ -651,13 +699,6 @@ declare module '@tanstack/react-router' {
       path: '/pages'
       fullPath: '/dashboard/pages'
       preLoaderRoute: typeof DashboardDashboardPagesRouteImport
-      parentRoute: typeof DashboardDashboardRoute
-    }
-    '/_dashboard/dashboard/next': {
-      id: '/_dashboard/dashboard/next'
-      path: '/next'
-      fullPath: '/dashboard/next'
-      preLoaderRoute: typeof DashboardDashboardNextRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
     '/_dashboard/dashboard/music': {
@@ -744,10 +785,10 @@ interface DashboardDashboardRouteChildren {
   DashboardDashboardHeroRoute: typeof DashboardDashboardHeroRoute
   DashboardDashboardIntegrationsRoute: typeof DashboardDashboardIntegrationsRoute
   DashboardDashboardMusicRoute: typeof DashboardDashboardMusicRoute
-  DashboardDashboardNextRoute: typeof DashboardDashboardNextRoute
   DashboardDashboardPagesRoute: typeof DashboardDashboardPagesRoute
   DashboardDashboardPhotosRoute: typeof DashboardDashboardPhotosRoute
   DashboardDashboardPressRoute: typeof DashboardDashboardPressRoute
+  DashboardDashboardProfileRoute: typeof DashboardDashboardProfileRoute
   DashboardDashboardRosterRoute: typeof DashboardDashboardRosterRoute
   DashboardDashboardSettingsRoute: typeof DashboardDashboardSettingsRoute
   DashboardDashboardSocialPreviewRoute: typeof DashboardDashboardSocialPreviewRoute
@@ -770,10 +811,10 @@ const DashboardDashboardRouteChildren: DashboardDashboardRouteChildren = {
   DashboardDashboardHeroRoute: DashboardDashboardHeroRoute,
   DashboardDashboardIntegrationsRoute: DashboardDashboardIntegrationsRoute,
   DashboardDashboardMusicRoute: DashboardDashboardMusicRoute,
-  DashboardDashboardNextRoute: DashboardDashboardNextRoute,
   DashboardDashboardPagesRoute: DashboardDashboardPagesRoute,
   DashboardDashboardPhotosRoute: DashboardDashboardPhotosRoute,
   DashboardDashboardPressRoute: DashboardDashboardPressRoute,
+  DashboardDashboardProfileRoute: DashboardDashboardProfileRoute,
   DashboardDashboardRosterRoute: DashboardDashboardRosterRoute,
   DashboardDashboardSettingsRoute: DashboardDashboardSettingsRoute,
   DashboardDashboardSocialPreviewRoute: DashboardDashboardSocialPreviewRoute,
@@ -821,7 +862,9 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
+  VerifyEmailRoute: VerifyEmailRoute,
   AgencyOrgSlugRoute: AgencyOrgSlugRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
   InviteTokenRoute: InviteTokenRoute,
 }
 export const routeTree = rootRouteImport
