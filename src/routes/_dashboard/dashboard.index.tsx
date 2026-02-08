@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { getChecklistState, toggleChecklistItem, type ChecklistState } from '~/server/checklist'
+import { createCheckoutSession } from '~/server/billing'
 
 export const Route = createFileRoute('/_dashboard/dashboard/')({
   loader: () => getChecklistState(),
@@ -50,9 +51,9 @@ const PHASES: { title: string; items: ChecklistItem[] }[] = [
 ]
 
 function Dashboard() {
-  const initialState = Route.useLoaderData()
+  const loaderData = Route.useLoaderData()
 
-  if (!initialState) {
+  if (!loaderData) {
     return (
       <div>
         <div className="mb-8 pb-6 border-b border-border">
@@ -63,10 +64,10 @@ function Dashboard() {
     )
   }
 
-  return <DashboardContent initialState={initialState} />
+  return <DashboardContent initialState={loaderData.checklist} tier={loaderData.tier} />
 }
 
-function DashboardContent({ initialState }: { initialState: ChecklistState }) {
+function DashboardContent({ initialState, tier }: { initialState: ChecklistState; tier: 'free' | 'pro' }) {
   const [state, setState] = useState<ChecklistState>(initialState)
 
   const MANUAL_KEYS = new Set<keyof ChecklistState>(['shared_social', 'added_to_bio', 'sent_to_promoter', 'added_to_email_sig', 'included_in_demo'])
@@ -84,6 +85,8 @@ function DashboardContent({ initialState }: { initialState: ChecklistState }) {
     phase.items.some((item) => !state[item.key])
   )
 
+  const isFree = tier === 'free'
+
   return (
     <div>
       <div className="mb-8 pb-6 border-b border-border">
@@ -91,30 +94,99 @@ function DashboardContent({ initialState }: { initialState: ChecklistState }) {
         <p className="text-sm text-text-secondary mt-1">Make the most of your EPK with these steps.</p>
       </div>
 
-      <div className="space-y-6 max-w-2xl">
-        {PHASES.map((phase, phaseIndex) => {
-          const completed = phase.items.filter((item) => state[item.key]).length
-          const total = phase.items.length
-          const isFullyComplete = completed === total
-          const isFocus = phaseIndex === focusPhaseIndex
-          const isPastFocus = focusPhaseIndex !== -1 && phaseIndex > focusPhaseIndex
+      <div className={`${isFree ? 'flex gap-8' : ''}`}>
+        <div className={`space-y-6 ${isFree ? 'flex-1 min-w-0' : 'max-w-2xl'}`}>
+          {PHASES.map((phase, phaseIndex) => {
+            const completed = phase.items.filter((item) => state[item.key]).length
+            const total = phase.items.length
+            const isFullyComplete = completed === total
+            const isFocus = phaseIndex === focusPhaseIndex
+            const isPastFocus = focusPhaseIndex !== -1 && phaseIndex > focusPhaseIndex
 
-          return (
-            <PhaseCard
-              key={phaseIndex}
-              phaseNumber={phaseIndex + 1}
-              title={phase.title}
-              items={phase.items}
-              state={state}
-              completed={completed}
-              total={total}
-              isFullyComplete={isFullyComplete}
-              defaultExpanded={isFocus || focusPhaseIndex === -1}
-              muted={isPastFocus}
-              onToggle={handleToggle}
-            />
-          )
-        })}
+            return (
+              <PhaseCard
+                key={phaseIndex}
+                phaseNumber={phaseIndex + 1}
+                title={phase.title}
+                items={phase.items}
+                state={state}
+                completed={completed}
+                total={total}
+                isFullyComplete={isFullyComplete}
+                defaultExpanded={isFocus || focusPhaseIndex === -1}
+                muted={isPastFocus}
+                onToggle={handleToggle}
+              />
+            )
+          })}
+        </div>
+
+        {isFree && <ProUpsellPanel />}
+      </div>
+    </div>
+  )
+}
+
+const PRO_FEATURES = [
+  { label: 'Custom domain', description: 'Use your own domain for a professional look' },
+  { label: 'Remove platform branding', description: 'A clean page with just your brand' },
+  { label: 'SEO & social preview controls', description: 'Control how your link appears when shared' },
+  { label: 'Advanced theme customization', description: 'Custom colors, fonts, spacing & effects' },
+]
+
+function ProUpsellPanel() {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleUpgrade = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const result = await createCheckoutSession({ data: {} })
+      if ('url' in result && result.url) {
+        window.location.href = result.url
+      } else {
+        setError('error' in result && result.error ? result.error : 'Unable to start checkout')
+        setLoading(false)
+      }
+    } catch {
+      setError('Something went wrong. Please try again.')
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="w-72 flex-shrink-0 hidden lg:block">
+      <div className="sticky top-8 border border-accent/30 bg-accent/5 p-6">
+        <h2 className="font-display font-bold text-sm uppercase tracking-wider mb-1">Upgrade to Pro</h2>
+        <p className="text-2xl font-bold text-text-primary">
+          $9<span className="text-sm font-normal text-text-secondary">/month</span>
+        </p>
+
+        <ul className="mt-5 space-y-3">
+          {PRO_FEATURES.map((feature) => (
+            <li key={feature.label} className="flex gap-2.5">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-accent flex-shrink-0 mt-0.5">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+              <div>
+                <span className="text-sm font-medium text-text-primary">{feature.label}</span>
+                <p className="text-xs text-text-secondary mt-0.5">{feature.description}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        {error && <p className="mt-4 text-xs text-red-500">{error}</p>}
+
+        <button
+          type="button"
+          onClick={handleUpgrade}
+          disabled={loading}
+          className="mt-6 w-full py-2.5 bg-accent text-white text-sm font-bold uppercase tracking-wider hover:bg-accent/90 transition-colors disabled:opacity-50"
+        >
+          {loading ? 'Redirecting...' : 'Upgrade Now'}
+        </button>
       </div>
     </div>
   )

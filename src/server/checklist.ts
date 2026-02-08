@@ -31,7 +31,12 @@ function hasBioContent(bio: unknown, shortBio: string | null): boolean {
   return Array.isArray(blocks) && blocks.length > 0
 }
 
-export const getChecklistState = createServerFn({ method: 'GET' }).handler(async (): Promise<ChecklistState | null> => {
+export interface ChecklistLoaderData {
+  checklist: ChecklistState
+  tier: 'free' | 'pro'
+}
+
+export const getChecklistState = createServerFn({ method: 'GET' }).handler(async (): Promise<ChecklistLoaderData | null> => {
   const { supabase, user } = await withAuthOrNull()
   if (!user) return null
 
@@ -48,22 +53,25 @@ export const getChecklistState = createServerFn({ method: 'GET' }).handler(async
   const manualProgress: Record<string, boolean> = (profile.checklist_progress as Record<string, boolean>) || {}
 
   return {
-    has_display_name: !!profile.display_name?.trim(),
-    has_profile_image: !!profile.profile_image_url,
-    has_bio: hasBioContent(profile.bio, profile.short_bio),
-    has_hero_image: !!profile.hero_image_url,
-    has_mixes: (mixesResult.count ?? 0) > 0,
-    has_contact: !!(contactResult.data?.email || contactResult.data?.phone),
-    has_socials: (socialsResult.count ?? 0) > 0,
-    is_published: profile.published,
-    has_social_preview: !!(profile.og_title || profile.og_image_url),
-    shared_social: !!manualProgress.shared_social,
-    added_to_bio: !!manualProgress.added_to_bio,
-    sent_to_promoter: !!manualProgress.sent_to_promoter,
-    has_custom_domain: !!profile.custom_domain,
-    added_to_email_sig: !!manualProgress.added_to_email_sig,
-    included_in_demo: !!manualProgress.included_in_demo,
-    has_custom_theme: profile.template !== 'default' || profile.accent_color !== null,
+    tier: profile.tier === 'pro' ? 'pro' : 'free',
+    checklist: {
+      has_display_name: !!profile.display_name?.trim(),
+      has_profile_image: !!profile.profile_image_url,
+      has_bio: hasBioContent(profile.bio, profile.short_bio),
+      has_hero_image: !!profile.hero_image_url,
+      has_mixes: (mixesResult.count ?? 0) > 0,
+      has_contact: !!(contactResult.data?.email || contactResult.data?.phone),
+      has_socials: (socialsResult.count ?? 0) > 0,
+      is_published: profile.published,
+      has_social_preview: !!(profile.og_title || profile.og_image_url),
+      shared_social: !!manualProgress.shared_social,
+      added_to_bio: !!manualProgress.added_to_bio,
+      sent_to_promoter: !!manualProgress.sent_to_promoter,
+      has_custom_domain: !!profile.custom_domain,
+      added_to_email_sig: !!manualProgress.added_to_email_sig,
+      included_in_demo: !!manualProgress.included_in_demo,
+      has_custom_theme: profile.template !== 'default' || profile.accent_color !== null,
+    },
   }
 })
 
