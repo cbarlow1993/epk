@@ -31,33 +31,6 @@ function hasBioContent(bio: unknown, shortBio: string | null): boolean {
   return Array.isArray(blocks) && blocks.length > 0
 }
 
-const checklistBadgeSchema = z.object({ profileId: z.string() })
-
-/** Lightweight badge check — only queries counts, reuses profile from getCurrentUser. */
-export const getChecklistBadge = createServerFn({ method: 'POST' })
-  .inputValidator((data: unknown) => checklistBadgeSchema.parse(data))
-  .handler(async ({ data }): Promise<boolean> => {
-    const { supabase } = await withAuth()
-
-    const [profileResult, mixesResult, socialsResult, contactResult] = await Promise.all([
-      supabase.from('profiles').select('display_name, profile_image_url, bio, short_bio, hero_image_url').eq('id', data.profileId).single(),
-      supabase.from('mixes').select('id', { count: 'exact', head: true }).eq('profile_id', data.profileId),
-      supabase.from('social_links').select('id', { count: 'exact', head: true }).eq('profile_id', data.profileId),
-      supabase.from('booking_contact').select('email, phone').eq('profile_id', data.profileId).single(),
-    ])
-
-    const profile = profileResult.data
-    if (!profile) return true
-
-    return !profile.display_name?.trim() ||
-      !profile.profile_image_url ||
-      !hasBioContent(profile.bio, profile.short_bio) ||
-      !profile.hero_image_url ||
-      (mixesResult.count ?? 0) === 0 ||
-      !(contactResult.data?.email || contactResult.data?.phone) ||
-      (socialsResult.count ?? 0) === 0
-  })
-
 export const getChecklistState = createServerFn({ method: 'GET' }).handler(async (): Promise<ChecklistState | null> => {
   const { supabase, user } = await withAuthOrNull()
   if (!user) return null

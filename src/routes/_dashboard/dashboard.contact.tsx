@@ -2,20 +2,26 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { getBookingContact, updateBookingContact } from '~/server/booking-contact'
+import { getProfile } from '~/server/profile'
 import { bookingContactUpdateSchema, type BookingContactUpdate } from '~/schemas/booking-contact'
 import { FormInput } from '~/components/forms'
 import { useDashboardSave } from '~/hooks/useDashboardSave'
 import { DashboardHeader } from '~/components/DashboardHeader'
-import type { BookingContactRow } from '~/types/database'
+import { useSectionToggle } from '~/hooks/useSectionToggle'
+
 
 export const Route = createFileRoute('/_dashboard/dashboard/contact')({
-  loader: () => getBookingContact(),
+  loader: async () => {
+    const [contact, profile] = await Promise.all([getBookingContact(), getProfile()])
+    return { contact, sectionVisibility: (profile?.section_visibility as Record<string, boolean> | null) ?? null }
+  },
   component: BookingContactEditor,
 })
 
 function BookingContactEditor() {
-  const initialData = Route.useLoaderData() as BookingContactRow | null
+  const { contact: initialData, sectionVisibility } = Route.useLoaderData()
   const { saving, saved, error, onSave: save } = useDashboardSave(updateBookingContact)
+  const sectionToggle = useSectionToggle('contact', sectionVisibility)
 
   const { register, handleSubmit, formState: { errors, isDirty } } = useForm<BookingContactUpdate>({
     resolver: zodResolver(bookingContactUpdateSchema),
@@ -27,11 +33,13 @@ function BookingContactEditor() {
     },
   })
 
-  const onSave = handleSubmit(save)
+  const onSave = handleSubmit(async (data) => {
+    await Promise.all([save(data), sectionToggle.save()])
+  })
 
   return (
     <form onSubmit={onSave}>
-      <DashboardHeader title="Booking Contact" saving={saving} saved={saved} error={error} isDirty={isDirty} />
+      <DashboardHeader title="Booking Contact" saving={saving} saved={saved} error={error} isDirty={isDirty || sectionToggle.isDirty} sectionEnabled={sectionToggle.enabled} onToggleSection={sectionToggle.toggle} />
 
       <div className="space-y-6">
         <FormInput

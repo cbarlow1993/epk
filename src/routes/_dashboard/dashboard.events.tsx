@@ -13,11 +13,12 @@ import { DashboardHeader } from '~/components/DashboardHeader'
 import { useSectionToggle } from '~/hooks/useSectionToggle'
 import { Modal } from '~/components/Modal'
 import type { EventRow } from '~/types/database'
+import { formatEventDate } from '~/utils/dates'
 
 export const Route = createFileRoute('/_dashboard/dashboard/events')({
   loader: async () => {
     const [events, categories, profile] = await Promise.all([getEvents(), getEventCategories(), getProfile()])
-    return { events, categories, eventCategoryOrder: profile?.event_category_order ?? [] }
+    return { events, categories, eventCategoryOrder: profile?.event_category_order ?? [], sectionVisibility: (profile?.section_visibility as Record<string, boolean> | null) ?? null }
   },
   component: EventsEditor,
 })
@@ -25,14 +26,14 @@ export const Route = createFileRoute('/_dashboard/dashboard/events')({
 const modalSchema = eventUpsertSchema.omit({ sort_order: true })
 
 function EventsEditor() {
-  const { events: initialEvents, categories: initialCategories, eventCategoryOrder: initialCategoryOrder } = Route.useLoaderData()
+  const { events: initialEvents, categories: initialCategories, eventCategoryOrder: initialCategoryOrder, sectionVisibility } = Route.useLoaderData()
   const { items: events, handleDelete, addItem, setItems: setEvents } = useListEditor(
     initialEvents || [],
     { deleteFn: deleteEvent, reorderFn: reorderEvents }
   )
   const [modalItem, setModalItem] = useState<'add' | EventRow | null>(null)
   const [submitting, setSubmitting] = useState(false)
-  const sectionToggle = useSectionToggle('events')
+  const sectionToggle = useSectionToggle('events', sectionVisibility)
   const [sectionSaving, setSectionSaving] = useState(false)
   const [sectionSaved, setSectionSaved] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -77,7 +78,7 @@ function EventsEditor() {
 
   const openModal = (item: 'add' | EventRow) => {
     if (item === 'add') {
-      reset({ name: '', category: '', link_url: '', description: '' })
+      reset({ name: '', category: '', link_url: '', description: '', event_date: '', event_date_end: '' })
       setImagePreview(null)
     } else {
       reset({
@@ -87,6 +88,8 @@ function EventsEditor() {
         image_url: item.image_url || undefined,
         link_url: item.link_url || '',
         description: item.description || '',
+        event_date: item.event_date || '',
+        event_date_end: item.event_date_end || '',
       })
       setImagePreview(item.image_url || null)
     }
@@ -113,6 +116,8 @@ function EventsEditor() {
       ...data,
       image_url: imageUrl || undefined,
       link_url: data.link_url || undefined,
+      event_date: data.event_date || undefined,
+      event_date_end: data.event_date_end || undefined,
     }
 
     if (!isEditing) {
@@ -264,6 +269,9 @@ function EventsEditor() {
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-text-primary truncate">{event.name}</p>
+                        {formatEventDate(event.event_date, event.event_date_end) && (
+                          <p className="text-xs text-text-secondary">{formatEventDate(event.event_date, event.event_date_end)}</p>
+                        )}
                         {event.link_url && (
                           <p className="text-xs text-text-secondary truncate">{event.link_url}</p>
                         )}
@@ -344,6 +352,25 @@ function EventsEditor() {
               {...register('description')}
               className={FORM_INPUT}
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={FORM_LABEL}>Date (optional)</label>
+              <input
+                type="date"
+                {...register('event_date')}
+                className={FORM_INPUT}
+              />
+            </div>
+            <div>
+              <label className={FORM_LABEL}>End Date (optional)</label>
+              <input
+                type="date"
+                {...register('event_date_end')}
+                className={FORM_INPUT}
+              />
+            </div>
           </div>
 
           <div>

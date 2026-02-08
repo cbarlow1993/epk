@@ -8,6 +8,8 @@ export const eventUpsertSchema = z.object({
   link_url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
   sort_order: z.number().int().min(0).optional(),
   description: z.string().max(1000).optional().or(z.literal('')),
+  event_date: z.string().optional().or(z.literal('')),
+  event_date_end: z.string().optional().or(z.literal('')),
 })
 
 export type EventUpsert = z.infer<typeof eventUpsertSchema>

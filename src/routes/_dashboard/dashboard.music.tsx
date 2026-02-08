@@ -18,7 +18,7 @@ import type { MixRow } from '~/types/database'
 export const Route = createFileRoute('/_dashboard/dashboard/music')({
   loader: async () => {
     const [mixes, categories, profile] = await Promise.all([getMixes(), getMixCategories(), getProfile()])
-    return { mixes, categories, mixCategoryOrder: profile?.mix_category_order ?? [] }
+    return { mixes, categories, mixCategoryOrder: profile?.mix_category_order ?? [], sectionVisibility: (profile?.section_visibility as Record<string, boolean> | null) ?? null }
   },
   component: MusicEditor,
 })
@@ -26,14 +26,14 @@ export const Route = createFileRoute('/_dashboard/dashboard/music')({
 const modalSchema = mixUpsertSchema.omit({ sort_order: true, thumbnail_url: true, platform: true, embed_html: true })
 
 function MusicEditor() {
-  const { mixes: initialMixes, categories: initialCategories, mixCategoryOrder: initialCategoryOrder } = Route.useLoaderData()
+  const { mixes: initialMixes, categories: initialCategories, mixCategoryOrder: initialCategoryOrder, sectionVisibility } = Route.useLoaderData()
   const { items: mixes, handleDelete, addItem, setItems: setMixes } = useListEditor(
     initialMixes || [],
     { deleteFn: deleteMix, reorderFn: reorderMixes }
   )
   const [modalItem, setModalItem] = useState<'add' | MixRow | null>(null)
   const [submitting, setSubmitting] = useState(false)
-  const sectionToggle = useSectionToggle('music')
+  const sectionToggle = useSectionToggle('music', sectionVisibility)
   const [sectionSaving, setSectionSaving] = useState(false)
   const [sectionSaved, setSectionSaved] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)

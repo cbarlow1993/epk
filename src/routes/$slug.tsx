@@ -9,19 +9,45 @@ import { Analytics, trackSectionView } from '~/components/Analytics'
 import { getTemplate, resolveTheme } from '~/utils/templates'
 import { isLightBackground } from '~/utils/color'
 import type { MixRow, EventRow, SocialLinkRow, FileRow } from '~/types/database'
+import { formatEventDate } from '~/utils/dates'
 
 type PhotoRow = { id: string; image_url: string; caption: string | null; sort_order: number }
 
+// Theme search params accepted in preview mode
+const THEME_SEARCH_KEYS = [
+  'accent_color', 'bg_color', 'font_family', 'template',
+  'hero_style', 'bio_layout', 'animate_sections',
+  'theme_display_font', 'theme_display_size', 'theme_display_weight',
+  'theme_heading_font', 'theme_heading_size', 'theme_heading_weight',
+  'theme_subheading_font', 'theme_subheading_size', 'theme_subheading_weight',
+  'theme_body_font', 'theme_body_size', 'theme_body_weight',
+  'theme_text_color', 'theme_heading_color', 'theme_link_color',
+  'theme_card_bg', 'theme_border_color',
+  'theme_section_padding', 'theme_content_width', 'theme_card_radius', 'theme_element_gap',
+  'theme_button_style', 'theme_link_style',
+  'theme_card_border', 'theme_shadow', 'theme_divider_style',
+] as const
+
 export const Route = createFileRoute('/$slug')({
-  validateSearch: (search: Record<string, unknown>) => ({
-    preview: search.preview === 'true',
-    accent: (search.accent as string) || undefined,
-    bg: (search.bg as string) || undefined,
-    font: (search.font as string) || undefined,
-    hero: (search.hero as string) || undefined,
-    bioLayout: (search.bioLayout as string) || undefined,
-    sections: (search.sections as string) || undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>) => {
+    const result: Record<string, unknown> = {
+      preview: search.preview === 'true',
+      // Legacy short params (backward compat)
+      accent: (search.accent as string) || undefined,
+      bg: (search.bg as string) || undefined,
+      font: (search.font as string) || undefined,
+      hero: (search.hero as string) || undefined,
+      bioLayout: (search.bioLayout as string) || undefined,
+      sections: (search.sections as string) || undefined,
+    }
+    // Pass through all theme_* and known field params for preview
+    for (const key of THEME_SEARCH_KEYS) {
+      if (typeof search[key] === 'string' && search[key]) {
+        result[key] = search[key] as string
+      }
+    }
+    return result as Record<string, string | boolean | undefined>
+  },
   loader: ({ params }) => getPublicProfile({ data: params.slug }),
   head: ({ loaderData }) => {
     const profile = loaderData?.profile
@@ -202,25 +228,42 @@ function PublicEPK() {
   const { profile, socialLinks, mixes, events, technicalRider, bookingContact, pressAssets, photos: rawPhotos } = data
   const photos = (rawPhotos || []) as PhotoRow[]
 
-  const templateConfig = getTemplate(profile.template || 'default')
+  // Build search overrides from all theme params in URL
+  const s = search as Record<string, string | boolean | undefined>
+  const searchOverrides: Record<string, string | undefined> = {
+    // Legacy short names → canonical field names
+    accent_color: (s.accent_color as string) || (search.accent as string | undefined),
+    bg_color: (s.bg_color as string) || (search.bg as string | undefined),
+  }
+  // Map legacy ?font= to both display and body fonts
+  if (search.font) {
+    searchOverrides.theme_display_font = search.font as string
+    searchOverrides.theme_body_font = search.font as string
+  }
+  // Copy all theme_* params from search
+  for (const key of THEME_SEARCH_KEYS) {
+    const val = s[key]
+    if (typeof val === 'string' && val && !(key in searchOverrides && searchOverrides[key])) {
+      searchOverrides[key] = val
+    }
+  }
+
+  const searchTemplate = s.template as string | undefined
+  const templateConfig = getTemplate(searchTemplate || profile.template || 'default')
   const theme = resolveTheme(
     profile as Record<string, unknown>,
     templateConfig,
-    {
-      accent_color: search.accent,
-      bg_color: search.bg,
-      theme_display_font: search.font, // backward compat: search.font maps to display font
-      theme_body_font: search.font,
-    } as Record<string, string | undefined>
+    searchOverrides,
   )
 
-  const heroStyle = search.hero || profile.hero_style || templateConfig.heroStyle
-  const bioLayout = search.bioLayout || profile.bio_layout || templateConfig.bioLayout
+  const heroStyle = (s.hero_style as string) || (search.hero as string | undefined) || profile.hero_style || templateConfig.heroStyle
+  const bioLayout = (s.bio_layout as string) || (search.bioLayout as string | undefined) || profile.bio_layout || templateConfig.bioLayout
   const sectionOrder = search.sections
-    ? search.sections.split(',')
+    ? (search.sections as string).split(',')
     : profile.section_order || templateConfig.sectionOrder
   const sectionVisibility = (profile.section_visibility || {}) as Record<string, boolean>
-  const animateSections = profile.animate_sections !== false
+  const searchAnimateSections = s.animate_sections as string | undefined
+  const animateSections = searchAnimateSections != null ? searchAnimateSections !== 'false' : profile.animate_sections !== false
 
   const accent = theme.accent
   const bg = theme.bg
@@ -291,7 +334,7 @@ function PublicEPK() {
     profile.bio && { label: 'Bio', href: '#bio' },
     mixes.length > 0 && { label: 'Music', href: '#music' },
     events.length > 0 && { label: 'Events', href: '#events' },
-    technicalRider && (technicalRider.deck_model || technicalRider.mixer_model || technicalRider.monitor_type || technicalRider.additional_notes) && { label: 'Technical', href: '#technical' },
+    technicalRider && (technicalRider.deck_model || technicalRider.mixer_model || technicalRider.monitor_type || technicalRider.additional_notes) && { label: 'Rider', href: '#technical' },
     (pressAssets.length > 0 || profile.press_kit_url) && { label: 'Press', href: '#press' },
     bookingContact && bookingContact.manager_name && { label: 'Contact', href: '#contact' },
     (data?.integrations || []).some((i: { type: string }) => ['soundcloud', 'spotify', 'mixcloud'].includes(i.type)) && { label: 'Listen', href: '#listen-embeds' },
@@ -302,9 +345,19 @@ function PublicEPK() {
   const textClass = isLight ? 'text-text-primary' : 'text-white'
   const textSecClass = isLight ? 'text-text-secondary' : 'text-white/60'
   const proseClass = isLight ? 'prose prose-sm max-w-none' : 'prose prose-invert prose-sm max-w-none'
-  const borderClass = isLight ? 'border-black/6' : 'border-white/5'
-  const cardBgClass = isLight ? 'bg-white' : 'bg-white/5'
   const socialBorderClass = isLight ? 'border-black/10' : 'border-white/20'
+
+  // Card styles derived from CSS variables
+  const cardStyle: React.CSSProperties = {
+    backgroundColor: 'var(--theme-card-bg)',
+    borderColor: 'var(--theme-border-color)',
+    borderWidth: 'var(--theme-border-width)',
+    borderRadius: 'var(--theme-card-radius)',
+    boxShadow: 'var(--theme-shadow)',
+  }
+  const borderStyle: React.CSSProperties = {
+    borderColor: 'var(--theme-border-color)',
+  }
 
   return (
     <div
@@ -343,14 +396,14 @@ function PublicEPK() {
       className="min-h-screen"
     >
       {profile.theme_custom_fonts && (profile.theme_custom_fonts as Array<{name: string; url: string; weight: string}>).length > 0 && (
-        <style dangerouslySetInnerHTML={{ __html: (profile.theme_custom_fonts as Array<{name: string; url: string; weight: string}>).map(f => `
-          @font-face {
-            font-family: '${f.name}';
-            src: url('${f.url}') format('${f.url.endsWith('.woff2') ? 'woff2' : f.url.endsWith('.woff') ? 'woff' : f.url.endsWith('.otf') ? 'opentype' : 'truetype'}');
-            font-weight: ${f.weight};
-            font-display: swap;
-          }
-        `).join('\n') }} />
+        <style dangerouslySetInnerHTML={{ __html: (profile.theme_custom_fonts as Array<{name: string; url: string; weight: string}>).map(f => {
+          // Sanitize values to prevent CSS injection
+          const safeName = f.name.replace(/['"\\}{;()<>]/g, '')
+          const safeUrl = f.url.replace(/['"\\}{;()<>]/g, '')
+          const safeWeight = f.weight.replace(/[^0-9]/g, '') || '400'
+          const format = safeUrl.endsWith('.woff2') ? 'woff2' : safeUrl.endsWith('.woff') ? 'woff' : safeUrl.endsWith('.otf') ? 'opentype' : 'truetype'
+          return `@font-face{font-family:'${safeName}';src:url('${safeUrl}') format('${format}');font-weight:${safeWeight};font-display:swap;}`
+        }).join('\n') }} />
       )}
       <Analytics slug={profile.slug as string} />
       <Nav displayName={name} sections={navSections} />
@@ -494,7 +547,7 @@ function PublicEPK() {
                     </h3>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {categoryMixes.map((mix) => (
-                        <div key={mix.id} className={`${cardBgClass} border ${borderClass} overflow-hidden`}>
+                        <div key={mix.id} className="border overflow-hidden" style={cardStyle}>
                           {mix.embed_html ? (
                             <div
                               className="w-full [&_iframe]:w-full [&_iframe]:rounded-none"
@@ -532,15 +585,19 @@ function PublicEPK() {
                       href={event.link_url || '#'}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`group block overflow-hidden border ${borderClass} hover:border-accent/30 transition-all hover:scale-105`}
+                      className="group block overflow-hidden border hover:border-accent/30 transition-all hover:scale-105"
+                      style={cardStyle}
                     >
-                      <div className={`aspect-square overflow-hidden ${cardBgClass}`}>
+                      <div className="aspect-square overflow-hidden" style={{ backgroundColor: 'var(--theme-card-bg)' }}>
                         {event.image_url && (
                           <img src={event.image_url} alt={event.name} className="w-full h-full object-cover object-center" loading="lazy" />
                         )}
                       </div>
-                      <div className={`${cardBgClass} backdrop-blur-sm px-3 py-2`}>
+                      <div className="backdrop-blur-sm px-3 py-2" style={{ backgroundColor: 'var(--theme-card-bg)' }}>
                         <p className={`text-xs text-center ${textSecClass} leading-tight`}>{event.name}</p>
+                        {formatEventDate(event.event_date, event.event_date_end) && (
+                          <p className={`text-[10px] text-center ${textSecClass} opacity-70 mt-0.5`}>{formatEventDate(event.event_date, event.event_date_end)}</p>
+                        )}
                       </div>
                     </a>
                   ))}
@@ -565,7 +622,7 @@ function PublicEPK() {
                         loading="lazy"
                       />
                       {photo.caption && (
-                        <div className={`px-3 py-2 ${cardBgClass}`}>
+                        <div className="px-3 py-2" style={{ backgroundColor: 'var(--theme-card-bg)' }}>
                           <p className={`text-xs ${textSecClass}`}>{photo.caption}</p>
                         </div>
                       )}
@@ -577,7 +634,7 @@ function PublicEPK() {
 
             technical: technicalRider && (technicalRider.deck_model || technicalRider.mixer_model || technicalRider.monitor_type || technicalRider.additional_notes) ? (
               <EPKSection key="technical" id="technical" heading="Technical Rider" animate={animateSections}>
-                <div className={`${cardBgClass} backdrop-blur-sm border ${borderClass} overflow-hidden max-w-4xl mx-auto`}>
+                <div className="backdrop-blur-sm border overflow-hidden max-w-4xl mx-auto" style={cardStyle}>
                   <dl className="divide-y divide-current/5">
                     {technicalRider.deck_model && (
                       <div className="px-6 py-4 flex justify-between items-baseline">
@@ -613,7 +670,7 @@ function PublicEPK() {
                   </dl>
                   {technicalRider.additional_notes && (
                     <>
-                      <div className={`border-t ${borderClass}`} />
+                      <div className="border-t" style={borderStyle} />
                       <div className="px-6 py-4">
                         <p className="text-sm font-medium mb-2">Additional Notes</p>
                         <p className={`text-sm ${textSecClass} whitespace-pre-line`}>{technicalRider.additional_notes}</p>
@@ -632,7 +689,8 @@ function PublicEPK() {
                       href={profile.press_kit_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`inline-flex items-center gap-2 ${cardBgClass} border ${borderClass} px-5 py-3 hover:border-accent/30 transition-colors group`}
+                      className="inline-flex items-center gap-2 border px-5 py-3 hover:border-accent/30 transition-colors group"
+                      style={cardStyle}
                     >
                       <span className="font-semibold text-sm">Download Press Kit</span>
                       <span className={`text-xs ${textSecClass} group-hover:text-accent transition-colors`}>&rarr;</span>
@@ -648,7 +706,8 @@ function PublicEPK() {
                         download
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`${cardBgClass} border ${borderClass} p-4 hover:border-accent/30 transition-colors group`}
+                        className="border p-4 hover:border-accent/30 transition-colors group"
+                        style={cardStyle}
                       >
                         <p className="font-semibold text-sm mb-1">{asset.press_title || asset.name}</p>
                         <p className={`text-xs ${textSecClass} group-hover:text-accent transition-colors`}>Download</p>
@@ -660,7 +719,7 @@ function PublicEPK() {
             ) : null,
 
             contact: bookingContact && bookingContact.manager_name ? (
-              <EPKSection key="contact" id="contact" heading="Booking Contact" maxWidth="max-w-4xl" animate={animateSections}>
+              <EPKSection key="contact" id="contact" heading="Booking Contact" animate={animateSections}>
                 <div className={`${textSecClass} space-y-2`}>
                   <p><strong>Management:</strong> {bookingContact.manager_name}</p>
                   {bookingContact.email && <p><strong>Email:</strong> {bookingContact.email}</p>}
@@ -789,7 +848,7 @@ function PublicEPK() {
 
       {/* Agency Branding */}
       {data.organization && (
-        <div className={`py-6 text-center border-t ${borderClass}`}>
+        <div className="py-6 text-center border-t" style={borderStyle}>
           <p className={`text-xs ${textSecClass}`}>
             Represented by{' '}
             {data.organization.website_url ? (
@@ -805,7 +864,7 @@ function PublicEPK() {
 
       {/* Branded footer for free tier */}
       {!(profile.hide_platform_branding && profile.tier === 'pro') && (
-        <footer className={`py-6 text-center border-t ${borderClass}`}>
+        <footer className="py-6 text-center border-t" style={borderStyle}>
           <p className={`text-xs ${textSecClass}`}>
             Built with <a href="/" className="text-accent hover:underline">DJ EPK</a>
           </p>

@@ -4,15 +4,21 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { getPressAssets, upsertPressAsset, deletePressAsset, reorderPressAssets } from '~/server/press-assets'
+import { getProfile, updateProfile } from '~/server/profile'
 import { ASSET_TYPES } from '~/schemas/press-asset'
 import { uploadFileFromInput } from '~/utils/upload'
-import { FORM_INPUT, BTN_PRIMARY, CARD_SECTION, toSelectOptions } from '~/components/forms'
+import { FORM_INPUT, FORM_LABEL, BTN_PRIMARY, CARD_SECTION, toSelectOptions } from '~/components/forms'
 import { GridItemOverlay } from '~/components/GridItemOverlay'
 import { useListEditor } from '~/hooks/useListEditor'
-import type { FileRow } from '~/types/database'
+import { DashboardHeader } from '~/components/DashboardHeader'
+import { useSectionToggle } from '~/hooks/useSectionToggle'
+import type { FileRow, ProfileRow } from '~/types/database'
 
 export const Route = createFileRoute('/_dashboard/dashboard/press')({
-  loader: () => getPressAssets(),
+  loader: async () => {
+    const [assets, profile] = await Promise.all([getPressAssets(), getProfile()])
+    return { assets, profile }
+  },
   component: PressEditor,
 })
 
@@ -26,13 +32,21 @@ const uploadFormSchema = z.object({
 type UploadFormValues = z.infer<typeof uploadFormSchema>
 
 function PressEditor() {
-  const initialAssets = Route.useLoaderData()
+  const { assets: initialAssets, profile } = Route.useLoaderData()
   const { items: assets, handleDelete, handleReorder, addItem } = useListEditor(
     (initialAssets || []) as FileRow[],
     { deleteFn: deletePressAsset, reorderFn: reorderPressAssets }
   )
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const sectionToggle = useSectionToggle('press', (profile as ProfileRow | null)?.section_visibility as Record<string, boolean> | null)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState('')
+  const savedPressKitUrl = useRef((profile as ProfileRow | null)?.press_kit_url || '')
+  const [pressKitUrl, setPressKitUrl] = useState(savedPressKitUrl.current)
+  const linkDirty = pressKitUrl !== savedPressKitUrl.current
+  const isDirty = linkDirty || sectionToggle.isDirty
 
   const { register, getValues, reset } = useForm<UploadFormValues>({
     resolver: zodResolver(uploadFormSchema),
@@ -69,9 +83,56 @@ function PressEditor() {
   }
 
 
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSaving(true)
+    setError('')
+
+    if (sectionToggle.isDirty) {
+      await sectionToggle.save()
+    }
+
+    if (linkDirty) {
+      const trimmed = pressKitUrl.trim()
+      const result = await updateProfile({ data: { press_kit_url: trimmed || '' } })
+      if (result && 'error' in result && result.error) {
+        setError(result.error as string)
+        setSaving(false)
+        return
+      }
+      savedPressKitUrl.current = trimmed
+      setPressKitUrl(trimmed)
+    }
+
+    setSaving(false)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 3000)
+  }
+
   return (
     <div>
-      <h1 className="text-2xl font-display font-extrabold tracking-tight uppercase mb-8">Press Assets</h1>
+      <form onSubmit={handleSave}>
+        <DashboardHeader title="Press Assets" saving={saving} saved={saved} error={error} isDirty={isDirty} sectionEnabled={sectionToggle.enabled} onToggleSection={sectionToggle.toggle} />
+
+        {/* External Assets Link */}
+        <div className={CARD_SECTION}>
+          <h2 className="font-medium text-text-secondary mb-4">External Assets Link</h2>
+          <p className="text-xs text-text-secondary mb-3">
+            Share a link to your assets (e.g. Dropbox, Google Drive, WeTransfer).
+            Visitors can access all your assets in one click.
+          </p>
+          <div>
+            <label className={FORM_LABEL}>URL</label>
+            <input
+              type="url"
+              placeholder="https://dropbox.com/sh/your-press-kit"
+              value={pressKitUrl}
+              onChange={(e) => setPressKitUrl(e.target.value)}
+              className={FORM_INPUT}
+            />
+          </div>
+        </div>
+      </form>
 
       {/* Upload Form */}
       <div className={CARD_SECTION}>
@@ -134,7 +195,7 @@ function PressEditor() {
                 label={asset.press_title || asset.name}
                 index={index}
                 total={assets.length}
-                onReorder={handleReorder!}
+                onReorder={handleReorder ?? (() => {})}
                 onDelete={() => handleDelete(asset.id)}
               >
                 <span className="inline-block bg-bg rounded px-2 py-0.5 text-[10px] text-text-secondary uppercase tracking-wider">

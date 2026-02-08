@@ -122,6 +122,8 @@ export interface EventRow {
   sort_order: number
   created_at: string
   description: string | null
+  event_date: string | null
+  event_date_end: string | null
 }
 
 export interface SocialLinkRow {

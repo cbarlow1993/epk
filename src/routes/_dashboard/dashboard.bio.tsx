@@ -29,7 +29,7 @@ function BioEditor() {
   const [wordCount, setWordCount] = useState(0)
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const [uploadError, setUploadError] = useState('')
-  const sectionToggle = useSectionToggle('bio')
+  const sectionToggle = useSectionToggle('bio', initialProfile?.section_visibility as Record<string, boolean> | null)
 
   const { register, handleSubmit, watch, formState: { errors, isDirty }, setValue } = useForm<BioFormValues>({
     resolver: zodResolver(bioFormSchema) as never,
@@ -65,7 +65,8 @@ function BioEditor() {
 
   return (
     <form onSubmit={handleSave}>
-      <DashboardHeader title="Bio" saving={saving} saved={saved} error={error} isDirty={isDirty || sectionToggle.isDirty || true} sectionEnabled={sectionToggle.enabled} onToggleSection={sectionToggle.toggle} />
+      {/* Editor.js is uncontrolled so isDirty can't track its changes — always allow save */}
+      <DashboardHeader title="Bio" saving={saving} saved={saved} error={error} isDirty sectionEnabled={sectionToggle.enabled} onToggleSection={sectionToggle.toggle} />
 
       <div className="space-y-6 max-w-2xl">
         {/* Bio Layout */}
@@ -124,7 +125,17 @@ function BioEditor() {
             <label className={FORM_LABEL}>Side Image</label>
             <div className="flex items-center gap-4">
               {profileImageUrl ? (
-                <img src={profileImageUrl} alt="Side" className="w-20 h-20 object-cover border border-border" />
+                <div className="relative group">
+                  <img src={profileImageUrl} alt="Side" className="w-20 h-20 object-cover border border-border" />
+                  <button
+                    type="button"
+                    onClick={() => setValue('profile_image_url', '', { shouldDirty: true })}
+                    className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                    aria-label="Remove image"
+                  >
+                    &times;
+                  </button>
+                </div>
               ) : (
                 <div className="w-20 h-20 bg-surface border border-border flex items-center justify-center text-text-secondary text-xs">
                   No image

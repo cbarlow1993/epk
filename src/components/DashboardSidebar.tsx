@@ -7,8 +7,8 @@ import type { ProfileRow } from '~/types/database'
 type SidebarProfile = Pick<ProfileRow, 'slug' | 'display_name' | 'profile_image_url' | 'published'>
 
 const NAV_ITEMS = [
-  { label: 'Profile', href: '/dashboard' },
-  { label: 'What to do next', href: '/dashboard/next' },
+  { label: 'Dashboard', href: '/dashboard' },
+  { label: 'Profile', href: '/dashboard/profile' },
   { label: 'Hero', href: '/dashboard/hero' },
   { label: 'Bio', href: '/dashboard/bio' },
   { label: 'Music', href: '/dashboard/music' },
@@ -34,7 +34,7 @@ const AGENCY_NAV_ITEMS = [
   { label: 'Agency Analytics', href: '/dashboard/analytics-overview' },
 ]
 
-export function DashboardSidebar({ profile, isAgency = false, showNextBadge = false }: { profile: SidebarProfile; isAgency?: boolean; showNextBadge?: boolean }) {
+export function DashboardSidebar({ profile, isAgency = false }: { profile: SidebarProfile; isAgency?: boolean }) {
   const matchRoute = useMatchRoute()
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -87,9 +87,6 @@ export function DashboardSidebar({ profile, isAgency = false, showNextBadge = fa
               }`}
             >
               {item.label}
-              {item.href === '/dashboard/next' && showNextBadge && (
-                <span className="ml-2 inline-block w-2 h-2 rounded-full bg-accent" />
-              )}
             </Link>
           )
         })}

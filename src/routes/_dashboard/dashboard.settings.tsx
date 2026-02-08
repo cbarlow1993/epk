@@ -1,21 +1,26 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { getProfile, getUserEmail, updateProfile, updateUserEmail, updateUserPassword } from '~/server/profile'
-import type { ProfileRow } from '~/types/database'
+import type { ProfileRow, DomainOrderRow } from '~/types/database'
 import { createCheckoutSession, createPortalSession } from '~/server/billing'
-import { addCustomDomain, removeCustomDomain, checkDomainStatus } from '~/server/domains'
-import { SETTINGS_CARD, FORM_LABEL, FORM_INPUT, BTN_PRIMARY } from '~/components/forms'
+import { addCustomDomain, removeCustomDomain, checkDomainStatus, searchDomain, getDomainOrder, createDomainCheckout, cancelDomainOrder } from '~/server/domains'
+import { contactInfoSchema, type ContactInfo } from '~/schemas/domain-order'
+import { SETTINGS_CARD, FORM_LABEL, FORM_INPUT, FORM_INPUT_ERROR, BTN_PRIMARY } from '~/components/forms'
 
 export const Route = createFileRoute('/_dashboard/dashboard/settings')({
   loader: async () => {
-    const [profile, emailResult] = await Promise.all([getProfile(), getUserEmail()])
-    return { profile, userEmail: emailResult.email }
+    const [profile, emailResult, domainResult] = await Promise.all([
+      getProfile(),
+      getUserEmail(),
+      getDomainOrder(),
+    ])
+    return { profile, userEmail: emailResult.email, domainOrder: domainResult.order }
   },
   component: SettingsPage,
 })
 
 function SettingsPage() {
-  const { profile, userEmail } = Route.useLoaderData()
+  const { profile, userEmail, domainOrder } = Route.useLoaderData()
   const [billingLoading, setBillingLoading] = useState(false)
   const [billingError, setBillingError] = useState('')
 
@@ -78,7 +83,7 @@ function SettingsPage() {
                 type="button"
                 onClick={() => redirectToBilling(createPortalSession)}
                 disabled={billingLoading}
-                className="bg-bg hover:bg-border disabled:opacity-30 text-text-primary text-sm font-medium px-6 py-2 transition-colors"
+                className="px-4 py-2 text-sm font-semibold uppercase tracking-wider bg-bg text-text-primary hover:bg-border disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {billingLoading ? 'Loading...' : 'Manage Subscription'}
               </button>
@@ -90,7 +95,7 @@ function SettingsPage() {
                 type="button"
                 onClick={() => redirectToBilling(createCheckoutSession)}
                 disabled={billingLoading}
-                className="bg-text-primary hover:bg-accent disabled:opacity-30 text-white text-sm font-medium px-6 py-2 transition-colors"
+                className={BTN_PRIMARY}
               >
                 {billingLoading ? 'Loading...' : 'Upgrade to Pro'}
               </button>
@@ -103,7 +108,7 @@ function SettingsPage() {
         <BrandingSection profile={profile} />
 
         {/* Custom Domain */}
-        <CustomDomainSection profile={profile} />
+        <CustomDomainSection profile={profile} initialOrder={domainOrder} />
       </div>
     </div>
   )
@@ -142,7 +147,7 @@ function BrandingSection({ profile }: { profile: ProfileRow | null }) {
       setError(result.error as string)
     } else {
       setSaved(true)
-      setTimeout(() => setSaved(false), 2000)
+      setTimeout(() => setSaved(false), 3000)
     }
   }
 
@@ -151,13 +156,13 @@ function BrandingSection({ profile }: { profile: ProfileRow | null }) {
       <h2 className="font-medium text-text-secondary text-sm mb-4">Branding</h2>
       <div className="space-y-4">
         <div>
-          <label className="text-xs text-text-secondary block mb-1">Favicon URL</label>
+          <label className={FORM_LABEL}>Favicon URL</label>
           <input
             type="text"
             value={faviconUrl}
             onChange={(e) => setFaviconUrl(e.target.value)}
             placeholder="https://example.com/favicon.ico"
-            className="w-full bg-bg border border-border  px-4 py-2 text-text-primary text-sm focus:border-accent focus:outline-none"
+            className={FORM_INPUT}
           />
         </div>
         <div className="flex items-center gap-3">
@@ -173,15 +178,15 @@ function BrandingSection({ profile }: { profile: ProfileRow | null }) {
           </label>
         </div>
         <div>
-          <label className="text-xs text-text-secondary block mb-1">
-            Custom Meta Description <span className="text-text-secondary/50">({metaDescription.length}/300)</span>
+          <label className={FORM_LABEL}>
+            Custom Meta Description <span className="text-text-secondary/50 normal-case font-normal">({metaDescription.length}/300)</span>
           </label>
           <textarea
             value={metaDescription}
             onChange={(e) => setMetaDescription(e.target.value.slice(0, 300))}
             placeholder="Custom description for search engines and social sharing..."
             rows={3}
-            className="w-full bg-bg border border-border  px-4 py-2 text-text-primary text-sm focus:border-accent focus:outline-none resize-none"
+            className={FORM_INPUT + ' resize-none'}
           />
         </div>
         <div className="flex items-center gap-3">
@@ -189,7 +194,7 @@ function BrandingSection({ profile }: { profile: ProfileRow | null }) {
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="bg-text-primary hover:bg-accent disabled:opacity-30 text-white text-sm font-medium px-6 py-2 transition-colors"
+            className={BTN_PRIMARY}
           >
             {saving ? 'Saving...' : 'Save'}
           </button>
@@ -358,7 +363,70 @@ function SecuritySection() {
   )
 }
 
-function CustomDomainSection({ profile }: { profile: ProfileRow | null }) {
+type SearchResult = {
+  domain: string
+  available: boolean
+  purchasePrice: number
+  renewalPrice: number
+  years: number
+}
+
+function CustomDomainSection({ profile, initialOrder }: { profile: ProfileRow | null; initialOrder: DomainOrderRow | null }) {
+  const [tab, setTab] = useState<'byod' | 'buy'>('byod')
+  const [domainOrder, setDomainOrder] = useState<DomainOrderRow | null>(initialOrder)
+
+  if (profile?.tier !== 'pro') {
+    return (
+      <div className={SETTINGS_CARD}>
+        <h2 className="font-medium text-text-secondary text-sm mb-4">Custom Domain</h2>
+        <p className="text-text-secondary text-sm">Upgrade to Pro to use a custom domain.</p>
+      </div>
+    )
+  }
+
+  if (domainOrder && ['active', 'purchasing', 'renewal_failed', 'failed'].includes(domainOrder.status)) {
+    return <DomainOrderStatus order={domainOrder} onRemove={() => setDomainOrder(null)} />
+  }
+
+  return (
+    <div className={SETTINGS_CARD}>
+      <h2 className="font-medium text-text-secondary text-sm mb-4">Custom Domain</h2>
+
+      <div className="flex gap-4 mb-6 border-b border-border">
+        <button
+          type="button"
+          onClick={() => setTab('byod')}
+          className={`pb-2 text-sm font-medium transition-colors ${
+            tab === 'byod'
+              ? 'text-text-primary border-b-2 border-accent'
+              : 'text-text-secondary hover:text-text-primary'
+          }`}
+        >
+          Use your own
+        </button>
+        <button
+          type="button"
+          onClick={() => setTab('buy')}
+          className={`pb-2 text-sm font-medium transition-colors ${
+            tab === 'buy'
+              ? 'text-text-primary border-b-2 border-accent'
+              : 'text-text-secondary hover:text-text-primary'
+          }`}
+        >
+          Buy a domain
+        </button>
+      </div>
+
+      {tab === 'byod' ? (
+        <BYODFlow profile={profile} />
+      ) : (
+        <DomainSearchFlow onOrderCreated={setDomainOrder} />
+      )}
+    </div>
+  )
+}
+
+function BYODFlow({ profile }: { profile: ProfileRow | null }) {
   const [domain, setDomain] = useState(profile?.custom_domain || '')
   const [status, setStatus] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -376,61 +444,372 @@ function CustomDomainSection({ profile }: { profile: ProfileRow | null }) {
 
   const handleRemove = async () => {
     setLoading(true)
-    await removeCustomDomain()
+    const result = await removeCustomDomain()
     setLoading(false)
-    setDomain('')
-    setStatus('Domain removed.')
+    if (result && 'error' in result && result.error) {
+      setStatus(result.error as string)
+    } else {
+      setDomain('')
+      setStatus('Domain removed.')
+    }
   }
 
   const handleCheck = async () => {
+    setLoading(true)
     const result = await checkDomainStatus({ data: { domain } })
+    setLoading(false)
     setStatus(result.configured ? 'Domain is verified and active.' : 'Domain not yet verified. Check your DNS settings.')
   }
 
-  if (profile?.tier !== 'pro') {
+  if (profile?.custom_domain) {
     return (
-      <div className={SETTINGS_CARD}>
-        <h2 className="font-medium text-text-secondary text-sm mb-4">Custom Domain</h2>
-        <p className="text-text-secondary text-sm">Upgrade to Pro to use a custom domain.</p>
+      <div className="space-y-3">
+        <p className="text-sm">Current domain: <span className="font-mono text-accent">{profile.custom_domain}</span></p>
+        <div className="flex gap-2">
+          <button type="button" onClick={handleCheck} className="text-xs text-text-secondary hover:text-text-primary transition-colors">Check status</button>
+          <button type="button" onClick={handleRemove} disabled={loading} className="text-xs text-red-500 hover:text-red-600 transition-colors">Remove</button>
+        </div>
+        {status && <p className="text-xs text-text-secondary mt-3">{status}</p>}
+        <div className="mt-4 text-xs text-text-secondary">
+          <p className="font-bold mb-1">DNS Configuration:</p>
+          <p>Add a CNAME record pointing your domain to <code className="text-accent">cname.vercel-dns.com</code></p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className={SETTINGS_CARD}>
-      <h2 className="font-medium text-text-secondary text-sm mb-4">Custom Domain</h2>
-      {profile?.custom_domain ? (
-        <div className="space-y-3">
-          <p className="text-sm">Current domain: <span className="font-mono text-accent">{profile.custom_domain}</span></p>
-          <div className="flex gap-2">
-            <button type="button" onClick={handleCheck} className="text-xs text-text-secondary hover:text-text-primary transition-colors">Check status</button>
-            <button type="button" onClick={handleRemove} disabled={loading} className="text-xs text-red-500 hover:text-red-600 transition-colors">Remove</button>
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          <input
-            type="text"
-            value={domain}
-            onChange={(e) => setDomain(e.target.value)}
-            placeholder="yourdomain.com"
-            className="w-full bg-bg border border-border  px-4 py-2 text-text-primary text-sm focus:border-accent focus:outline-none"
-          />
-          <button
-            type="button"
-            onClick={handleAdd}
-            disabled={!domain || loading}
-            className="bg-text-primary hover:bg-accent disabled:opacity-30 text-white text-sm font-medium px-6 py-2 transition-colors"
-          >
-            {loading ? 'Adding...' : 'Add Domain'}
-          </button>
-        </div>
-      )}
+    <div className="space-y-3">
+      <input
+        type="text"
+        value={domain}
+        onChange={(e) => setDomain(e.target.value)}
+        placeholder="yourdomain.com"
+        className={FORM_INPUT}
+      />
+      <button
+        type="button"
+        onClick={handleAdd}
+        disabled={!domain || loading}
+        className={BTN_PRIMARY}
+      >
+        {loading ? 'Adding...' : 'Add Domain'}
+      </button>
       {status && <p className="text-xs text-text-secondary mt-3">{status}</p>}
       <div className="mt-4 text-xs text-text-secondary">
         <p className="font-bold mb-1">DNS Configuration:</p>
         <p>Add a CNAME record pointing your domain to <code className="text-accent">cname.vercel-dns.com</code></p>
       </div>
+    </div>
+  )
+}
+
+function DomainSearchFlow({ onOrderCreated }: { onOrderCreated: (order: DomainOrderRow) => void }) {
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState<SearchResult[]>([])
+  const [searching, setSearching] = useState(false)
+  const [error, setError] = useState('')
+  const [selectedDomain, setSelectedDomain] = useState<SearchResult | null>(null)
+
+  const SERVICE_FEE = 5
+
+  const handleSearch = async () => {
+    if (!query.trim()) return
+    setSearching(true)
+    setError('')
+    setResults([])
+    setSelectedDomain(null)
+
+    const result = await searchDomain({ data: { domain: query.trim().toLowerCase() } })
+    setSearching(false)
+
+    if ('error' in result) {
+      setError(result.error as string)
+    } else {
+      setResults(result.results)
+      if (result.results.length === 0) {
+        setError('No results found. Try a different name.')
+      }
+    }
+  }
+
+  if (selectedDomain) {
+    return (
+      <ContactInfoForm
+        domain={selectedDomain}
+        serviceFee={SERVICE_FEE}
+        onBack={() => setSelectedDomain(null)}
+        onOrderCreated={onOrderCreated}
+      />
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+          placeholder="Search for a domain..."
+          className={FORM_INPUT + ' flex-1'}
+        />
+        <button
+          type="button"
+          onClick={handleSearch}
+          disabled={searching || !query.trim()}
+          className={BTN_PRIMARY}
+        >
+          {searching ? 'Searching...' : 'Search'}
+        </button>
+      </div>
+
+      {error && <p className="text-xs text-red-500">{error}</p>}
+
+      {results.length > 0 && (
+        <div className="border border-border divide-y divide-border">
+          {results.map((r) => (
+            <div key={r.domain} className="flex items-center justify-between px-4 py-3">
+              <div>
+                <span className="font-mono text-sm">{r.domain}</span>
+                {!r.available && (
+                  <span className="ml-2 text-xs text-text-secondary">Unavailable</span>
+                )}
+              </div>
+              {r.available && (
+                <div className="flex items-center gap-4">
+                  <div className="text-right text-xs text-text-secondary">
+                    <div>${(r.purchasePrice + SERVICE_FEE).toFixed(2)} first year</div>
+                    {r.renewalPrice !== r.purchasePrice && (
+                      <div>${(r.renewalPrice + SERVICE_FEE).toFixed(2)}/yr renewal</div>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedDomain(r)}
+                    className={BTN_PRIMARY + ' text-xs py-1.5 px-4'}
+                  >
+                    Buy
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      <p className="text-xs text-text-secondary">
+        Prices include a ${SERVICE_FEE} service fee. Domains auto-renew annually.
+      </p>
+    </div>
+  )
+}
+
+function ContactInfoForm({
+  domain,
+  serviceFee,
+  onBack,
+  onOrderCreated,
+}: {
+  domain: SearchResult
+  serviceFee: number
+  onBack: () => void
+  onOrderCreated: (order: DomainOrderRow) => void
+}) {
+  const [form, setForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address1: '',
+    address2: '',
+    city: '',
+    state: '',
+    zip: '',
+    country: 'US',
+  })
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
+
+  const updateField = (field: keyof ContactInfo, value: string) => {
+    setForm((prev) => ({ ...prev, [field]: value }))
+    setErrors((prev) => ({ ...prev, [field]: '' }))
+  }
+
+  const handleSubmit = async () => {
+    const parsed = contactInfoSchema.safeParse(form)
+    if (!parsed.success) {
+      const fieldErrors: Record<string, string> = {}
+      parsed.error.issues.forEach((issue) => {
+        const field = issue.path[0] as string
+        fieldErrors[field] = issue.message
+      })
+      setErrors(fieldErrors)
+      return
+    }
+
+    setSubmitting(true)
+    setSubmitError('')
+
+    const result = await createDomainCheckout({
+      data: {
+        domain: domain.domain,
+        contactInfo: parsed.data,
+      },
+    })
+
+    if ('error' in result) {
+      setSubmitError(result.error as string)
+      setSubmitting(false)
+    } else if ('url' in result && typeof result.url === 'string') {
+      window.location.href = result.url
+    }
+  }
+
+  const fields: { key: keyof ContactInfo; label: string; placeholder: string; half?: boolean }[] = [
+    { key: 'firstName', label: 'First Name', placeholder: 'John', half: true },
+    { key: 'lastName', label: 'Last Name', placeholder: 'Doe', half: true },
+    { key: 'email', label: 'Email', placeholder: 'you@example.com' },
+    { key: 'phone', label: 'Phone', placeholder: '+1 555 123 4567' },
+    { key: 'address1', label: 'Address', placeholder: '123 Main St' },
+    { key: 'address2', label: 'Address 2', placeholder: 'Apt 4B' },
+    { key: 'city', label: 'City', placeholder: 'New York', half: true },
+    { key: 'state', label: 'State', placeholder: 'NY', half: true },
+    { key: 'zip', label: 'ZIP Code', placeholder: '10001', half: true },
+    { key: 'country', label: 'Country Code', placeholder: 'US', half: true },
+  ]
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between mb-2">
+        <div>
+          <p className="text-sm font-medium">Register <span className="font-mono text-accent">{domain.domain}</span></p>
+          <p className="text-xs text-text-secondary">${(domain.purchasePrice + serviceFee).toFixed(2)} first year, then ${(domain.renewalPrice + serviceFee).toFixed(2)}/yr</p>
+        </div>
+        <button type="button" onClick={onBack} className="text-xs text-text-secondary hover:text-text-primary">
+          Back to search
+        </button>
+      </div>
+
+      <p className="text-xs text-text-secondary font-bold uppercase tracking-wider">Registrant Information</p>
+
+      <div className="grid grid-cols-2 gap-3">
+        {fields.map((f) => (
+          <div key={f.key} className={f.half ? '' : 'col-span-2'}>
+            <label className={FORM_LABEL}>{f.label}</label>
+            <input
+              type="text"
+              value={form[f.key]}
+              onChange={(e) => updateField(f.key, e.target.value)}
+              placeholder={f.placeholder}
+              className={errors[f.key] ? FORM_INPUT_ERROR : FORM_INPUT}
+            />
+            {errors[f.key] && <p className="text-xs text-red-500 mt-1">{errors[f.key]}</p>}
+          </div>
+        ))}
+      </div>
+
+      <button
+        type="button"
+        onClick={handleSubmit}
+        disabled={submitting}
+        className={BTN_PRIMARY + ' w-full'}
+      >
+        {submitting ? 'Redirecting to payment...' : `Pay $${(domain.purchasePrice + serviceFee).toFixed(2)} and register`}
+      </button>
+
+      {submitError && <p className="text-xs text-red-500">{submitError}</p>}
+    </div>
+  )
+}
+
+function DomainOrderStatus({ order, onRemove }: { order: DomainOrderRow; onRemove: () => void }) {
+  const [removing, setRemoving] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleRemove = async () => {
+    if (!confirm('Remove this domain? Your renewal subscription will be cancelled.')) return
+    setRemoving(true)
+    const result = await cancelDomainOrder()
+    setRemoving(false)
+    if ('error' in result) {
+      setError(result.error as string)
+    } else {
+      onRemove()
+    }
+  }
+
+  return (
+    <div className={SETTINGS_CARD}>
+      <h2 className="font-medium text-text-secondary text-sm mb-4">Custom Domain</h2>
+
+      {order.status === 'purchasing' && (
+        <div className="flex items-center gap-2 text-sm text-text-secondary">
+          <span className="animate-spin inline-block w-4 h-4 border-2 border-accent border-t-transparent rounded-full" />
+          Setting up {order.domain}...
+        </div>
+      )}
+
+      {order.status === 'active' && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-sm text-accent">{order.domain}</span>
+            <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 font-medium uppercase tracking-wider">Active</span>
+          </div>
+          {order.expires_at && (
+            <p className="text-xs text-text-secondary">
+              Expires {new Date(order.expires_at).toLocaleDateString()} (auto-renews)
+            </p>
+          )}
+          <button
+            type="button"
+            onClick={handleRemove}
+            disabled={removing}
+            className="text-xs text-red-500 hover:text-red-600 transition-colors"
+          >
+            {removing ? 'Removing...' : 'Remove domain'}
+          </button>
+        </div>
+      )}
+
+      {order.status === 'renewal_failed' && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-sm">{order.domain}</span>
+            <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 font-medium uppercase tracking-wider">Renewal Issue</span>
+          </div>
+          <p className="text-xs text-yellow-600">
+            Domain renewal failed. We&apos;ll retry automatically. Your domain remains active until {order.expires_at ? new Date(order.expires_at).toLocaleDateString() : 'expiry'}.
+          </p>
+          <button
+            type="button"
+            onClick={handleRemove}
+            disabled={removing}
+            className="text-xs text-red-500 hover:text-red-600 transition-colors"
+          >
+            {removing ? 'Removing...' : 'Remove domain'}
+          </button>
+        </div>
+      )}
+
+      {order.status === 'failed' && (
+        <div className="space-y-3">
+          <p className="text-xs text-red-500">
+            Domain purchase for <span className="font-mono">{order.domain}</span> failed. Your payment has been refunded.
+          </p>
+          <button
+            type="button"
+            onClick={onRemove}
+            className="text-xs text-text-secondary hover:text-text-primary transition-colors"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {error && <p className="text-xs text-red-500 mt-3">{error}</p>}
     </div>
   )
 }

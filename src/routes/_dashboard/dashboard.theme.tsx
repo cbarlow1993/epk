@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useForm, type UseFormSetValue, type UseFormWatch, type UseFormRegister, type FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { z } from 'zod'
 import { getProfile, updateProfile } from '~/server/profile'
 import { profileUpdateSchema, type ProfileUpdate } from '~/schemas/profile'
@@ -344,7 +344,7 @@ function FontUploadSection({
               <div className="flex items-center gap-3">
                 <span
                   className="text-lg font-medium"
-                  style={{ fontFamily: `'${font.name}', sans-serif` }}
+                  style={{ fontFamily: `'${font.name.replace(/['"\\}{;()<>]/g, '')}', sans-serif` }}
                 >
                   Aa
                 </span>
@@ -362,6 +362,127 @@ function FontUploadSection({
               </button>
             </div>
           ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Template dropdown — shows selected template as trigger, opens card list
+// ---------------------------------------------------------------------------
+
+function TemplateCard({ tpl, isSelected, onClick }: {
+  tpl: (typeof TEMPLATES)[number]
+  isSelected: boolean
+  onClick?: () => void
+}) {
+  const Tag = onClick ? 'button' : 'div'
+  return (
+    <Tag
+      type={onClick ? 'button' : undefined}
+      onClick={onClick}
+      className={`relative border p-3 text-left transition-all w-full ${
+        isSelected
+          ? 'border-accent bg-accent/10 ring-1 ring-accent'
+          : 'border-border hover:border-text-primary bg-white'
+      }`}
+    >
+      <div className="flex items-center gap-2 mb-1.5">
+        <div
+          className="w-4 h-4 rounded-full border border-border shrink-0"
+          style={{ backgroundColor: tpl.defaults.accent_color }}
+        />
+        <span className="font-bold text-xs">{tpl.name}</span>
+      </div>
+      <p className="text-[10px] text-text-secondary leading-tight">{tpl.description}</p>
+      <div className="mt-2 flex items-center gap-2">
+        <div
+          className="w-6 h-3 rounded shrink-0"
+          style={{
+            backgroundColor: tpl.defaults.bg_color,
+            border: '1px solid rgba(128,128,128,0.2)',
+          }}
+        />
+        <span
+          className="text-[9px] text-text-secondary"
+          style={{ fontFamily: tpl.defaults.font_family }}
+        >
+          {tpl.defaults.font_family}
+        </span>
+      </div>
+    </Tag>
+  )
+}
+
+function TemplateDropdown({ selectedTemplate, onSelect }: {
+  selectedTemplate: string
+  onSelect: (id: string) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const currentTpl = useMemo(() => getTemplate(selectedTemplate), [selectedTemplate])
+
+  // Close on click outside
+  useEffect(() => {
+    if (!open) return
+    function handleClick(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [open])
+
+  // Close on Escape
+  useEffect(() => {
+    if (!open) return
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [open])
+
+  return (
+    <div className="mb-6 relative" ref={containerRef}>
+      <label className={FORM_LABEL}>Template</label>
+
+      {/* Trigger — shows current template */}
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full text-left"
+        aria-expanded={open}
+        aria-haspopup="listbox"
+      >
+        <div className="relative">
+          <TemplateCard tpl={currentTpl} isSelected={false} />
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary">
+            <svg className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+      </button>
+
+      {/* Dropdown panel */}
+      {open && (
+        <div className="absolute z-50 left-0 right-0 mt-1 bg-white border border-border shadow-lg max-h-80 overflow-y-auto">
+          <div className="grid grid-cols-2 gap-2 p-2">
+            {TEMPLATES.map((tpl) => (
+              <TemplateCard
+                key={tpl.id}
+                tpl={tpl}
+                isSelected={selectedTemplate === tpl.id}
+                onClick={() => {
+                  onSelect(tpl.id)
+                  setOpen(false)
+                }}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -496,6 +617,11 @@ function ThemeEditor() {
     setValue('theme_card_border', d.card_border, { shouldDirty: true })
     setValue('theme_shadow', d.shadow, { shouldDirty: true })
     setValue('theme_divider_style', d.divider_style, { shouldDirty: true })
+
+    // Animation
+    setValue('animate_sections', true, { shouldDirty: true })
+
+    // Custom Fonts — preserve (don't reset uploaded fonts when switching templates)
   }
 
   // -------------------------------------------------------------------------
@@ -814,48 +940,11 @@ function ThemeEditor() {
       <div className="grid lg:grid-cols-[400px_1fr] gap-8">
         {/* ---- Left panel: controls ---- */}
         <div className="lg:max-h-[calc(100vh-10rem)] lg:overflow-y-auto lg:pr-2">
-          {/* Template Cards */}
-          <div className="mb-6">
-            <label className={FORM_LABEL}>Template</label>
-            <div className="grid grid-cols-2 gap-3">
-              {TEMPLATES.map((tpl) => (
-                <button
-                  key={tpl.id}
-                  type="button"
-                  onClick={() => applyTemplate(tpl.id)}
-                  className={`relative border p-3 text-left transition-all ${
-                    selectedTemplate === tpl.id
-                      ? 'border-accent bg-accent/10 ring-1 ring-accent'
-                      : 'border-border hover:border-text-primary bg-white'
-                  }`}
-                >
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <div
-                      className="w-4 h-4 rounded-full border border-border"
-                      style={{ backgroundColor: tpl.defaults.accent_color }}
-                    />
-                    <span className="font-bold text-xs">{tpl.name}</span>
-                  </div>
-                  <p className="text-[10px] text-text-secondary leading-tight">{tpl.description}</p>
-                  <div className="mt-2 flex items-center gap-2">
-                    <div
-                      className="w-6 h-3 rounded"
-                      style={{
-                        backgroundColor: tpl.defaults.bg_color,
-                        border: '1px solid rgba(128,128,128,0.2)',
-                      }}
-                    />
-                    <span
-                      className="text-[9px] text-text-secondary"
-                      style={{ fontFamily: tpl.defaults.font_family }}
-                    >
-                      {tpl.defaults.font_family}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
+          {/* Template Dropdown */}
+          <TemplateDropdown
+            selectedTemplate={selectedTemplate}
+            onSelect={applyTemplate}
+          />
 
           {/* Accordion sections */}
           <Accordion defaultOpen="colors" sections={accordionSections} />
