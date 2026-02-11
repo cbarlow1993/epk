@@ -7,9 +7,13 @@ export const Route = createFileRoute('/blog/')({
     meta: [
       { title: 'Blog | myEPK — Tips for DJs & Artists' },
       { name: 'description', content: 'Guides and tips for DJs: how to make a press kit, what to include, how to get booked, and more.' },
-      { property: 'og:title', content: 'Blog | myEPK' },
+      { property: 'og:title', content: 'Blog | myEPK — Tips for DJs & Artists' },
       { property: 'og:description', content: 'Guides and tips for DJs: how to make a press kit, what to include, how to get booked, and more.' },
       { property: 'og:type', content: 'website' },
+      { property: 'og:url', content: 'https://myepk.bio/blog' },
+      { property: 'og:image', content: 'https://myepk.bio/og-default.png' },
+      { property: 'twitter:card', content: 'summary_large_image' },
+      { property: 'twitter:image', content: 'https://myepk.bio/og-default.png' },
     ],
   }),
 })

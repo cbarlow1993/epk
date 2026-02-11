@@ -8,6 +8,17 @@ import { friendlyAuthError } from '~/utils/auth-errors'
 import { getSupabaseBrowserClient } from '~/utils/supabase'
 
 export const Route = createFileRoute('/signup')({
+  head: () => ({
+    meta: [
+      { title: 'Sign Up | myEPK' },
+      { name: 'description', content: 'Create your free myEPK account and build a professional press kit in minutes.' },
+      { property: 'og:title', content: 'Sign Up | myEPK — Free Professional Press Kits' },
+      { property: 'og:description', content: 'Create your free myEPK account and build a professional press kit in minutes.' },
+      { property: 'og:image', content: 'https://myepk.bio/og-default.png' },
+      { property: 'twitter:card', content: 'summary_large_image' },
+      { property: 'twitter:image', content: 'https://myepk.bio/og-default.png' },
+    ],
+  }),
   beforeLoad: async () => {
     try {
       const result = await getCurrentUser()

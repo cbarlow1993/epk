@@ -3,6 +3,12 @@ import { useState } from 'react'
 import { getSupabaseBrowserClient } from '~/utils/supabase'
 
 export const Route = createFileRoute('/verify-email')({
+  head: () => ({
+    meta: [
+      { title: 'Verify Email | myEPK' },
+      { name: 'description', content: 'Verify your email address to activate your myEPK account.' },
+    ],
+  }),
   component: VerifyEmailPage,
 })
 

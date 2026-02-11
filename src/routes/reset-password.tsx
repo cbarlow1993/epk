@@ -7,6 +7,12 @@ import { friendlyAuthError } from '~/utils/auth-errors'
 import { getCurrentUser } from '~/server/auth'
 
 export const Route = createFileRoute('/reset-password')({
+  head: () => ({
+    meta: [
+      { title: 'Reset Password | myEPK' },
+      { name: 'description', content: 'Set a new password for your myEPK account.' },
+    ],
+  }),
   beforeLoad: async () => {
     try {
       const result = await getCurrentUser()

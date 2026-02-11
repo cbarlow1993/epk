@@ -22,7 +22,11 @@ export const Route = createFileRoute('/blog/$slug')({
         { property: 'og:title', content: post.title },
         { property: 'og:description', content: post.metaDescription },
         { property: 'og:type', content: 'article' },
+        { property: 'og:url', content: `https://myepk.bio/blog/${params.slug}` },
+        { property: 'og:image', content: 'https://myepk.bio/og-default.png' },
         { property: 'article:published_time', content: post.publishedDate },
+        { property: 'twitter:card', content: 'summary_large_image' },
+        { property: 'twitter:image', content: 'https://myepk.bio/og-default.png' },
       ],
     }
   },

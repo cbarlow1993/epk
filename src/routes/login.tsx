@@ -7,6 +7,12 @@ export const Route = createFileRoute('/login')({
   validateSearch: z.object({
     error: z.string().optional(),
   }),
+  head: () => ({
+    meta: [
+      { title: 'Log In | myEPK' },
+      { name: 'description', content: 'Log in to your myEPK account to manage your electronic press kit.' },
+    ],
+  }),
   beforeLoad: async () => {
     try {
       const result = await getCurrentUser()

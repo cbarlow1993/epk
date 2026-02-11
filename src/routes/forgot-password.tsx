@@ -5,6 +5,12 @@ import { FORM_INPUT, FORM_LABEL } from '~/components/forms'
 import { friendlyAuthError } from '~/utils/auth-errors'
 
 export const Route = createFileRoute('/forgot-password')({
+  head: () => ({
+    meta: [
+      { title: 'Forgot Password | myEPK' },
+      { name: 'description', content: 'Reset your myEPK account password.' },
+    ],
+  }),
   component: ForgotPasswordPage,
 })
 

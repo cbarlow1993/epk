@@ -8,8 +8,13 @@ export const Route = createFileRoute('/')({
     meta: [
       { title: 'myEPK - Professional Electronic Press Kits for DJs & Artists' },
       { name: 'description', content: 'Create a professional DJ press kit in minutes. Bio, mixes, events, technical rider, booking info — all in one beautiful page.' },
-      { property: 'og:title', content: 'myEPK - Professional Electronic Press Kits' },
+      { property: 'og:title', content: 'myEPK — Professional Electronic Press Kits for DJs & Artists' },
+      { property: 'og:description', content: 'Create a professional DJ press kit in minutes. Bio, mixes, events, technical rider, booking info — all in one beautiful page.' },
       { property: 'og:type', content: 'website' },
+      { property: 'og:url', content: 'https://myepk.bio' },
+      { property: 'og:image', content: 'https://myepk.bio/og-default.png' },
+      { property: 'twitter:card', content: 'summary_large_image' },
+      { property: 'twitter:image', content: 'https://myepk.bio/og-default.png' },
     ],
   }),
 })
