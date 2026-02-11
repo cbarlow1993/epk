@@ -59,7 +59,7 @@ function BillingPage() {
       {/* Per-Artist Table */}
       <div className="space-y-3">
         {billing.profiles.map((profile: { id: string; display_name: string | null; slug: string | null; tier: string }) => (
-          <div key={profile.id} className="bg-white border border-border p-4 flex items-center gap-4">
+          <div key={profile.id} className="bg-surface border border-border p-4 flex items-center gap-4">
             <div className="flex-1">
               <p className="font-bold text-sm">{profile.display_name}</p>
               <p className="text-xs text-text-secondary">/{profile.slug}</p>

@@ -67,7 +67,7 @@ function AgencyPage() {
             <a
               key={profile.slug}
               href={`/${profile.slug}`}
-              className="group block bg-white border border-border overflow-hidden hover:border-accent/30 transition-all hover:scale-105 shadow-card hover:shadow-card-hover"
+              className="group block bg-surface border border-border overflow-hidden hover:border-accent/30 transition-all hover:scale-105 shadow-card hover:shadow-card-hover"
             >
               <div className="aspect-square bg-surface overflow-hidden">
                 {profile.profile_image_url ? (

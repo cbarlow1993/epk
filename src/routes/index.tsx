@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { BLOG_POSTS } from '~/data/blog-posts'
 
 export const Route = createFileRoute('/')({
@@ -25,15 +25,15 @@ const FEATURES = [
   { title: 'Custom Themes', desc: 'Match your EPK to your brand identity. Colours, layout, and typography — your rules.' },
 ]
 
-const PRICING_ROWS = [
-  { feature: 'Full EPK page', free: true, pro: true },
-  { feature: 'All sections (bio, mixes, events, rider, press, contact)', free: true, pro: true },
-  { feature: 'yourname.djepk.com URL', free: true, pro: true },
-  { feature: 'Social links', free: true, pro: true },
-  { feature: 'Platform branding', free: true, pro: false, proLabel: 'Removed' },
-  { feature: 'Custom domain', free: false, pro: true },
-  { feature: 'Full theme customisation', free: false, pro: true },
-  { feature: 'Priority support', free: false, pro: true },
+const PRICING_FEATURES = [
+  { label: 'Full EPK page', free: true, pro: true },
+  { label: 'All sections (bio, mixes, events, rider, press, contact)', free: true, pro: true },
+  { label: 'yourname.djepk.com URL', free: true, pro: true },
+  { label: 'Social links', free: true, pro: true },
+  { label: 'Platform branding removed', free: false, pro: true },
+  { label: 'Custom domain', free: false, pro: true },
+  { label: 'Full theme customisation', free: false, pro: true },
+  { label: 'Priority support', free: false, pro: true },
 ]
 
 function useScrollReveal(ref: React.RefObject<HTMLElement | null>) {
@@ -50,37 +50,85 @@ function useScrollReveal(ref: React.RefObject<HTMLElement | null>) {
             const index = Array.from(siblings).indexOf(entry.target as Element)
             setTimeout(() => {
               (entry.target as HTMLElement).style.opacity = '1';
-              (entry.target as HTMLElement).style.transform = 'translateX(0)'
-            }, index * 80)
+              (entry.target as HTMLElement).style.transform = 'translateY(0)'
+            }, index * 60)
             observer.unobserve(entry.target)
           }
         }
       },
-      { rootMargin: '0px 0px -60px 0px', threshold: 0.1 }
+      { rootMargin: '0px 0px -40px 0px', threshold: 0.1 }
     )
     items.forEach((item) => observer.observe(item))
     return () => observer.disconnect()
   }, [ref])
 }
 
-function LandingPage() {
-  const mainRef = useRef<HTMLDivElement>(null)
-  useScrollReveal(mainRef)
+function EqBars({ className = '' }: { className?: string }) {
+  const bars = useRef(
+    Array.from({ length: 48 }, () => ({
+      height: 8 + Math.random() * 44,
+      delay: Math.random() * 1.6,
+      duration: 1.0 + Math.random() * 0.8,
+    }))
+  )
 
   return (
-    <div ref={mainRef} className="min-h-screen bg-bg">
+    <div className={`flex items-end justify-center gap-[2px] ${className}`}>
+      {bars.current.map((bar, i) => (
+        <div
+          key={i}
+          className="w-[3px] rounded-t-sm bg-accent/30"
+          style={{
+            height: '4px',
+            animation: `eq-bar ${bar.duration}s ease-in-out infinite`,
+            animationDelay: `${bar.delay}s`,
+            '--eq-height': `${bar.height}px`,
+          } as React.CSSProperties}
+        />
+      ))}
+    </div>
+  )
+}
+
+function LandingPage() {
+  const mainRef = useRef<HTMLDivElement>(null)
+  const [scrolled, setScrolled] = useState(false)
+  useScrollReveal(mainRef)
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 40)
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  return (
+    <div ref={mainRef} className="theme-dark min-h-screen bg-bg text-text-primary font-body">
+      {/* Grain texture overlay */}
+      <div
+        className="fixed inset-0 pointer-events-none z-[100] opacity-[0.03]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='a'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23a)'/%3E%3C/svg%3E")`,
+        }}
+      />
+
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-text-primary">
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          scrolled
+            ? 'bg-bg/95 backdrop-blur-md border-b border-border'
+            : 'bg-transparent'
+        }`}
+      >
         <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,4vw,4rem)] h-16 flex items-center justify-between">
-          <Link to="/" className="font-display font-extrabold text-xl tracking-tight flex items-center gap-2">
+          <Link to="/" className="font-display font-bold text-lg tracking-tight flex items-center gap-2">
             DJ EPK <span className="inline-block w-2 h-2 bg-accent rounded-full" />
           </Link>
           <div className="flex items-center gap-8">
-            <a href="#features" className="hidden sm:inline text-xs font-medium uppercase tracking-wider hover:text-accent transition-colors">Features</a>
-            <a href="#pricing" className="hidden sm:inline text-xs font-medium uppercase tracking-wider hover:text-accent transition-colors">Pricing</a>
-            <Link to="/blog" className="hidden sm:inline text-xs font-medium uppercase tracking-wider hover:text-accent transition-colors">Blog</Link>
-            <Link to="/login" className="text-xs font-medium uppercase tracking-wider hover:text-accent transition-colors">Log in</Link>
-            <Link to="/signup" className="text-xs font-semibold uppercase tracking-wider bg-text-primary text-white px-5 py-2 hover:bg-accent transition-colors">
+            <a href="#features" className="hidden sm:inline text-xs font-medium tracking-wider text-text-secondary hover:text-accent transition-colors">Features</a>
+            <a href="#pricing" className="hidden sm:inline text-xs font-medium tracking-wider text-text-secondary hover:text-accent transition-colors">Pricing</a>
+            <Link to="/blog" className="hidden sm:inline text-xs font-medium tracking-wider text-text-secondary hover:text-accent transition-colors">Blog</Link>
+            <Link to="/login" className="text-xs font-medium tracking-wider text-text-secondary hover:text-text-primary transition-colors">Log in</Link>
+            <Link to="/signup" className="text-xs font-semibold tracking-wider bg-accent text-white px-5 py-2 rounded-full hover:brightness-110 transition-all">
               Get Started
             </Link>
           </div>
@@ -88,62 +136,105 @@ function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="min-h-screen flex flex-col justify-end pt-16 pb-16 border-b border-text-primary">
-        <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,4vw,4rem)] w-full">
-          <div className="grid md:grid-cols-2 gap-6 items-end">
-            <h1 className="font-display font-extrabold text-[clamp(3.5rem,10vw,9rem)] leading-[0.9] tracking-tighter uppercase">
-              Your<br />
-              Press<br />
-              <span className="text-accent">Kit.</span>
-            </h1>
-            <div className="flex flex-col gap-8 pb-2">
-              <p className="text-[clamp(1rem,1.5vw,1.25rem)] leading-relaxed text-text-secondary max-w-[400px]">
+      <section className="relative min-h-screen flex flex-col justify-center overflow-hidden pt-16">
+        {/* Ambient gradient orbs */}
+        <div
+          className="absolute top-[15%] left-[10%] w-[500px] h-[500px] rounded-full blur-[180px]"
+          style={{ background: 'radial-gradient(circle, rgba(255,85,0,0.12) 0%, transparent 70%)', animation: 'pulse-glow 6s ease-in-out infinite' }}
+        />
+        <div
+          className="absolute bottom-[20%] right-[5%] w-[400px] h-[400px] rounded-full blur-[150px]"
+          style={{ background: 'radial-gradient(circle, rgba(255,85,0,0.08) 0%, transparent 70%)', animation: 'pulse-glow 8s ease-in-out infinite 2s' }}
+        />
+        <div
+          className="absolute top-[60%] left-[50%] w-[300px] h-[300px] rounded-full blur-[120px]"
+          style={{ background: 'radial-gradient(circle, rgba(255,130,40,0.06) 0%, transparent 70%)', animation: 'pulse-glow 7s ease-in-out infinite 4s' }}
+        />
+
+        {/* Dot grid pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.04]"
+          style={{ backgroundImage: 'radial-gradient(circle, #888 1px, transparent 1px)', backgroundSize: '32px 32px' }}
+        />
+
+        {/* Content */}
+        <div className="relative z-10 max-w-[1400px] mx-auto px-[clamp(1.5rem,4vw,4rem)] w-full">
+          <div className="grid lg:grid-cols-[1.2fr_1fr] gap-12 items-end">
+            <div>
+              <div className="flex items-center gap-3 mb-8">
+                <div className="h-px w-12 bg-accent" />
+                <span className="text-xs font-medium tracking-widest text-accent uppercase">Electronic Press Kits</span>
+              </div>
+              <h1 className="font-display font-extrabold text-[clamp(3.5rem,10vw,8rem)] leading-[0.9] tracking-tight">
+                Your<br />
+                Press<br />
+                <span className="text-accent">Kit.</span>
+              </h1>
+            </div>
+            <div className="flex flex-col gap-8 pb-4">
+              <p className="text-[clamp(1rem,1.5vw,1.15rem)] leading-relaxed text-text-secondary max-w-[420px]">
                 One link for your bio, mixes, events, rider, and booking contact. Built for DJs who take their career seriously.
               </p>
-              <div className="flex gap-12 text-xs font-semibold uppercase tracking-widest text-text-secondary">
-                <div>
-                  <span className="block font-display font-extrabold text-3xl tracking-tight text-text-primary normal-case mb-1">8</span>
-                  Sections
-                </div>
-                <div>
-                  <span className="block font-display font-extrabold text-3xl tracking-tight text-text-primary normal-case mb-1">1</span>
-                  Link
-                </div>
-                <div>
-                  <span className="block font-display font-extrabold text-3xl tracking-tight text-text-primary normal-case mb-1">&pound;0</span>
-                  To Start
-                </div>
+              <div className="flex gap-4">
+                <Link
+                  to="/signup"
+                  className="px-8 py-3.5 bg-accent text-white font-semibold text-sm tracking-wider rounded-full hover:brightness-110 hover:shadow-[0_0_24px_rgba(255,85,0,0.3)] transition-all"
+                >
+                  Create Your EPK
+                </Link>
+                <a
+                  href="#features"
+                  className="px-8 py-3.5 border border-border text-text-secondary font-medium text-sm tracking-wider rounded-full hover:border-text-secondary hover:text-text-primary transition-all"
+                >
+                  Learn More
+                </a>
+              </div>
+              <div className="flex gap-12 pt-4">
+                {[
+                  { value: '8', label: 'Sections' },
+                  { value: '1', label: 'Link' },
+                  { value: '\u00A30', label: 'To Start' },
+                ].map((stat) => (
+                  <div key={stat.label} className="text-xs font-medium tracking-widest text-text-secondary uppercase">
+                    <span className="block font-display font-bold text-2xl tracking-tight text-text-primary mb-1">{stat.value}</span>
+                    {stat.label}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
+
+        {/* Equalizer bars at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-16 overflow-hidden">
+          <EqBars className="h-full" />
+        </div>
       </section>
 
-      {/* Red divider */}
-      <div className="h-[3px] bg-accent" />
+      {/* Accent line */}
+      <div className="h-px bg-gradient-to-r from-transparent via-accent to-transparent" />
 
       {/* Features */}
-      <section id="features" className="border-b border-text-primary">
+      <section id="features" className="py-24">
         <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,4vw,4rem)]">
-          <div className="flex items-baseline gap-8 pt-16 pb-8">
-            <span className="font-display font-bold text-sm tracking-wider text-text-secondary">01</span>
-            <h2 className="font-display font-extrabold text-[clamp(2rem,5vw,4rem)] tracking-tighter uppercase leading-none">Features</h2>
+          <div className="flex items-center gap-4 mb-16">
+            <span className="font-display font-bold text-sm tracking-wider text-accent">01</span>
+            <div className="h-px w-8 bg-border" />
+            <h2 className="font-display font-bold text-[clamp(1.8rem,4vw,3rem)] tracking-tight">Features</h2>
           </div>
-          <div className="grid md:grid-cols-2">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {FEATURES.map((f, i) => (
               <div
                 key={f.title}
                 data-reveal
-                className="grid grid-cols-[2rem_1fr] gap-6 py-8 pr-8 border-t border-border md:even:pl-8 md:even:border-l md:even:border-l-border"
-                style={{ opacity: 0, transform: 'translateX(-30px)', transition: 'opacity 0.6s ease, transform 0.6s ease' }}
+                className="group bg-surface border border-border rounded-xl p-6 hover:border-accent/50 hover:shadow-[0_0_20px_rgba(255,85,0,0.06)] transition-all duration-300"
+                style={{ opacity: 0, transform: 'translateY(20px)', transition: 'opacity 0.5s ease, transform 0.5s ease' }}
               >
-                <span className="font-display font-bold text-xs text-text-secondary pt-0.5">
+                <span className="inline-block font-display font-bold text-xs text-accent mb-4">
                   {String(i + 1).padStart(2, '0')}
                 </span>
-                <div>
-                  <h3 className="font-display font-bold text-xl tracking-tight mb-2">{f.title}</h3>
-                  <p className="text-sm text-text-secondary leading-relaxed max-w-[320px]">{f.desc}</p>
-                </div>
+                <h3 className="font-display font-semibold text-base tracking-tight mb-2 group-hover:text-accent transition-colors">{f.title}</h3>
+                <p className="text-sm text-text-secondary leading-relaxed">{f.desc}</p>
               </div>
             ))}
           </div>
@@ -151,111 +242,127 @@ function LandingPage() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="border-b border-text-primary">
+      <section id="pricing" className="py-24">
         <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,4vw,4rem)]">
-          <div className="flex items-baseline gap-8 pt-16 pb-8">
-            <span className="font-display font-bold text-sm tracking-wider text-text-secondary">02</span>
-            <h2 className="font-display font-extrabold text-[clamp(2rem,5vw,4rem)] tracking-tighter uppercase leading-none">Pricing</h2>
+          <div className="flex items-center gap-4 mb-16">
+            <span className="font-display font-bold text-sm tracking-wider text-accent">02</span>
+            <div className="h-px w-8 bg-border" />
+            <h2 className="font-display font-bold text-[clamp(1.8rem,4vw,3rem)] tracking-tight">Pricing</h2>
           </div>
-
-          <table className="w-full border-collapse mt-4">
-            <thead>
-              <tr>
-                <th className="w-1/2 text-left font-display font-bold text-sm uppercase tracking-wider p-4 border-b-2 border-text-primary align-bottom" />
-                <th className="text-left font-display font-bold text-sm uppercase tracking-wider p-4 border-b-2 border-text-primary align-bottom">
-                  Free
-                  <span className="block font-display font-extrabold text-4xl tracking-tighter mt-1 leading-none">&pound;0</span>
-                  <span className="font-normal text-xs text-text-secondary tracking-wider">Forever</span>
-                </th>
-                <th className="text-left font-display font-bold text-sm uppercase tracking-wider p-4 border-b-2 border-text-primary bg-text-primary text-white align-bottom">
-                  Pro
-                  <span className="block font-display font-extrabold text-4xl tracking-tighter mt-1 leading-none">&pound;9</span>
-                  <span className="font-normal text-xs text-white/60 tracking-wider">Per Month</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {PRICING_ROWS.map((row, i) => (
-                <tr
-                  key={row.feature}
-                  data-reveal
-                  style={{ opacity: 0, transform: 'translateX(-20px)', transition: `opacity 0.4s ease, transform 0.4s ease` }}
-                >
-                  <td className="p-3.5 border-b border-border text-sm font-medium text-text-secondary">{row.feature}</td>
-                  <td className="p-3.5 border-b border-border text-center text-sm font-semibold">
-                    {row.free ? <span>&#10003;</span> : <span className="text-border">&#8212;</span>}
-                  </td>
-                  <td className="p-3.5 border-b border-text-primary/10 text-center text-sm font-semibold bg-text-primary text-white">
-                    {row.pro ? (
-                      <span>&#10003;</span>
+          <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            {/* Free */}
+            <div
+              data-reveal
+              className="bg-surface border border-border rounded-xl p-8 flex flex-col"
+              style={{ opacity: 0, transform: 'translateY(20px)', transition: 'opacity 0.5s ease, transform 0.5s ease' }}
+            >
+              <div className="mb-8">
+                <span className="text-xs font-semibold tracking-widest text-text-secondary uppercase">Free</span>
+                <div className="mt-2">
+                  <span className="font-display font-bold text-4xl tracking-tight">&pound;0</span>
+                  <span className="text-text-secondary text-sm ml-2">forever</span>
+                </div>
+              </div>
+              <ul className="space-y-3 flex-1 mb-8">
+                {PRICING_FEATURES.map((row) => (
+                  <li key={row.label} className="flex items-start gap-3 text-sm">
+                    {row.free ? (
+                      <svg className="w-4 h-4 text-accent mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
                     ) : (
-                      <span className="text-white/40">&#8212; {row.proLabel}</span>
+                      <svg className="w-4 h-4 text-text-secondary/40 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M18 12H6" />
+                      </svg>
                     )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-            <tfoot>
-              <tr>
-                <td className="p-4" />
-                <td className="p-4 text-center">
-                  <Link
-                    to="/signup"
-                    className="inline-block px-8 py-3 border border-text-primary text-text-primary text-xs font-semibold uppercase tracking-wider hover:bg-text-primary hover:text-white transition-colors"
-                  >
-                    Start Free
-                  </Link>
-                </td>
-                <td className="p-4 text-center bg-text-primary">
-                  <Link
-                    to="/signup"
-                    className="inline-block px-8 py-3 bg-accent text-white text-xs font-semibold uppercase tracking-wider border border-accent hover:bg-red-600 transition-colors"
-                  >
-                    Go Pro
-                  </Link>
-                </td>
-              </tr>
-            </tfoot>
-          </table>
+                    <span className={row.free ? 'text-text-primary' : 'text-text-secondary/50'}>{row.label}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link
+                to="/signup"
+                className="block text-center px-6 py-3 border border-border text-text-primary font-semibold text-sm tracking-wider rounded-full hover:border-text-secondary transition-colors"
+              >
+                Start Free
+              </Link>
+            </div>
+
+            {/* Pro */}
+            <div
+              data-reveal
+              className="relative bg-surface border border-accent/40 rounded-xl p-8 flex flex-col shadow-[0_0_30px_rgba(255,85,0,0.08)]"
+              style={{ opacity: 0, transform: 'translateY(20px)', transition: 'opacity 0.5s ease, transform 0.5s ease' }}
+            >
+              <div className="absolute -top-3 right-6">
+                <span className="bg-accent text-white text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full">
+                  Recommended
+                </span>
+              </div>
+              <div className="mb-8">
+                <span className="text-xs font-semibold tracking-widest text-accent uppercase">Pro</span>
+                <div className="mt-2">
+                  <span className="font-display font-bold text-4xl tracking-tight">&pound;4</span>
+                  <span className="text-text-secondary text-sm ml-2">per month</span>
+                </div>
+              </div>
+              <ul className="space-y-3 flex-1 mb-8">
+                {PRICING_FEATURES.map((row) => (
+                  <li key={row.label} className="flex items-start gap-3 text-sm">
+                    <svg className="w-4 h-4 text-accent mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-text-primary">{row.label}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link
+                to="/signup"
+                className="block text-center px-6 py-3 bg-accent text-white font-semibold text-sm tracking-wider rounded-full hover:brightness-110 hover:shadow-[0_0_20px_rgba(255,85,0,0.25)] transition-all"
+              >
+                Go Pro
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Blog */}
-      <section id="blog" className="border-b border-text-primary">
+      <section className="py-24">
         <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,4vw,4rem)]">
-          <div className="flex items-baseline gap-8 pt-16 pb-8">
-            <span className="font-display font-bold text-sm tracking-wider text-text-secondary">03</span>
-            <h2 className="font-display font-extrabold text-[clamp(2rem,5vw,4rem)] tracking-tighter uppercase leading-none">From the Blog</h2>
+          <div className="flex items-center gap-4 mb-16">
+            <span className="font-display font-bold text-sm tracking-wider text-accent">03</span>
+            <div className="h-px w-8 bg-border" />
+            <h2 className="font-display font-bold text-[clamp(1.8rem,4vw,3rem)] tracking-tight">From the Blog</h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-px bg-border mb-12">
+          <div className="grid md:grid-cols-3 gap-4">
             {BLOG_POSTS.slice(0, 3).map((post, i) => (
               <Link
                 key={post.slug}
                 to="/blog/$slug"
                 params={{ slug: post.slug }}
                 data-reveal
-                className="bg-bg p-8 group hover:bg-gray-50 transition-colors"
-                style={{ opacity: 0, transform: 'translateX(-30px)', transition: 'opacity 0.6s ease, transform 0.6s ease' }}
+                className="group bg-surface border border-border rounded-xl p-8 hover:border-accent/40 transition-all duration-300"
+                style={{ opacity: 0, transform: 'translateY(20px)', transition: 'opacity 0.5s ease, transform 0.5s ease' }}
               >
-                <span className="font-display font-bold text-xs text-text-secondary">
+                <span className="font-display font-bold text-xs text-accent">
                   {String(i + 1).padStart(2, '0')}
                 </span>
-                <h3 className="font-display font-bold text-lg tracking-tight mt-3 mb-3 group-hover:text-accent transition-colors">
+                <h3 className="font-display font-semibold text-base tracking-tight mt-4 mb-3 group-hover:text-accent transition-colors">
                   {post.title}
                 </h3>
-                <p className="text-sm text-text-secondary leading-relaxed mb-4">
+                <p className="text-sm text-text-secondary leading-relaxed mb-6">
                   {post.excerpt}
                 </p>
-                <span className="text-xs font-semibold uppercase tracking-wider text-accent">
+                <span className="text-xs font-semibold tracking-wider text-accent opacity-0 group-hover:opacity-100 transition-opacity">
                   Read &rarr;
                 </span>
               </Link>
             ))}
           </div>
-          <div className="pb-12">
+          <div className="mt-8">
             <Link
               to="/blog"
-              className="text-xs font-semibold uppercase tracking-wider hover:text-accent transition-colors"
+              className="text-xs font-semibold tracking-wider text-text-secondary hover:text-accent transition-colors"
             >
               View all posts &rarr;
             </Link>
@@ -264,17 +371,22 @@ function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-32 text-center">
-        <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,4vw,4rem)]">
-          <h2 className="font-display font-extrabold text-[clamp(2.5rem,7vw,6rem)] tracking-tighter uppercase leading-[0.95] mb-8">
-            Stop<br />Sending<br /><span className="text-accent">PDFs.</span>
+      <section className="py-32 text-center relative overflow-hidden">
+        {/* Ambient glow behind CTA */}
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[200px]"
+          style={{ background: 'radial-gradient(circle, rgba(255,85,0,0.1) 0%, transparent 70%)' }}
+        />
+        <div className="relative z-10 max-w-[1400px] mx-auto px-[clamp(1.5rem,4vw,4rem)]">
+          <h2 className="font-display font-extrabold text-[clamp(2.5rem,7vw,5.5rem)] tracking-tight leading-[0.95] mb-6">
+            Stop Sending<br /><span className="text-accent">PDFs.</span>
           </h2>
-          <p className="text-lg text-text-secondary max-w-[500px] mx-auto mb-12 leading-relaxed">
+          <p className="text-lg text-text-secondary max-w-[480px] mx-auto mb-10 leading-relaxed">
             Build your electronic press kit in minutes. Share one link with every promoter, venue, and agent.
           </p>
           <Link
             to="/signup"
-            className="inline-block px-12 py-4 bg-accent text-white font-bold text-sm uppercase tracking-widest hover:translate-y-[-2px] hover:shadow-[0_4px_0_0_black] transition-all"
+            className="inline-block px-10 py-4 bg-accent text-white font-semibold text-sm tracking-wider rounded-full hover:brightness-110 hover:shadow-[0_0_32px_rgba(255,85,0,0.3)] transition-all"
           >
             Create Your EPK
           </Link>
@@ -282,9 +394,9 @@ function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-text-primary py-6">
+      <footer className="border-t border-border py-6">
         <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,4vw,4rem)] flex items-center justify-between">
-          <span className="font-display font-bold text-sm">DJ EPK <span className="text-accent">&#9679;</span></span>
+          <span className="font-display font-bold text-sm">DJ EPK <span className="text-accent">&bull;</span></span>
           <span className="text-xs text-text-secondary">&copy; {new Date().getFullYear()} DJ EPK</span>
         </div>
       </footer>

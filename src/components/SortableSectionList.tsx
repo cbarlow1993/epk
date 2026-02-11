@@ -45,7 +45,7 @@ function SortableItem({ id, visible, onToggleVisibility }: SortableItemProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-3 p-3 border bg-white transition-colors ${isDragging ? 'shadow-lg' : ''} ${
+      className={`flex items-center gap-3 p-3 border bg-surface transition-colors ${isDragging ? 'shadow-lg' : ''} ${
         visible ? 'border-border' : 'border-border/50 opacity-60'
       }`}
     >

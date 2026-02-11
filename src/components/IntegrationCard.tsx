@@ -88,7 +88,7 @@ export function IntegrationCard({
         <div className="flex items-center gap-3">
           <span className="font-semibold text-text-primary">{title}</span>
           <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 ${
-            enabled ? 'bg-green-100 text-green-700' : 'bg-surface text-text-secondary'
+            enabled ? 'bg-green-500/10 text-green-400' : 'bg-surface text-text-secondary'
           }`}>
             {enabled ? 'Active' : 'Inactive'}
           </span>
@@ -168,7 +168,7 @@ export function IntegrationCard({
             >
               {saving ? 'Saving...' : 'Save'}
             </button>
-            {saved && <span className="text-xs font-semibold uppercase tracking-wider text-green-600">Saved</span>}
+            {saved && <span className="text-xs font-semibold uppercase tracking-wider text-green-400">Saved</span>}
             {error && <span className="text-xs text-red-500">{error}</span>}
           </div>
         </div>

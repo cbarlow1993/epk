@@ -103,7 +103,7 @@ function FileCard({
   const isImage = file.file_type === 'image'
 
   return (
-    <div className="bg-white border border-border overflow-hidden group">
+    <div className="bg-surface border border-border overflow-hidden group">
       {/* Preview area */}
       <div
         className="h-36 flex items-center justify-center bg-border cursor-pointer"
@@ -383,7 +383,7 @@ function FilesPage() {
         <div className={`${SETTINGS_CARD} mb-6`}>
           <h2 className="font-medium text-text-secondary mb-2">Free Tier</h2>
           <p className="text-sm text-text-secondary mb-3">
-            You have {formatBytes(storageUsage.limit)} of storage. Upgrade to Pro for 100 GB storage, folders, and more.
+            You have {formatBytes(storageUsage.limit)} of storage. Upgrade to Pro for 20 GB storage, folders, and more.
           </p>
           <Link to="/dashboard/settings" className={BTN_PRIMARY}>
             Upgrade to Pro

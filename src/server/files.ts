@@ -62,7 +62,7 @@ export const uploadFileToRepo = createServerFn({ method: 'POST' })
 
     const quota = await checkStorageQuota(supabase, user.id)
     if (quota.used + actualSize > quota.limit) {
-      return { error: 'Storage limit exceeded. Upgrade to Pro for 100GB storage.' }
+      return { error: 'Storage limit exceeded. Upgrade to Pro for 20GB storage.' }
     }
 
     const safeName = data.fileName.replace(/[^a-zA-Z0-9._-]/g, '_')

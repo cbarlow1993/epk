@@ -98,7 +98,7 @@ function AnalyticsOverviewPage() {
               const maxViews = data.profiles[0]?.views || 1
               const barWidth = Math.max((profile.views / maxViews) * 100, 2)
               return (
-                <div key={profile.slug} className="bg-white border border-border p-4">
+                <div key={profile.slug} className="bg-surface border border-border p-4">
                   <div className="flex items-center gap-4 mb-2">
                     <span className="text-xs text-text-secondary font-bold w-6">#{i + 1}</span>
                     <div className="flex-1">

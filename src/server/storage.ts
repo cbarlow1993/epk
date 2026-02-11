@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 export const STORAGE_LIMIT_FREE = 5 * 1024 * 1024 * 1024   // 5GB
-export const STORAGE_LIMIT_PRO = 100 * 1024 * 1024 * 1024   // 100GB
+export const STORAGE_LIMIT_PRO = 20 * 1024 * 1024 * 1024   // 20GB
 
 export async function checkStorageQuota(
   supabase: SupabaseClient,

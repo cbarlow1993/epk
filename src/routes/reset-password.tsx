@@ -60,12 +60,12 @@ function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-bg flex items-center justify-center px-4">
+    <div className="theme-dark min-h-screen bg-bg font-body flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <h1 className="text-3xl font-display font-extrabold tracking-tight uppercase text-center mb-8">New Password</h1>
+        <h1 className="text-3xl font-display font-bold tracking-tight text-text-primary text-center mb-8">New Password</h1>
 
         {done ? (
-          <div className="bg-accent/10 border border-accent/20 px-4 py-6 text-center">
+          <div className="bg-accent/10 border border-accent/30 rounded-xl px-4 py-6 text-center">
             <p className="text-accent font-semibold mb-2">Password Updated</p>
             <p className="text-text-secondary text-sm mb-4">Your password has been reset successfully.</p>
             <Link to="/dashboard" className="text-accent hover:underline font-semibold text-sm">Go to Dashboard</Link>
@@ -73,9 +73,9 @@ function ResetPasswordPage() {
         ) : (
           <>
             {error && (
-              <div className="border border-red-500 px-4 py-3 mb-6 text-red-500 text-sm">{error}</div>
+              <div className="border border-red-500/50 bg-red-500/10 rounded-lg px-4 py-3 mb-6 text-red-400 text-sm">{error}</div>
             )}
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label htmlFor="password" className={FORM_LABEL}>New Password</label>
                 <div className="relative">
@@ -84,7 +84,7 @@ function ResetPasswordPage() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className={FORM_INPUT}
+                    className={`${FORM_INPUT} rounded-lg`}
                     placeholder="At least 6 characters"
                     minLength={6}
                     required
@@ -118,7 +118,7 @@ function ResetPasswordPage() {
                     type={showConfirm ? 'text' : 'password'}
                     value={confirm}
                     onChange={(e) => setConfirm(e.target.value)}
-                    className={FORM_INPUT}
+                    className={`${FORM_INPUT} rounded-lg`}
                     placeholder="Confirm your new password"
                     required
                   />
@@ -145,7 +145,7 @@ function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-text-primary text-white hover:bg-accent disabled:opacity-50 font-semibold py-3 transition-colors uppercase tracking-wider text-sm"
+                className="w-full bg-accent hover:brightness-110 disabled:opacity-50 text-white font-semibold py-3 rounded-full transition-all tracking-wider text-sm hover:shadow-[0_0_20px_rgba(255,85,0,0.25)]"
               >
                 {loading ? 'Updating...' : 'Update Password'}
               </button>

@@ -78,7 +78,7 @@ function AnalyticsPage() {
           </p>
           <Link
             to="/dashboard/settings"
-            className={`${BTN_BASE} bg-text-primary text-white hover:bg-accent inline-block`}
+            className={`${BTN_BASE} bg-accent text-white hover:brightness-110 inline-block`}
           >
             Upgrade to Pro
           </Link>

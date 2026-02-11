@@ -427,7 +427,7 @@ function SocialPreviewUpgrade({ name, initial }: { name: string; initial: Profil
               type="button"
               onClick={handleUpgrade}
               disabled={loading}
-              className="bg-text-primary hover:bg-accent disabled:opacity-30 text-white text-sm font-medium px-6 py-2 transition-colors"
+              className="bg-accent hover:brightness-110 disabled:opacity-30 text-white text-sm font-medium px-6 py-2 transition-colors"
             >
               {loading ? 'Loading...' : 'Upgrade to Pro'}
             </button>

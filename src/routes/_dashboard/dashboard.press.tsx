@@ -174,7 +174,7 @@ function PressEditor() {
           {assets.map((asset, index) => (
             <div
               key={asset.id}
-              className="group relative aspect-square bg-white border border-border overflow-hidden"
+              className="group relative aspect-square bg-surface border border-border overflow-hidden"
             >
               {asset.press_type === 'video' ? (
                 <div className="w-full h-full flex flex-col items-center justify-center text-text-secondary">

@@ -3,18 +3,24 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { getProfile, updateProfile } from '~/server/profile'
 import { profileUpdateSchema, type ProfileUpdate } from '~/schemas/profile'
-import { FormInput, FORM_LABEL, FORM_INPUT, FORM_ERROR_MSG } from '~/components/forms'
+import { FormInput, FORM_LABEL, FORM_INPUT, FORM_INPUT_ERROR, FORM_ERROR_MSG } from '~/components/forms'
 import { PREDEFINED_GENRES } from '~/utils/genres'
 import { useDashboardSave } from '~/hooks/useDashboardSave'
 import { DashboardHeader } from '~/components/DashboardHeader'
+import { getSocialLinks, saveSocialLinksBulk } from '~/server/social-links'
+import { FIXED_SOCIAL_PLATFORMS, SOCIAL_PLATFORM_LABELS } from '~/schemas/social-link'
+import { useState } from 'react'
 
 export const Route = createFileRoute('/_dashboard/dashboard/profile')({
-  loader: () => getProfile(),
+  loader: async () => {
+    const [profile, socialLinks] = await Promise.all([getProfile(), getSocialLinks()])
+    return { profile, socialLinks }
+  },
   component: ProfileEditor,
 })
 
 function ProfileEditor() {
-  const initialProfile = Route.useLoaderData()
+  const { profile: initialProfile, socialLinks: initialSocialLinks } = Route.useLoaderData()
   const { saving, saved, error, onSave: save } = useDashboardSave(updateProfile)
   const { register, handleSubmit, watch, formState: { errors, isDirty }, setValue } = useForm<ProfileUpdate>({
     resolver: zodResolver(profileUpdateSchema.partial()) as never,
@@ -27,13 +33,58 @@ function ProfileEditor() {
     },
   })
 
-  const onSave = handleSubmit(save)
+  // Social links — managed as local state, saved alongside profile
+  const buildSocialDefaults = () => {
+    const map: Record<string, string> = {}
+    for (const p of FIXED_SOCIAL_PLATFORMS) {
+      const existing = (initialSocialLinks || []).find((l: { platform: string }) => l.platform === p)
+      map[p] = existing ? (existing as { url: string }).url : ''
+    }
+    return map
+  }
+  const [socialUrls, setSocialUrls] = useState<Record<string, string>>(buildSocialDefaults)
+  const [socialErrors, setSocialErrors] = useState<Record<string, string>>({})
+  const [socialDirty, setSocialDirty] = useState(false)
+
+  const handleSocialChange = (platform: string, url: string) => {
+    setSocialUrls((prev) => ({ ...prev, [platform]: url }))
+    setSocialDirty(true)
+    // Clear error on edit
+    if (socialErrors[platform]) {
+      setSocialErrors((prev) => {
+        const next = { ...prev }
+        delete next[platform]
+        return next
+      })
+    }
+  }
+
+  const validateSocialUrls = (): boolean => {
+    const errs: Record<string, string> = {}
+    for (const [platform, url] of Object.entries(socialUrls)) {
+      if (url && !url.match(/^https?:\/\/.+/)) {
+        errs[platform] = 'Must be a valid URL (https://...)'
+      }
+    }
+    setSocialErrors(errs)
+    return Object.keys(errs).length === 0
+  }
+
+  const onSave = handleSubmit(async (data) => {
+    if (!validateSocialUrls()) return
+    // Save profile and social links in parallel
+    const results = await Promise.all([
+      save(data),
+      socialDirty ? saveSocialLinksBulk({ data: socialUrls }) : Promise.resolve(),
+    ])
+    if (results[1]) setSocialDirty(false)
+  })
 
   const genres = watch('genres')
 
   return (
     <form onSubmit={onSave}>
-      <DashboardHeader title="Profile" saving={saving} saved={saved} error={error} isDirty={isDirty} />
+      <DashboardHeader title="Profile" saving={saving} saved={saved} error={error} isDirty={isDirty || socialDirty} />
 
       <div className="space-y-6 max-w-2xl">
         <FormInput
@@ -55,7 +106,7 @@ function ProfileEditor() {
                   setValue('slug', cleaned, { shouldDirty: true })
                 },
               })}
-              className={`flex-1 bg-white border  px-4 py-3 text-text-primary focus:border-accent focus:outline-none transition-colors ${
+              className={`flex-1 bg-surface border  px-4 py-3 text-text-primary focus:border-accent focus:outline-none transition-colors ${
                 errors.slug ? 'border-red-500' : 'border-border'
               }`}
             />
@@ -83,7 +134,7 @@ function ProfileEditor() {
                   className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
                     isSelected
                       ? 'bg-accent text-white'
-                      : 'bg-white border border-border text-text-secondary hover:border-accent/30'
+                      : 'bg-card border border-border text-text-secondary hover:border-accent/30'
                   }`}
                 >
                   {genre}
@@ -155,6 +206,32 @@ function ProfileEditor() {
               className={`${FORM_INPUT} w-24`}
             />
             <span className="text-text-secondary text-sm">BPM</span>
+          </div>
+        </div>
+
+        {/* Social Links */}
+        <div>
+          <label className={FORM_LABEL}>Social Links</label>
+          <div className="space-y-3">
+            {FIXED_SOCIAL_PLATFORMS.map((platform) => (
+              <div key={platform}>
+                <div className="flex items-center gap-3">
+                  <span className="text-text-secondary text-sm w-28 shrink-0">
+                    {SOCIAL_PLATFORM_LABELS[platform]}
+                  </span>
+                  <input
+                    type="url"
+                    placeholder={`https://${platform}.com/...`}
+                    value={socialUrls[platform] || ''}
+                    onChange={(e) => handleSocialChange(platform, e.target.value)}
+                    className={socialErrors[platform] ? FORM_INPUT_ERROR : FORM_INPUT}
+                  />
+                </div>
+                {socialErrors[platform] && (
+                  <p className={`${FORM_ERROR_MSG} ml-[7.75rem]`}>{socialErrors[platform]}</p>
+                )}
+              </div>
+            ))}
           </div>
         </div>
 

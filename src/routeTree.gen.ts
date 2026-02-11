@@ -29,7 +29,6 @@ import { Route as DashboardDashboardIndexRouteImport } from './routes/_dashboard
 import { Route as DashboardDashboardThemeRouteImport } from './routes/_dashboard/dashboard.theme'
 import { Route as DashboardDashboardTechnicalRouteImport } from './routes/_dashboard/dashboard.technical'
 import { Route as DashboardDashboardTeamRouteImport } from './routes/_dashboard/dashboard.team'
-import { Route as DashboardDashboardSocialsRouteImport } from './routes/_dashboard/dashboard.socials'
 import { Route as DashboardDashboardSocialPreviewRouteImport } from './routes/_dashboard/dashboard.social-preview'
 import { Route as DashboardDashboardSettingsRouteImport } from './routes/_dashboard/dashboard.settings'
 import { Route as DashboardDashboardRosterRouteImport } from './routes/_dashboard/dashboard.roster'
@@ -148,12 +147,6 @@ const DashboardDashboardTeamRoute = DashboardDashboardTeamRouteImport.update({
   path: '/team',
   getParentRoute: () => DashboardDashboardRoute,
 } as any)
-const DashboardDashboardSocialsRoute =
-  DashboardDashboardSocialsRouteImport.update({
-    id: '/socials',
-    path: '/socials',
-    getParentRoute: () => DashboardDashboardRoute,
-  } as any)
 const DashboardDashboardSocialPreviewRoute =
   DashboardDashboardSocialPreviewRouteImport.update({
     id: '/social-preview',
@@ -284,7 +277,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/roster': typeof DashboardDashboardRosterRoute
   '/dashboard/settings': typeof DashboardDashboardSettingsRoute
   '/dashboard/social-preview': typeof DashboardDashboardSocialPreviewRoute
-  '/dashboard/socials': typeof DashboardDashboardSocialsRoute
   '/dashboard/team': typeof DashboardDashboardTeamRoute
   '/dashboard/technical': typeof DashboardDashboardTechnicalRoute
   '/dashboard/theme': typeof DashboardDashboardThemeRoute
@@ -321,7 +313,6 @@ export interface FileRoutesByTo {
   '/dashboard/roster': typeof DashboardDashboardRosterRoute
   '/dashboard/settings': typeof DashboardDashboardSettingsRoute
   '/dashboard/social-preview': typeof DashboardDashboardSocialPreviewRoute
-  '/dashboard/socials': typeof DashboardDashboardSocialsRoute
   '/dashboard/team': typeof DashboardDashboardTeamRoute
   '/dashboard/technical': typeof DashboardDashboardTechnicalRoute
   '/dashboard/theme': typeof DashboardDashboardThemeRoute
@@ -362,7 +353,6 @@ export interface FileRoutesById {
   '/_dashboard/dashboard/roster': typeof DashboardDashboardRosterRoute
   '/_dashboard/dashboard/settings': typeof DashboardDashboardSettingsRoute
   '/_dashboard/dashboard/social-preview': typeof DashboardDashboardSocialPreviewRoute
-  '/_dashboard/dashboard/socials': typeof DashboardDashboardSocialsRoute
   '/_dashboard/dashboard/team': typeof DashboardDashboardTeamRoute
   '/_dashboard/dashboard/technical': typeof DashboardDashboardTechnicalRoute
   '/_dashboard/dashboard/theme': typeof DashboardDashboardThemeRoute
@@ -403,7 +393,6 @@ export interface FileRouteTypes {
     | '/dashboard/roster'
     | '/dashboard/settings'
     | '/dashboard/social-preview'
-    | '/dashboard/socials'
     | '/dashboard/team'
     | '/dashboard/technical'
     | '/dashboard/theme'
@@ -440,7 +429,6 @@ export interface FileRouteTypes {
     | '/dashboard/roster'
     | '/dashboard/settings'
     | '/dashboard/social-preview'
-    | '/dashboard/socials'
     | '/dashboard/team'
     | '/dashboard/technical'
     | '/dashboard/theme'
@@ -480,7 +468,6 @@ export interface FileRouteTypes {
     | '/_dashboard/dashboard/roster'
     | '/_dashboard/dashboard/settings'
     | '/_dashboard/dashboard/social-preview'
-    | '/_dashboard/dashboard/socials'
     | '/_dashboard/dashboard/team'
     | '/_dashboard/dashboard/technical'
     | '/_dashboard/dashboard/theme'
@@ -645,13 +632,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardTeamRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
-    '/_dashboard/dashboard/socials': {
-      id: '/_dashboard/dashboard/socials'
-      path: '/socials'
-      fullPath: '/dashboard/socials'
-      preLoaderRoute: typeof DashboardDashboardSocialsRouteImport
-      parentRoute: typeof DashboardDashboardRoute
-    }
     '/_dashboard/dashboard/social-preview': {
       id: '/_dashboard/dashboard/social-preview'
       path: '/social-preview'
@@ -792,7 +772,6 @@ interface DashboardDashboardRouteChildren {
   DashboardDashboardRosterRoute: typeof DashboardDashboardRosterRoute
   DashboardDashboardSettingsRoute: typeof DashboardDashboardSettingsRoute
   DashboardDashboardSocialPreviewRoute: typeof DashboardDashboardSocialPreviewRoute
-  DashboardDashboardSocialsRoute: typeof DashboardDashboardSocialsRoute
   DashboardDashboardTeamRoute: typeof DashboardDashboardTeamRoute
   DashboardDashboardTechnicalRoute: typeof DashboardDashboardTechnicalRoute
   DashboardDashboardThemeRoute: typeof DashboardDashboardThemeRoute
@@ -818,7 +797,6 @@ const DashboardDashboardRouteChildren: DashboardDashboardRouteChildren = {
   DashboardDashboardRosterRoute: DashboardDashboardRosterRoute,
   DashboardDashboardSettingsRoute: DashboardDashboardSettingsRoute,
   DashboardDashboardSocialPreviewRoute: DashboardDashboardSocialPreviewRoute,
-  DashboardDashboardSocialsRoute: DashboardDashboardSocialsRoute,
   DashboardDashboardTeamRoute: DashboardDashboardTeamRoute,
   DashboardDashboardTechnicalRoute: DashboardDashboardTechnicalRoute,
   DashboardDashboardThemeRoute: DashboardDashboardThemeRoute,

@@ -73,7 +73,7 @@ export function FontPicker({ label, value, onChange, customFonts = [] }: FontPic
       <button
         type="button"
         onClick={() => { setOpen(!open); setTimeout(() => inputRef.current?.focus(), 50) }}
-        className="w-full flex items-center justify-between bg-white border border-border px-4 py-3 text-sm text-text-primary focus:border-accent focus:outline-none"
+        className="w-full flex items-center justify-between bg-card border border-border px-4 py-3 text-sm text-text-primary focus:border-accent focus:outline-none"
       >
         <span style={{ fontFamily: `'${value}', sans-serif` }}>{value}</span>
         <svg className={`h-4 w-4 text-text-secondary transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -82,9 +82,9 @@ export function FontPicker({ label, value, onChange, customFonts = [] }: FontPic
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-1 w-full max-h-80 overflow-y-auto border border-border bg-white shadow-lg">
+        <div className="absolute z-50 mt-1 w-full max-h-80 overflow-y-auto border border-border bg-surface shadow-lg">
           {/* Search input */}
-          <div className="sticky top-0 bg-white border-b border-border p-2">
+          <div className="sticky top-0 bg-surface border-b border-border p-2">
             <input
               ref={inputRef}
               type="text"

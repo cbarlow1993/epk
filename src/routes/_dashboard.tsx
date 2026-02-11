@@ -30,7 +30,7 @@ function DashboardLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-bg flex">
+    <div className="theme-dark min-h-screen bg-bg text-text-primary font-body flex">
       <DashboardSidebar profile={safeProfile} />
       <main className="flex-1 p-6 pt-20 md:pt-10 md:p-10 md:ml-64">
         <Outlet />

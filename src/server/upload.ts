@@ -49,7 +49,7 @@ export const uploadFile = createServerFn({ method: 'POST' })
     // Check storage quota
     const quota = await checkStorageQuota(supabase, user.id)
     if (quota.used + buffer.byteLength > quota.limit) {
-      return { error: 'Storage limit exceeded. Upgrade to Pro for 100GB storage.' }
+      return { error: 'Storage limit exceeded. Upgrade to Pro for 20GB storage.' }
     }
 
     // Sanitize filename — strip path separators and use timestamp prefix

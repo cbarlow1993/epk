@@ -14,7 +14,7 @@ export interface BlogPost {
 function BlogCTA() {
   return (
     <div className="mt-16 pt-8 border-t border-border">
-      <p className="text-xl font-display font-bold tracking-tight mb-4">
+      <p className="text-xl font-display font-semibold tracking-tight mb-4 !text-text-primary">
         Or just use <span className="text-accent">DJ EPK</span> for free.
       </p>
       <p className="text-text-secondary mb-6">
@@ -22,7 +22,7 @@ function BlogCTA() {
       </p>
       <Link
         to="/signup"
-        className="inline-block px-8 py-3 bg-accent text-white text-xs font-semibold uppercase tracking-wider hover:bg-red-600 transition-colors"
+        className="inline-block px-8 py-3 bg-accent text-white text-sm font-semibold tracking-wider rounded-full hover:brightness-110 hover:shadow-[0_0_20px_rgba(255,85,0,0.25)] transition-all"
       >
         Create Your Free EPK
       </Link>

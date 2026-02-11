@@ -18,12 +18,12 @@ export function FormColorInput({ label, value, registration, onChange, error }: 
           type="color"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-12 h-10 rounded border border-border bg-white cursor-pointer"
+          className="w-12 h-10 rounded border border-border bg-card cursor-pointer"
         />
         <input
           type="text"
           {...registration}
-          className={`flex-1 bg-white border px-3 py-2 text-text-primary text-sm font-mono focus:border-accent focus:outline-none ${
+          className={`flex-1 bg-card border px-3 py-2 text-text-primary text-sm font-mono focus:border-accent focus:outline-none ${
             error ? 'border-red-500' : 'border-border'
           }`}
         />

@@ -150,7 +150,7 @@ function PhotosEditor() {
                 <button
                   type="button"
                   onClick={() => openModal(photo)}
-                  className="bg-white/90 text-text-primary px-2 py-1 text-xs font-medium"
+                  className="bg-bg/90 text-text-primary px-2 py-1 text-xs font-medium"
                 >
                   Edit
                 </button>

@@ -385,7 +385,7 @@ function TemplateCard({ tpl, isSelected, onClick }: {
       className={`relative border p-3 text-left transition-all w-full ${
         isSelected
           ? 'border-accent bg-accent/10 ring-1 ring-accent'
-          : 'border-border hover:border-text-primary bg-white'
+          : 'border-border hover:border-text-primary bg-surface'
       }`}
     >
       <div className="flex items-center gap-2 mb-1.5">
@@ -469,7 +469,7 @@ function TemplateDropdown({ selectedTemplate, onSelect }: {
 
       {/* Dropdown panel */}
       {open && (
-        <div className="absolute z-50 left-0 right-0 mt-1 bg-white border border-border shadow-lg max-h-80 overflow-y-auto">
+        <div className="absolute z-50 left-0 right-0 mt-1 bg-surface border border-border shadow-lg max-h-80 overflow-y-auto">
           <div className="grid grid-cols-2 gap-2 p-2">
             {TEMPLATES.map((tpl) => (
               <TemplateCard
@@ -904,7 +904,7 @@ function ThemeEditor() {
       id: 'animation',
       title: 'Animation',
       children: (
-        <div className="flex items-center justify-between bg-white border border-border p-4">
+        <div className="flex items-center justify-between bg-surface border border-border p-4">
           <div>
             <p className="text-sm font-medium">Animate sections on scroll</p>
             <p className="text-xs text-text-secondary mt-0.5">Sections fade in as visitors scroll down your EPK</p>

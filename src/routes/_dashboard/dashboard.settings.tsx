@@ -198,7 +198,7 @@ function BrandingSection({ profile }: { profile: ProfileRow | null }) {
           >
             {saving ? 'Saving...' : 'Save'}
           </button>
-          {saved && <span className="text-xs text-green-600">Saved!</span>}
+          {saved && <span className="text-xs text-green-400">Saved!</span>}
           {error && <span className="text-xs text-red-500">{error}</span>}
         </div>
       </div>
@@ -279,7 +279,7 @@ function ProfileSection({ profile, userEmail }: { profile: ProfileRow | null; us
           >
             {saving ? 'Saving...' : 'Save'}
           </button>
-          {saved && <span className="text-xs text-green-600">{email !== userEmail ? 'Saved! Check your email to confirm the change.' : 'Saved!'}</span>}
+          {saved && <span className="text-xs text-green-400">{email !== userEmail ? 'Saved! Check your email to confirm the change.' : 'Saved!'}</span>}
           {error && <span className="text-xs text-red-500">{error}</span>}
         </div>
       </div>
@@ -355,7 +355,7 @@ function SecuritySection() {
           >
             {saving ? 'Updating...' : 'Update Password'}
           </button>
-          {saved && <span className="text-xs text-green-600">Password updated!</span>}
+          {saved && <span className="text-xs text-green-400">Password updated!</span>}
           {error && <span className="text-xs text-red-500">{error}</span>}
         </div>
       </div>

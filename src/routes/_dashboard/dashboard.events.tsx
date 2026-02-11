@@ -249,7 +249,7 @@ function EventsEditor() {
                   {catEvents.map((event, index) => (
                     <div
                       key={event.id}
-                      className="bg-white border border-border p-4 flex items-center gap-4"
+                      className="bg-surface border border-border p-4 flex items-center gap-4"
                     >
                       <ReorderButtons
                         index={index}
@@ -375,6 +375,7 @@ function EventsEditor() {
 
           <div>
             <label className={FORM_LABEL}>Image (optional)</label>
+            <p className="text-xs text-text-secondary mb-2">Recommended: 800 x 800px</p>
             <input
               type="file"
               accept="image/*"

@@ -224,7 +224,7 @@ export const BlockEditor = forwardRef<BlockEditorHandle, BlockEditorProps>(
         {label && <label className={FORM_LABEL}>{label}</label>}
         <div
           ref={holderRef}
-          className="border border-text-primary/20 bg-white min-h-[200px] px-4 py-3 [&_.ce-block__content]:max-w-none [&_.ce-toolbar__content]:max-w-none"
+          className="border border-text-primary/20 bg-card min-h-[200px] px-4 py-3 [&_.ce-block__content]:max-w-none [&_.ce-toolbar__content]:max-w-none"
         />
       </div>
     )

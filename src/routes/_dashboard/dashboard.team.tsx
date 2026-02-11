@@ -17,7 +17,7 @@ const ROLE_COLORS: Record<string, string> = {
   owner: 'bg-amber-500/20 text-amber-400',
   admin: 'bg-purple-500/20 text-purple-400',
   manager: 'bg-blue-500/20 text-blue-400',
-  artist: 'bg-green-500/10 text-green-600',
+  artist: 'bg-green-500/10 text-green-400',
 }
 
 const INVITABLE_ROLES: { value: OrgRole; label: string }[] = [
@@ -88,7 +88,7 @@ function TeamPage() {
       {/* Members List */}
       <div className="space-y-3">
         {members.map((member: { id: string; role: string; user_id: string }) => (
-          <div key={member.id} className="bg-white border border-border p-4 flex items-center gap-4">
+          <div key={member.id} className="bg-surface border border-border p-4 flex items-center gap-4">
             <div className="flex-1">
               <p className="font-bold text-sm">{member.user_id.slice(0, 8)}...</p>
             </div>

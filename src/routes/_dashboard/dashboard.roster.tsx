@@ -97,8 +97,8 @@ function RosterPage() {
             tier: string
             published: boolean
           }) => (
-            <div key={profile.id} className="bg-white border border-text-primary/20 overflow-hidden">
-              <div className="aspect-video bg-white flex items-center justify-center">
+            <div key={profile.id} className="bg-surface border border-border overflow-hidden">
+              <div className="aspect-video bg-surface flex items-center justify-center">
                 {profile.profile_image_url ? (
                   <img src={profile.profile_image_url} alt="" className="w-full h-full object-cover" />
                 ) : (
@@ -125,7 +125,7 @@ function RosterPage() {
                   <Link
                     to="/dashboard"
                     search={{ profile: profile.id }}
-                    className={`${BTN_BASE} text-xs bg-text-primary text-white hover:bg-accent`}
+                    className={`${BTN_BASE} text-xs bg-accent text-white hover:brightness-110`}
                   >
                     Edit
                   </Link>

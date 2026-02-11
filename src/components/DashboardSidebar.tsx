@@ -17,7 +17,6 @@ const NAV_ITEMS = [
   { label: 'Technical', href: '/dashboard/technical' },
   { label: 'Press Assets', href: '/dashboard/press' },
   { label: 'Contact', href: '/dashboard/contact' },
-  { label: 'Social Links', href: '/dashboard/socials' },
   { label: 'Theme', href: '/dashboard/theme' },
   { label: 'Pages', href: '/dashboard/pages' },
   { label: 'Social Preview', href: '/dashboard/social-preview' },
@@ -59,7 +58,7 @@ export function DashboardSidebar({ profile, isAgency = false }: { profile: Sideb
   const navContent = (
     <>
       {/* Header */}
-      <div className="p-6 border-b border-text-primary">
+      <div className="p-6 border-b border-border">
         <p className="font-display font-bold text-sm truncate">{profile.display_name}</p>
         <a
           href={`/${profile.slug}`}
@@ -93,7 +92,7 @@ export function DashboardSidebar({ profile, isAgency = false }: { profile: Sideb
       </nav>
 
       {/* Published + Logout */}
-      <div className="border-t border-text-primary">
+      <div className="border-t border-border">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">Published</span>
@@ -133,7 +132,7 @@ export function DashboardSidebar({ profile, isAgency = false }: { profile: Sideb
   return (
     <>
       {/* Mobile header bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white border-b border-text-primary flex items-center px-4 z-50">
+      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-bg border-b border-border flex items-center px-4 z-50">
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
           className="text-text-primary p-2 -ml-2"
@@ -160,7 +159,7 @@ export function DashboardSidebar({ profile, isAgency = false }: { profile: Sideb
 
       {/* Mobile drawer */}
       <aside
-        className={`md:hidden fixed top-14 left-0 bottom-0 w-64 bg-white border-r border-text-primary flex flex-col z-40 transition-transform ${
+        className={`md:hidden fixed top-14 left-0 bottom-0 w-64 bg-bg border-r border-border flex flex-col z-40 transition-transform ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -168,7 +167,7 @@ export function DashboardSidebar({ profile, isAgency = false }: { profile: Sideb
       </aside>
 
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex fixed top-0 left-0 h-full w-64 bg-white border-r border-text-primary flex-col z-40">
+      <aside className="hidden md:flex fixed top-0 left-0 h-full w-64 bg-bg border-r border-border flex-col z-40">
         {navContent}
       </aside>
     </>

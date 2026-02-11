@@ -29,7 +29,7 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
       }}
       className="backdrop:bg-black/50 bg-transparent p-0 m-auto max-w-lg w-full"
     >
-      <div className="bg-white border border-border p-6">
+      <div className="bg-surface border border-border rounded-xl p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-bold text-text-primary">{title}</h2>
           <button

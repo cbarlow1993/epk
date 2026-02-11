@@ -61,19 +61,19 @@ export function AuthForm({ title, fields, submitLabel, loadingLabel, onSubmit, f
 
   if (success && successContent) {
     return (
-      <div className="min-h-screen bg-bg flex items-center justify-center px-4">
+      <div className="theme-dark min-h-screen bg-bg font-body flex items-center justify-center px-4">
         <div className="w-full max-w-md">{successContent}</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-bg flex items-center justify-center px-4">
+    <div className="theme-dark min-h-screen bg-bg font-body flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <h1 className="font-display font-extrabold text-3xl tracking-tight uppercase text-center mb-8">{title}</h1>
+        <h1 className="font-display font-bold text-3xl tracking-tight text-text-primary text-center mb-8">{title}</h1>
 
         {error && (
-          <div className="border border-red-500 px-4 py-3 mb-6 text-red-500 text-sm">
+          <div className="border border-red-500/50 bg-red-500/10 rounded-lg px-4 py-3 mb-6 text-red-400 text-sm">
             {error}
           </div>
         )}
@@ -100,7 +100,7 @@ export function AuthForm({ title, fields, submitLabel, loadingLabel, onSubmit, f
                   setOauthLoading(null)
                 }
               }}
-              className="w-full bg-white border border-text-primary/20 hover:border-text-primary text-text-primary font-semibold py-3 transition-colors text-sm uppercase tracking-wider disabled:opacity-50"
+              className="w-full bg-surface border border-border rounded-lg text-text-primary font-medium py-3 transition-all text-sm hover:border-text-secondary disabled:opacity-50"
             >
               {oauthLoading === provider ? 'Redirecting...' : `Continue with ${provider.charAt(0).toUpperCase() + provider.slice(1)}`}
             </button>
@@ -108,12 +108,12 @@ export function AuthForm({ title, fields, submitLabel, loadingLabel, onSubmit, f
         </div>
 
         <div className="flex items-center gap-4 mb-6">
-          <div className="flex-1 h-px bg-text-primary" />
-          <span className="text-text-secondary text-xs uppercase tracking-wider">or</span>
-          <div className="flex-1 h-px bg-text-primary" />
+          <div className="flex-1 h-px bg-border" />
+          <span className="text-text-secondary text-xs tracking-wider">or</span>
+          <div className="flex-1 h-px bg-border" />
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-5">
           {fields.map((field) => (
             <div key={field.id}>
               <label htmlFor={field.id} className={FORM_LABEL}>{field.label}</label>
@@ -123,7 +123,7 @@ export function AuthForm({ title, fields, submitLabel, loadingLabel, onSubmit, f
                   type={field.type === 'password' && showPasswords[field.id] ? 'text' : field.type}
                   value={values[field.id]}
                   onChange={(e) => setValues((prev) => ({ ...prev, [field.id]: e.target.value }))}
-                  className={FORM_INPUT}
+                  className={`${FORM_INPUT} rounded-lg`}
                   placeholder={field.placeholder}
                   minLength={field.minLength}
                   disabled={loading}
@@ -158,7 +158,7 @@ export function AuthForm({ title, fields, submitLabel, loadingLabel, onSubmit, f
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-text-primary hover:bg-accent disabled:opacity-50 text-white font-semibold py-3 transition-colors uppercase tracking-wider text-sm"
+            className="w-full bg-accent hover:brightness-110 disabled:opacity-50 text-white font-semibold py-3 rounded-full transition-all tracking-wider text-sm hover:shadow-[0_0_20px_rgba(255,85,0,0.25)]"
           >
             {loading ? loadingLabel : submitLabel}
           </button>
