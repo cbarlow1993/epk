@@ -93,6 +93,7 @@ function OnboardingWizard() {
 
   // Publish step state
   const [publishing, setPublishing] = useState(false)
+  const [publishError, setPublishError] = useState('')
 
   const slugTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -277,10 +278,17 @@ function OnboardingWizard() {
 
   const handlePublish = async () => {
     setPublishing(true)
+    setPublishError('')
     try {
-      await updateProfile({ data: { published: true } })
+      const result = await updateProfile({ data: { published: true } })
+      if (result && 'error' in result && result.error) {
+        setPublishError(result.error)
+        setPublishing(false)
+        return
+      }
       window.location.href = '/dashboard'
     } catch {
+      setPublishError('Failed to publish. You can publish from the dashboard instead.')
       setPublishing(false)
     }
   }
@@ -626,6 +634,10 @@ function OnboardingWizard() {
               Get started for free, or unlock everything with Pro.
             </p>
 
+            <button type="button" onClick={() => setStep('events')} className="mb-8 mx-auto block text-sm font-semibold uppercase tracking-wider text-text-secondary hover:text-text-primary transition-colors">
+              &larr; Back
+            </button>
+
             <div className="grid sm:grid-cols-2 gap-6">
               {/* Free plan */}
               <div className="border border-border bg-surface p-6 flex flex-col">
@@ -706,6 +718,9 @@ function OnboardingWizard() {
             </p>
 
             <div className="space-y-3 max-w-xs mx-auto">
+              {publishError && (
+                <div className="border border-red-500/50 bg-red-500/10 rounded-lg px-4 py-3 text-red-400 text-sm">{publishError}</div>
+              )}
               <button
                 type="button"
                 onClick={handlePublish}
