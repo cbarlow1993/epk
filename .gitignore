@@ -7,3 +7,7 @@ dist
 .env
 .vercel
 .env*.local
+.DS_Store
+.playwright-mcp/
+e2e/.auth/
+*.png
