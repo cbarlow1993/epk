@@ -6,6 +6,7 @@ import { OAUTH_PROVIDERS } from '~/components/AuthForm'
 import { PasswordStrength } from '~/components/PasswordStrength'
 import { friendlyAuthError } from '~/utils/auth-errors'
 import { getSupabaseBrowserClient } from '~/utils/supabase'
+import { trackOAuthClick, trackSignupSubmit, trackSignupComplete } from '~/utils/analytics'
 
 export const Route = createFileRoute('/signup')({
   head: () => ({
@@ -92,6 +93,7 @@ function SignupPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
+    trackSignupSubmit()
     try {
       const result = await signupWithEmail({ data: { email: values.email, password: values.password, displayName: values.displayName } })
       if (result && 'error' in result && result.error) {
@@ -100,10 +102,12 @@ function SignupPage() {
         return
       }
       if (result && 'needsConfirmation' in result && result.needsConfirmation) {
+        trackSignupComplete('email')
         setSuccess(true)
         setLoading(false)
         return
       }
+      trackSignupComplete('email')
       window.location.href = '/dashboard/profile'
     } catch {
       setError('An unexpected error occurred')
@@ -114,6 +118,7 @@ function SignupPage() {
   const handleOAuth = async (provider: 'google' | 'apple' | 'spotify') => {
     setOauthLoading(provider)
     setError('')
+    trackOAuthClick(provider)
     const supabase = getSupabaseBrowserClient()
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider,

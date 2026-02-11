@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { BLOG_POSTS } from '~/data/blog-posts'
+import { trackCTA, trackNavClick, trackSectionView } from '~/utils/analytics'
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
@@ -106,6 +107,27 @@ function LandingPage() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // Track which landing page sections users scroll to
+  useEffect(() => {
+    const sections = mainRef.current?.querySelectorAll('[data-section]')
+    if (!sections?.length) return
+    const fired = new Set<string>()
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const name = (entry.target as HTMLElement).dataset.section!
+          if (entry.isIntersecting && !fired.has(name)) {
+            fired.add(name)
+            trackSectionView(name)
+          }
+        }
+      },
+      { threshold: 0.3 }
+    )
+    sections.forEach((el) => observer.observe(el))
+    return () => observer.disconnect()
+  }, [])
+
   return (
     <div ref={mainRef} className="theme-dark min-h-screen bg-bg text-text-primary font-body">
       {/* Grain texture overlay */}
@@ -129,11 +151,11 @@ function LandingPage() {
             myEPK <span className="inline-block w-2 h-2 bg-accent rounded-full" />
           </Link>
           <div className="flex items-center gap-8">
-            <a href="#features" className="hidden sm:inline text-xs font-medium tracking-wider text-text-secondary hover:text-accent transition-colors">Features</a>
-            <a href="#pricing" className="hidden sm:inline text-xs font-medium tracking-wider text-text-secondary hover:text-accent transition-colors">Pricing</a>
-            <Link to="/blog" className="hidden sm:inline text-xs font-medium tracking-wider text-text-secondary hover:text-accent transition-colors">Blog</Link>
-            <Link to="/login" className="text-xs font-medium tracking-wider text-text-secondary hover:text-text-primary transition-colors">Log in</Link>
-            <Link to="/signup" className="text-xs font-semibold tracking-wider bg-accent text-white px-5 py-2 rounded-full hover:brightness-110 transition-all">
+            <a href="#features" onClick={() => trackNavClick('features')} className="hidden sm:inline text-xs font-medium tracking-wider text-text-secondary hover:text-accent transition-colors">Features</a>
+            <a href="#pricing" onClick={() => trackNavClick('pricing')} className="hidden sm:inline text-xs font-medium tracking-wider text-text-secondary hover:text-accent transition-colors">Pricing</a>
+            <Link to="/blog" onClick={() => trackNavClick('blog')} className="hidden sm:inline text-xs font-medium tracking-wider text-text-secondary hover:text-accent transition-colors">Blog</Link>
+            <Link to="/login" onClick={() => trackNavClick('login')} className="text-xs font-medium tracking-wider text-text-secondary hover:text-text-primary transition-colors">Log in</Link>
+            <Link to="/signup" onClick={() => trackCTA('get_started', 'nav')} className="text-xs font-semibold tracking-wider bg-accent text-white px-5 py-2 rounded-full hover:brightness-110 transition-all">
               Get Started
             </Link>
           </div>
@@ -141,7 +163,7 @@ function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative min-h-screen flex flex-col justify-center overflow-hidden pt-16">
+      <section data-section="hero" className="relative min-h-screen flex flex-col justify-center overflow-hidden pt-16">
         {/* Ambient gradient orbs */}
         <div
           className="absolute top-[15%] left-[10%] w-[500px] h-[500px] rounded-full blur-[180px]"
@@ -183,12 +205,14 @@ function LandingPage() {
               <div className="flex gap-4">
                 <Link
                   to="/signup"
+                  onClick={() => trackCTA('create_your_epk', 'hero')}
                   className="px-8 py-3.5 bg-accent text-white font-semibold text-sm tracking-wider rounded-full hover:brightness-110 hover:shadow-[0_0_24px_rgba(255,85,0,0.3)] transition-all"
                 >
                   Create Your EPK
                 </Link>
                 <a
                   href="#features"
+                  onClick={() => trackCTA('learn_more', 'hero')}
                   className="px-8 py-3.5 border border-border text-text-secondary font-medium text-sm tracking-wider rounded-full hover:border-text-secondary hover:text-text-primary transition-all"
                 >
                   Learn More
@@ -220,7 +244,7 @@ function LandingPage() {
       <div className="h-px bg-gradient-to-r from-transparent via-accent to-transparent" />
 
       {/* Features */}
-      <section id="features" className="py-24">
+      <section id="features" data-section="features" className="py-24">
         <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,4vw,4rem)]">
           <div className="flex items-center gap-4 mb-16">
             <span className="font-display font-bold text-sm tracking-wider text-accent">01</span>
@@ -247,7 +271,7 @@ function LandingPage() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-24">
+      <section id="pricing" data-section="pricing" className="py-24">
         <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,4vw,4rem)]">
           <div className="flex items-center gap-4 mb-16">
             <span className="font-display font-bold text-sm tracking-wider text-accent">02</span>
@@ -286,6 +310,7 @@ function LandingPage() {
               </ul>
               <Link
                 to="/signup"
+                onClick={() => trackCTA('start_free', 'pricing')}
                 className="block text-center px-6 py-3 border border-border text-text-primary font-semibold text-sm tracking-wider rounded-full hover:border-text-secondary transition-colors"
               >
                 Start Free
@@ -322,6 +347,7 @@ function LandingPage() {
               </ul>
               <Link
                 to="/signup"
+                onClick={() => trackCTA('go_pro', 'pricing')}
                 className="block text-center px-6 py-3 bg-accent text-white font-semibold text-sm tracking-wider rounded-full hover:brightness-110 hover:shadow-[0_0_20px_rgba(255,85,0,0.25)] transition-all"
               >
                 Go Pro
@@ -332,7 +358,7 @@ function LandingPage() {
       </section>
 
       {/* Blog */}
-      <section className="py-24">
+      <section data-section="blog" className="py-24">
         <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,4vw,4rem)]">
           <div className="flex items-center gap-4 mb-16">
             <span className="font-display font-bold text-sm tracking-wider text-accent">03</span>
@@ -376,7 +402,7 @@ function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-32 text-center relative overflow-hidden">
+      <section data-section="cta" className="py-32 text-center relative overflow-hidden">
         {/* Ambient glow behind CTA */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[200px]"
@@ -391,6 +417,7 @@ function LandingPage() {
           </p>
           <Link
             to="/signup"
+            onClick={() => trackCTA('create_your_epk', 'footer_cta')}
             className="inline-block px-10 py-4 bg-accent text-white font-semibold text-sm tracking-wider rounded-full hover:brightness-110 hover:shadow-[0_0_32px_rgba(255,85,0,0.3)] transition-all"
           >
             Create Your EPK
