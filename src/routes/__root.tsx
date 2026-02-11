@@ -3,9 +3,13 @@ import {
   Outlet,
   Scripts,
   createRootRoute,
+  useRouter,
 } from '@tanstack/react-router'
+import { useEffect } from 'react'
 import '../styles.css'
 import { AuthProvider } from '~/components/AuthProvider'
+
+const GA_ID = 'G-V4TS3G7GD6'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -36,6 +40,13 @@ export const Route = createRootRoute({
     ],
     scripts: [
       {
+        src: `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`,
+        async: true,
+      },
+      {
+        children: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');`,
+      },
+      {
         type: 'application/ld+json',
         children: JSON.stringify({
           '@context': 'https://schema.org',
@@ -58,6 +69,18 @@ export const Route = createRootRoute({
 })
 
 function RootComponent() {
+  const router = useRouter()
+
+  useEffect(() => {
+    return router.subscribe('onResolved', (evt) => {
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', 'page_view', {
+          page_path: evt.toLocation.pathname,
+        })
+      }
+    })
+  }, [router])
+
   return (
     <html lang="en">
       <head>

@@ -37,3 +37,7 @@ declare module '@editorjs/text-variant-tune' {
   const TextVariantTune: unknown
   export default TextVariantTune
 }
+
+interface Window {
+  gtag: (...args: unknown[]) => void
+}
