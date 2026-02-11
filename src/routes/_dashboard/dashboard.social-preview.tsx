@@ -64,7 +64,7 @@ function SocialPreviewEditor() {
   const effectiveTitle = ogTitle || autoTitle
   const effectiveDescription = ogDescription || initial?.meta_description || autoDescription
   const effectiveImage = ogImageUrl || initial?.profile_image_url || ''
-  const domain = initial?.slug ? `${initial.slug}.myepk.bio` : 'myepk.bio'
+  const domain = initial?.slug ? `myepk.bio/${initial.slug}` : 'myepk.bio'
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]

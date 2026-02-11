@@ -34,7 +34,7 @@ const FEATURES = [
 const PRICING_FEATURES = [
   { label: 'Full EPK page', free: true, pro: true },
   { label: 'All sections (bio, mixes, events, rider, press, contact)', free: true, pro: true },
-  { label: 'yourname.myepk.bio URL', free: true, pro: true },
+  { label: 'myepk.bio/your-dj-name URL', free: true, pro: true },
   { label: 'Social links', free: true, pro: true },
   { label: 'Platform branding removed', free: false, pro: true },
   { label: 'Custom domain', free: false, pro: true },
