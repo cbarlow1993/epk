@@ -14,6 +14,11 @@ export const Route = createFileRoute('/_dashboard')({
       throw redirect({ to: '/verify-email' })
     }
 
+    // Enforce onboarding completion
+    if (!result.profile?.onboarding_completed) {
+      throw redirect({ to: '/onboarding' })
+    }
+
     return { user: result.user, profile: result.profile }
   },
   component: DashboardLayout,

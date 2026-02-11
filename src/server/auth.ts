@@ -35,7 +35,7 @@ export const loginWithEmail = createServerFn({ method: 'POST' })
   })
 
 export const signupWithEmail = createServerFn({ method: 'POST' })
-  .inputValidator((data: unknown) => z.object({ email: z.string().email(), password: z.string().min(6), displayName: z.string().min(1).max(100) }).parse(data))
+  .inputValidator((data: unknown) => z.object({ email: z.string().email(), password: z.string().min(6), displayName: z.string().max(100).optional().default('') }).parse(data))
   .handler(async ({ data }) => {
     const supabase = getSupabaseServerClient()
 
@@ -43,8 +43,8 @@ export const signupWithEmail = createServerFn({ method: 'POST' })
       email: data.email,
       password: data.password,
       options: {
-        data: { display_name: data.displayName },
-        emailRedirectTo: `${import.meta.env.VITE_SITE_URL || 'http://localhost:3000'}/auth/callback?next=/dashboard`,
+        data: data.displayName ? { display_name: data.displayName } : {},
+        emailRedirectTo: `${import.meta.env.VITE_SITE_URL || 'http://localhost:3000'}/auth/callback?next=/onboarding`,
       },
     })
 

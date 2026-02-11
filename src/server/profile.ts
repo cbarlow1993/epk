@@ -140,6 +140,75 @@ export const updateProfile = createServerFn({ method: 'POST' })
     return { profile }
   })
 
+export const checkSlugAvailability = createServerFn({ method: 'POST' })
+  .inputValidator((data: unknown) => z.object({ slug: z.string().min(2).max(50) }).parse(data))
+  .handler(async ({ data }) => {
+    const { supabase, user } = await withAuth()
+
+    const slug = data.slug.toLowerCase()
+
+    // Check reserved slugs
+    if (RESERVED_SLUGS.has(slug)) {
+      return { available: false, reason: 'This URL is reserved' }
+    }
+
+    // Check if slug is taken by another user
+    const { data: existing } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('slug', slug)
+      .maybeSingle()
+
+    if (existing && existing.id !== user.id) {
+      return { available: false, reason: 'This URL is already taken' }
+    }
+
+    return { available: true }
+  })
+
+export const completeOnboarding = createServerFn({ method: 'POST' })
+  .inputValidator((data: unknown) =>
+    z.object({
+      display_name: z.string().min(1, 'Display name is required').max(100),
+      slug: z.string().min(2).max(50).regex(/^[a-z0-9][a-z0-9-]*[a-z0-9]$/, 'Lowercase alphanumeric and hyphens only'),
+      genres: z.array(z.string().max(50)).max(20).optional(),
+    }).parse(data)
+  )
+  .handler(async ({ data }) => {
+    const { supabase, user } = await withAuth()
+
+    // Check reserved slugs
+    if (RESERVED_SLUGS.has(data.slug)) {
+      return { error: 'This URL is reserved. Please choose a different slug.' }
+    }
+
+    // Check slug uniqueness
+    const { data: existing } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('slug', data.slug)
+      .maybeSingle()
+
+    if (existing && existing.id !== user.id) {
+      return { error: 'This URL is already taken. Please choose a different one.' }
+    }
+
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .update({
+        display_name: data.display_name,
+        slug: data.slug,
+        genres: data.genres || [],
+        onboarding_completed: true,
+      })
+      .eq('id', user.id)
+      .select()
+      .single()
+
+    if (error) return { error: error.message }
+    return { profile }
+  })
+
 export const getUserEmail = createServerFn({ method: 'GET' }).handler(async () => {
   const { user } = await withAuth()
   return { email: user.email ?? '' }
