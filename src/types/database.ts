@@ -74,6 +74,7 @@ export interface ProfileRow {
   twitter_card_type: 'summary' | 'summary_large_image' | null
   organization_id: string | null
   managed_by: string | null
+  onboarding_completed: boolean
   created_at: string
 }
 

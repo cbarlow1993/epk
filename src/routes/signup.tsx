@@ -108,7 +108,7 @@ function SignupPage() {
         return
       }
       trackSignupComplete('email')
-      window.location.href = '/dashboard/profile'
+      window.location.href = '/onboarding'
     } catch {
       setError('An unexpected error occurred')
       setLoading(false)
@@ -123,7 +123,7 @@ function SignupPage() {
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard/profile`,
+        redirectTo: `${window.location.origin}/auth/callback?next=/onboarding`,
       },
     })
     if (oauthError) {
@@ -261,7 +261,7 @@ function SignupPage() {
           {/* Email form */}
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="displayName" className={FORM_LABEL}>Artist / DJ Name</label>
+              <label htmlFor="displayName" className={FORM_LABEL}>Artist / DJ Name <span className="text-text-secondary font-normal normal-case tracking-normal">(optional)</span></label>
               <input
                 id="displayName"
                 type="text"
@@ -270,7 +270,6 @@ function SignupPage() {
                 className={`${FORM_INPUT} rounded-lg`}
                 placeholder="Your name"
                 disabled={loading}
-                required
               />
             </div>
             <div>
