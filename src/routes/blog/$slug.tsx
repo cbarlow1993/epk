@@ -47,9 +47,10 @@ function BlogPost() {
             myEPK <span className="inline-block w-2 h-2 bg-accent rounded-full" />
           </Link>
           <div className="flex items-center gap-8">
-            <Link to="/blog" className="text-xs font-medium tracking-wider text-text-secondary hover:text-accent transition-colors">
-              &larr; All Posts
-            </Link>
+            <a href="/#features" className="hidden sm:inline text-xs font-medium tracking-wider text-text-secondary hover:text-accent transition-colors">Features</a>
+            <a href="/#pricing" className="hidden sm:inline text-xs font-medium tracking-wider text-text-secondary hover:text-accent transition-colors">Pricing</a>
+            <Link to="/blog" className="hidden sm:inline text-xs font-medium tracking-wider text-text-secondary hover:text-accent transition-colors">Blog</Link>
+            <Link to="/login" className="text-xs font-medium tracking-wider text-text-secondary hover:text-text-primary transition-colors">Log in</Link>
             <Link to="/signup" className="text-xs font-semibold tracking-wider bg-accent text-white px-5 py-2 rounded-full hover:brightness-110 transition-all">
               Get Started
             </Link>

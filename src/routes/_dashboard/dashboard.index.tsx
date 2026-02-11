@@ -160,7 +160,7 @@ function ProUpsellPanel() {
       <div className="sticky top-8 border border-accent/30 bg-accent/5 p-6">
         <h2 className="font-display font-bold text-sm uppercase tracking-wider mb-1">Upgrade to Pro</h2>
         <p className="text-2xl font-bold text-text-primary">
-          $4<span className="text-sm font-normal text-text-secondary">/month</span>
+          $5<span className="text-sm font-normal text-text-secondary">/month</span>
         </p>
 
         <ul className="mt-5 space-y-3">

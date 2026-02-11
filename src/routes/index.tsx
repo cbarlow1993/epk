@@ -301,7 +301,7 @@ function LandingPage() {
               <div className="mb-8">
                 <span className="text-xs font-semibold tracking-widest text-accent uppercase">Pro</span>
                 <div className="mt-2">
-                  <span className="font-display font-bold text-4xl tracking-tight">&pound;4</span>
+                  <span className="font-display font-bold text-4xl tracking-tight">$5</span>
                   <span className="text-text-secondary text-sm ml-2">per month</span>
                 </div>
               </div>
