@@ -14,10 +14,10 @@ export const Route = createFileRoute('/blog/$slug')({
   ),
   head: ({ params }) => {
     const post = BLOG_POSTS.find((p) => p.slug === params.slug)
-    if (!post) return { meta: [{ title: 'Post Not Found | DJ EPK' }] }
+    if (!post) return { meta: [{ title: 'Post Not Found | myEPK' }] }
     return {
       meta: [
-        { title: `${post.title} | DJ EPK` },
+        { title: `${post.title} | myEPK` },
         { name: 'description', content: post.metaDescription },
         { property: 'og:title', content: post.title },
         { property: 'og:description', content: post.metaDescription },
@@ -44,7 +44,7 @@ function BlogPost() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-bg/95 backdrop-blur-md border-b border-border">
         <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,4vw,4rem)] h-16 flex items-center justify-between">
           <Link to="/" className="font-display font-bold text-lg tracking-tight flex items-center gap-2">
-            DJ EPK <span className="inline-block w-2 h-2 bg-accent rounded-full" />
+            myEPK <span className="inline-block w-2 h-2 bg-accent rounded-full" />
           </Link>
           <div className="flex items-center gap-8">
             <Link to="/blog" className="text-xs font-medium tracking-wider text-text-secondary hover:text-accent transition-colors">
@@ -93,8 +93,8 @@ function BlogPost() {
       {/* Footer */}
       <footer className="border-t border-border py-6">
         <div className="max-w-[1400px] mx-auto px-[clamp(1.5rem,4vw,4rem)] flex items-center justify-between">
-          <span className="font-display font-bold text-sm">DJ EPK <span className="text-accent">&bull;</span></span>
-          <span className="text-xs text-text-secondary">&copy; {new Date().getFullYear()} DJ EPK</span>
+          <span className="font-display font-bold text-sm">myEPK <span className="text-accent">&bull;</span></span>
+          <span className="text-xs text-text-secondary">&copy; {new Date().getFullYear()} myEPK</span>
         </div>
       </footer>
     </div>

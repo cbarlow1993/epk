@@ -28,7 +28,7 @@ const ANALYTICS_INTEGRATIONS: { type: IntegrationType; title: string; fields: { 
     type: 'plausible',
     title: 'Plausible Analytics',
     fields: [
-      { name: 'domain', label: 'Domain', type: 'text', placeholder: 'yourdomain.com' },
+      { name: 'domain', label: 'Domain', type: 'text', placeholder: 'myepk.bio' },
     ],
   },
 ]

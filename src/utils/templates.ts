@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Template system – defines visual presets for DJ EPK pages.
+// Template system – defines visual presets for myEPK pages.
 // ---------------------------------------------------------------------------
 
 // -- Typography tier --------------------------------------------------------

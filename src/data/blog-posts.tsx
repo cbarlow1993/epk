@@ -15,7 +15,7 @@ function BlogCTA() {
   return (
     <div className="mt-16 pt-8 border-t border-border">
       <p className="text-xl font-display font-semibold tracking-tight mb-4 !text-text-primary">
-        Or just use <span className="text-accent">DJ EPK</span> for free.
+        Or just use <span className="text-accent">myEPK</span> for free.
       </p>
       <p className="text-text-secondary mb-6">
         Skip the hassle. Build your professional press kit in minutes — bio, mixes, events, technical rider, press assets, and booking contact — all in one link.
@@ -187,16 +187,16 @@ export const BLOG_POSTS: BlogPost[] = [
     ),
   },
   {
-    title: 'Free DJ EPK Template: Stop Sending PDFs',
+    title: 'Free myEPK Template: Stop Sending PDFs',
     slug: 'free-dj-epk-template',
     excerpt: 'PDF press kits are outdated the moment you send them. There\'s a better way.',
-    metaDescription: 'Why PDF DJ press kits fail and what to use instead. Free DJ EPK template that stays up to date, looks professional, and works on any device.',
+    metaDescription: 'Why PDF DJ press kits fail and what to use instead. Free myEPK template that stays up to date, looks professional, and works on any device.',
     publishedDate: '2026-01-29',
     readTime: '4 min read',
     content: () => (
       <>
         <p>
-          Search "DJ EPK template" and you'll find dozens of free PDF and Google Doc templates. They look decent. They have all the right sections. So you fill one in, export it as a PDF, and start emailing it to promoters.
+          Search "myEPK template" and you'll find dozens of free PDF and Google Doc templates. They look decent. They have all the right sections. So you fill one in, export it as a PDF, and start emailing it to promoters.
         </p>
         <p>
           Here's the problem: that PDF is already out of date.

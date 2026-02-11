@@ -97,7 +97,7 @@ function ProfileEditor() {
         <div>
           <label className={FORM_LABEL}>URL Slug</label>
           <div className="flex items-center gap-2">
-            <span className="text-text-secondary text-sm">yourdomain.com/</span>
+            <span className="text-text-secondary text-sm">myepk.bio/</span>
             <input
               type="text"
               {...register('slug', {

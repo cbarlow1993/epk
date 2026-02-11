@@ -2,7 +2,7 @@
 import { Resend } from 'resend'
 
 const resend = new Resend(process.env.RESEND_API_KEY!)
-const FROM_EMAIL = process.env.EMAIL_FROM || 'DJ EPK <noreply@yourdomain.com>'
+const FROM_EMAIL = process.env.EMAIL_FROM || 'myEPK <noreply@myepk.bio>'
 
 function escapeHtml(str: string): string {
   return str

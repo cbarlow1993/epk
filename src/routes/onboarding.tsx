@@ -19,7 +19,7 @@ function OnboardingPage() {
       <div className="min-h-screen bg-bg flex items-center justify-center px-4">
         <div className="w-full max-w-lg">
           <h1 className="text-3xl font-display font-extrabold tracking-tight uppercase text-center mb-8">Welcome</h1>
-          <p className="text-text-secondary text-center mb-8">How will you be using DJ EPK?</p>
+          <p className="text-text-secondary text-center mb-8">How will you be using myEPK?</p>
           <div className="grid sm:grid-cols-2 gap-4">
             <button
               onClick={() => { window.location.href = '/dashboard' }}
@@ -86,7 +86,7 @@ function OnboardingPage() {
           <div>
             <label className={FORM_LABEL}>Agency URL</label>
             <div className="flex items-center">
-              <span className="text-text-secondary text-sm mr-2">djepk.com/agency/</span>
+              <span className="text-text-secondary text-sm mr-2">myepk.bio/agency/</span>
               <input
                 type="text"
                 value={orgSlug}

@@ -74,20 +74,20 @@ export const Route = createFileRoute('/$slug')({
     ].filter(Boolean).join(' — ')
 
     const isPro = profile?.tier === 'pro'
-    const ogTitle = isPro ? (profile?.og_title || autoTitle) : `${name} | djepk.com`
+    const ogTitle = isPro ? (profile?.og_title || autoTitle) : `${name} | myepk.bio`
     const ogDescription = isPro
       ? (profile?.og_description || profile?.meta_description || autoDescription)
       : (profile?.meta_description || autoDescription)
     const ogImage = profile?.og_image_url || profile?.profile_image_url || ''
     const twitterCard = isPro ? (profile?.twitter_card_type || 'summary_large_image') : 'summary_large_image'
-    const siteBase = import.meta.env.VITE_SITE_URL || 'https://djepk.com'
+    const siteBase = import.meta.env.VITE_SITE_URL || 'https://myepk.bio'
     const ogUrl = profile?.custom_domain
       ? `https://${profile.custom_domain}`
       : `${siteBase}/${profile?.slug || ''}`
 
     return {
       meta: [
-        { title: isPro ? autoTitle : `${name} | djepk.com` },
+        { title: isPro ? autoTitle : `${name} | myepk.bio` },
         { name: 'description', content: profile?.meta_description || autoDescription },
         { property: 'og:title', content: ogTitle },
         { property: 'og:description', content: ogDescription },
@@ -866,7 +866,7 @@ function PublicEPK() {
       {!(profile.hide_platform_branding && profile.tier === 'pro') && (
         <footer className="py-6 text-center border-t" style={borderStyle}>
           <p className={`text-xs ${textSecClass}`}>
-            Built with <a href="/" className="text-accent hover:underline">DJ EPK</a>
+            Built with <a href="/" className="text-accent hover:underline">myEPK</a>
           </p>
         </footer>
       )}

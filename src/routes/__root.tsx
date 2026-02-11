@@ -35,7 +35,7 @@ export const Route = createRootRoute({
           name: 'Issy Smith',
           description: 'UK-based DJ specialising in House, Commercial House, Deep/Tech, Afro House, Nu-Disco, Funky House, Tech House, and Melodic House & Techno.',
           genre: ['House', 'Tech House', 'Melodic House', 'Afro House'],
-          url: 'https://issysmithdj.com',
+          url: 'https://myepk.bio',
         }),
       },
     ],

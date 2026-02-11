@@ -64,7 +64,7 @@ function SocialPreviewEditor() {
   const effectiveTitle = ogTitle || autoTitle
   const effectiveDescription = ogDescription || initial?.meta_description || autoDescription
   const effectiveImage = ogImageUrl || initial?.profile_image_url || ''
-  const domain = initial?.slug ? `${initial.slug}.djepk.com` : 'djepk.com'
+  const domain = initial?.slug ? `${initial.slug}.myepk.bio` : 'myepk.bio'
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -376,7 +376,7 @@ function SocialPreviewUpgrade({ name, initial }: { name: string; initial: Profil
   }
 
   const effectiveImage = ogImageUrl || initial?.profile_image_url || ''
-  const defaultTitle = `${name} | djepk.com`
+  const defaultTitle = `${name} | myepk.bio`
   const isDirty = ogImageUrl !== savedImageUrl
 
   return (
@@ -442,7 +442,7 @@ function SocialPreviewUpgrade({ name, initial }: { name: string; initial: Profil
             title={defaultTitle}
             description={`Official Electronic Press Kit for ${name}.`}
             imageUrl={effectiveImage}
-            domain="djepk.com"
+            domain="myepk.bio"
           />
           <p className="text-xs text-text-secondary mt-4">
             This preview is an approximation. Actual appearance may vary by platform.

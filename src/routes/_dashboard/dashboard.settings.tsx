@@ -174,7 +174,7 @@ function BrandingSection({ profile }: { profile: ProfileRow | null }) {
             className="accent-accent w-4 h-4"
           />
           <label htmlFor="hide-branding" className="text-sm text-text-secondary cursor-pointer">
-            Hide &ldquo;Built with DJ EPK&rdquo; footer
+            Hide &ldquo;Built with myEPK&rdquo; footer
           </label>
         </div>
         <div>
@@ -484,7 +484,7 @@ function BYODFlow({ profile }: { profile: ProfileRow | null }) {
         type="text"
         value={domain}
         onChange={(e) => setDomain(e.target.value)}
-        placeholder="yourdomain.com"
+        placeholder="myepk.bio"
         className={FORM_INPUT}
       />
       <button
