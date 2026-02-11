@@ -2,6 +2,7 @@ import { createFileRoute, redirect, isRedirect } from '@tanstack/react-router'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { getCurrentUser } from '~/server/auth'
 import { checkSlugAvailability, completeOnboarding } from '~/server/profile'
+import { createCheckoutSession } from '~/server/billing'
 import { FORM_INPUT, FORM_INPUT_ERROR, FORM_LABEL, FORM_ERROR_MSG, BTN_PRIMARY } from '~/components/forms'
 import { PREDEFINED_GENRES } from '~/utils/genres'
 import { RESERVED_SLUGS } from '~/utils/constants'
@@ -28,12 +29,12 @@ export const Route = createFileRoute('/onboarding')({
   component: OnboardingWizard,
 })
 
-type Step = 'name' | 'slug' | 'genres'
+type Step = 'profile' | 'genres' | 'plan'
 
 function OnboardingWizard() {
   const { profile } = Route.useRouteContext()
 
-  const [step, setStep] = useState<Step>('name')
+  const [step, setStep] = useState<Step>('profile')
   const [displayName, setDisplayName] = useState(profile?.display_name || '')
   const [slug, setSlug] = useState(profile?.slug || '')
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null)
@@ -53,6 +54,26 @@ function OnboardingWizard() {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '')
+  }
+
+  // Auto-generate slug as the user types their name
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(false)
+
+  const handleNameChange = (value: string) => {
+    setDisplayName(value)
+    if (nameError) setNameError('')
+    if (!slugManuallyEdited) {
+      const generated = generateSlug(value)
+      setSlug(generated)
+    }
+  }
+
+  const handleSlugChange = (value: string) => {
+    const cleaned = value.toLowerCase().replace(/[^a-z0-9-]/g, '')
+    setSlug(cleaned)
+    setSlugManuallyEdited(true)
+    setSlugAvailable(null)
+    setSlugError('')
   }
 
   // Validate slug format client-side
@@ -104,7 +125,7 @@ function OnboardingWizard() {
     }
   }, [slug, checkSlug])
 
-  const handleNameNext = () => {
+  const handleProfileNext = () => {
     const trimmed = displayName.trim()
     if (!trimmed) {
       setNameError('Please enter your DJ / artist name')
@@ -114,29 +135,17 @@ function OnboardingWizard() {
       setNameError('Name must be 100 characters or less')
       return
     }
-    setNameError('')
-    // Auto-generate a slug from the name if the user hasn't customized it yet
-    const currentSlugIsAuto = slug === generateSlug(profile?.display_name || '') || slug === profile?.slug || !slug
-    if (currentSlugIsAuto) {
-      const generated = generateSlug(trimmed)
-      if (generated.length >= 2) {
-        setSlug(generated)
-      }
-    }
-    setStep('slug')
-  }
-
-  const handleSlugNext = () => {
     if (!isValidSlugFormat(slug)) {
       setSlugError('Must be at least 2 characters, lowercase letters, numbers, and hyphens only')
       return
     }
     if (slugAvailable === false) return
     if (slugChecking) return
+    setNameError('')
     setStep('genres')
   }
 
-  const handleComplete = async () => {
+  const handleSaveAndShowPlan = async () => {
     setSubmitting(true)
     setSubmitError('')
     try {
@@ -152,10 +161,31 @@ function OnboardingWizard() {
         setSubmitting(false)
         return
       }
-      window.location.href = '/dashboard'
+      setSubmitting(false)
+      setStep('plan')
     } catch {
       setSubmitError('An unexpected error occurred')
       setSubmitting(false)
+    }
+  }
+
+  const [upgrading, setUpgrading] = useState(false)
+  const [upgradeError, setUpgradeError] = useState('')
+
+  const handleUpgrade = async () => {
+    setUpgrading(true)
+    setUpgradeError('')
+    try {
+      const result = await createCheckoutSession({ data: {} })
+      if ('url' in result && result.url) {
+        window.location.href = result.url
+      } else {
+        setUpgradeError('error' in result && result.error ? result.error : 'Unable to start checkout')
+        setUpgrading(false)
+      }
+    } catch {
+      setUpgradeError('Something went wrong. Please try again.')
+      setUpgrading(false)
     }
   }
 
@@ -175,9 +205,9 @@ function OnboardingWizard() {
 
   // Step indicator
   const steps: { key: Step; label: string }[] = [
-    { key: 'name', label: 'Name' },
-    { key: 'slug', label: 'URL' },
+    { key: 'profile', label: 'Profile' },
     { key: 'genres', label: 'Genres' },
+    { key: 'plan', label: 'Plan' },
   ]
   const currentIdx = steps.findIndex((s) => s.key === step)
 
@@ -226,128 +256,81 @@ function OnboardingWizard() {
 
       {/* Step content */}
       <div className="w-full max-w-lg">
-        {step === 'name' && (
+        {step === 'profile' && (
           <div>
             <h1 className="font-display font-extrabold text-3xl tracking-tight text-center mb-3">
-              What's your DJ name?
+              Set up your profile
             </h1>
             <p className="text-text-secondary text-center text-sm mb-8">
-              This is how you'll appear on your press kit.
+              Choose your name and claim your unique URL.
             </p>
 
-            <div className="mb-6">
-              <label htmlFor="display_name" className={FORM_LABEL}>
-                Artist / DJ Name
-              </label>
-              <input
-                id="display_name"
-                type="text"
-                value={displayName}
-                onChange={(e) => {
-                  setDisplayName(e.target.value)
-                  if (nameError) setNameError('')
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    handleNameNext()
-                  }
-                }}
-                className={nameError ? FORM_INPUT_ERROR : FORM_INPUT}
-                placeholder="e.g. DJ Shadow, Bonobo, Peggy Gou"
-                autoFocus
-              />
-              {nameError && <p className={FORM_ERROR_MSG}>{nameError}</p>}
+            <div className="space-y-6 mb-8">
+              <div>
+                <label htmlFor="display_name" className={FORM_LABEL}>
+                  Artist / DJ Name
+                </label>
+                <input
+                  id="display_name"
+                  type="text"
+                  value={displayName}
+                  onChange={(e) => handleNameChange(e.target.value)}
+                  className={nameError ? FORM_INPUT_ERROR : FORM_INPUT}
+                  placeholder="e.g. DJ Shadow, Bonobo, Peggy Gou"
+                  autoFocus
+                />
+                {nameError && <p className={FORM_ERROR_MSG}>{nameError}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="slug" className={FORM_LABEL}>
+                  Your EPK URL
+                </label>
+                <div className="flex items-center gap-2">
+                  <span className="text-text-secondary text-sm shrink-0">myepk.bio/</span>
+                  <input
+                    id="slug"
+                    type="text"
+                    value={slug}
+                    onChange={(e) => handleSlugChange(e.target.value)}
+                    className={`flex-1 bg-card border px-4 py-3 text-text-primary focus:border-accent focus:outline-none transition-colors text-sm ${
+                      slugError ? 'border-red-500' : slugAvailable === true ? 'border-green-500' : 'border-text-primary/20'
+                    }`}
+                    placeholder="your-name"
+                  />
+                </div>
+
+                {/* Slug status indicator */}
+                <div className="mt-2 h-5">
+                  {slugChecking && (
+                    <p className="text-xs text-text-secondary">Checking availability...</p>
+                  )}
+                  {!slugChecking && slugAvailable === true && slug.length >= 2 && (
+                    <p className="text-xs text-green-500 flex items-center gap-1">
+                      <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      myepk.bio/{slug} is available
+                    </p>
+                  )}
+                  {!slugChecking && slugError && (
+                    <p className={FORM_ERROR_MSG}>{slugError}</p>
+                  )}
+                  {!slugChecking && !slugError && slug.length > 0 && slug.length < 2 && (
+                    <p className="text-xs text-text-secondary">Must be at least 2 characters</p>
+                  )}
+                </div>
+              </div>
             </div>
 
             <button
               type="button"
-              onClick={handleNameNext}
+              onClick={handleProfileNext}
+              disabled={!slugAvailable || slugChecking || !displayName.trim()}
               className={`w-full ${BTN_PRIMARY} py-3`}
             >
               Continue
             </button>
-          </div>
-        )}
-
-        {step === 'slug' && (
-          <div>
-            <h1 className="font-display font-extrabold text-3xl tracking-tight text-center mb-3">
-              Choose your URL
-            </h1>
-            <p className="text-text-secondary text-center text-sm mb-8">
-              This is the unique link to your press kit. You can change it later.
-            </p>
-
-            <div className="mb-6">
-              <label htmlFor="slug" className={FORM_LABEL}>
-                Your EPK URL
-              </label>
-              <div className="flex items-center gap-2">
-                <span className="text-text-secondary text-sm shrink-0">myepk.bio/</span>
-                <input
-                  id="slug"
-                  type="text"
-                  value={slug}
-                  onChange={(e) => {
-                    const cleaned = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '')
-                    setSlug(cleaned)
-                    setSlugAvailable(null)
-                    setSlugError('')
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault()
-                      handleSlugNext()
-                    }
-                  }}
-                  className={`flex-1 bg-card border px-4 py-3 text-text-primary focus:border-accent focus:outline-none transition-colors text-sm ${
-                    slugError ? 'border-red-500' : slugAvailable === true ? 'border-green-500' : 'border-text-primary/20'
-                  }`}
-                  placeholder="your-name"
-                  autoFocus
-                />
-              </div>
-
-              {/* Slug status indicator */}
-              <div className="mt-2 h-5">
-                {slugChecking && (
-                  <p className="text-xs text-text-secondary">Checking availability...</p>
-                )}
-                {!slugChecking && slugAvailable === true && slug.length >= 2 && (
-                  <p className="text-xs text-green-500 flex items-center gap-1">
-                    <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    myepk.bio/{slug} is available
-                  </p>
-                )}
-                {!slugChecking && slugError && (
-                  <p className={FORM_ERROR_MSG}>{slugError}</p>
-                )}
-                {!slugChecking && !slugError && slug.length > 0 && slug.length < 2 && (
-                  <p className="text-xs text-text-secondary">Must be at least 2 characters</p>
-                )}
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => setStep('name')}
-                className="px-6 py-3 text-sm font-semibold uppercase tracking-wider text-text-secondary hover:text-text-primary transition-colors"
-              >
-                Back
-              </button>
-              <button
-                type="button"
-                onClick={handleSlugNext}
-                disabled={!slugAvailable || slugChecking}
-                className={`flex-1 ${BTN_PRIMARY} py-3`}
-              >
-                Continue
-              </button>
-            </div>
           </div>
         )}
 
@@ -423,19 +406,106 @@ function OnboardingWizard() {
             <div className="flex gap-3">
               <button
                 type="button"
-                onClick={() => setStep('slug')}
+                onClick={() => setStep('profile')}
                 className="px-6 py-3 text-sm font-semibold uppercase tracking-wider text-text-secondary hover:text-text-primary transition-colors"
               >
                 Back
               </button>
               <button
                 type="button"
-                onClick={handleComplete}
+                onClick={handleSaveAndShowPlan}
                 disabled={submitting}
                 className={`flex-1 ${BTN_PRIMARY} py-3`}
               >
-                {submitting ? 'Setting up...' : 'Complete Setup'}
+                {submitting ? 'Saving...' : 'Continue'}
               </button>
+            </div>
+          </div>
+        )}
+
+        {step === 'plan' && (
+          <div className="max-w-2xl mx-auto">
+            <h1 className="font-display font-extrabold text-3xl tracking-tight text-center mb-3">
+              Choose your plan
+            </h1>
+            <p className="text-text-secondary text-center text-sm mb-10">
+              Get started for free, or unlock everything with Pro.
+            </p>
+
+            <div className="grid sm:grid-cols-2 gap-6">
+              {/* Free plan */}
+              <div className="border border-border bg-surface p-6 flex flex-col">
+                <h3 className="font-display font-bold text-lg uppercase tracking-wider">Free</h3>
+                <p className="text-3xl font-extrabold mt-2">
+                  $0<span className="text-sm font-normal text-text-secondary">/month</span>
+                </p>
+                <ul className="mt-6 space-y-3 flex-1">
+                  {[
+                    'Professional EPK page',
+                    'Custom URL slug',
+                    'Mixes, events & photos',
+                    'Technical rider & contact',
+                    'Social links',
+                  ].map((f) => (
+                    <li key={f} className="flex gap-2.5 text-sm">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-text-secondary flex-shrink-0 mt-0.5">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                      <span className="text-text-secondary">{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  type="button"
+                  onClick={() => { window.location.href = '/dashboard' }}
+                  className="mt-6 w-full py-3 border border-border text-text-secondary text-sm font-semibold uppercase tracking-wider hover:border-text-secondary hover:text-text-primary transition-colors"
+                >
+                  Continue with Free
+                </button>
+              </div>
+
+              {/* Pro plan */}
+              <div className="border-2 border-accent bg-accent/5 p-6 flex flex-col relative">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1">
+                  Recommended
+                </div>
+                <h3 className="font-display font-bold text-lg uppercase tracking-wider text-accent">Pro</h3>
+                <p className="text-3xl font-extrabold mt-2">
+                  $5<span className="text-sm font-normal text-text-secondary">/month</span>
+                </p>
+                <ul className="mt-6 space-y-3 flex-1">
+                  <li className="flex gap-2.5 text-sm">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-accent flex-shrink-0 mt-0.5">
+                      <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                    <span className="text-text-primary font-medium">Everything in Free, plus:</span>
+                  </li>
+                  {[
+                    'Custom domain',
+                    'Remove platform branding',
+                    'SEO & social preview controls',
+                    'Advanced theme customization',
+                  ].map((f) => (
+                    <li key={f} className="flex gap-2.5 text-sm">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-accent flex-shrink-0 mt-0.5">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                      <span className="text-text-primary">{f}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {upgradeError && <p className="mt-4 text-xs text-red-500">{upgradeError}</p>}
+
+                <button
+                  type="button"
+                  onClick={handleUpgrade}
+                  disabled={upgrading}
+                  className={`mt-6 w-full ${BTN_PRIMARY} py-3`}
+                >
+                  {upgrading ? 'Redirecting...' : 'Upgrade Now'}
+                </button>
+              </div>
             </div>
           </div>
         )}
