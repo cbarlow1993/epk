@@ -222,7 +222,7 @@ function LandingPage() {
                 {[
                   { value: '8', label: 'Sections' },
                   { value: '1', label: 'Link' },
-                  { value: '\u00A30', label: 'To Start' },
+                  { value: '$0', label: 'To Start' },
                 ].map((stat) => (
                   <div key={stat.label} className="text-xs font-medium tracking-widest text-text-secondary uppercase">
                     <span className="block font-display font-bold text-2xl tracking-tight text-text-primary mb-1">{stat.value}</span>
@@ -288,7 +288,7 @@ function LandingPage() {
               <div className="mb-8">
                 <span className="text-xs font-semibold tracking-widest text-text-secondary uppercase">Free</span>
                 <div className="mt-2">
-                  <span className="font-display font-bold text-4xl tracking-tight">&pound;0</span>
+                  <span className="font-display font-bold text-4xl tracking-tight">$0</span>
                   <span className="text-text-secondary text-sm ml-2">forever</span>
                 </div>
               </div>
