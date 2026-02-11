@@ -312,7 +312,7 @@ function OnboardingWizard() {
   const currentIdx = STEP_META.findIndex((s) => s.key === step)
 
   return (
-    <div className="theme-dark min-h-screen bg-bg font-body flex flex-col items-center justify-center px-4 py-12">
+    <div className="theme-dark min-h-screen bg-bg text-text-primary font-body flex flex-col items-center justify-center px-4 py-12">
       {/* Progress indicator */}
       <div className="flex items-center gap-2 sm:gap-3 mb-12 flex-wrap justify-center">
         {STEP_META.map((s, i) => (
