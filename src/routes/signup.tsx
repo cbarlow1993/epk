@@ -104,7 +104,7 @@ function SignupPage() {
         setLoading(false)
         return
       }
-      window.location.href = '/dashboard'
+      window.location.href = '/dashboard/profile'
     } catch {
       setError('An unexpected error occurred')
       setLoading(false)
@@ -118,7 +118,7 @@ function SignupPage() {
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard/profile`,
       },
     })
     if (oauthError) {
