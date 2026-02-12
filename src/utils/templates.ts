@@ -113,9 +113,47 @@ export const BORDER_WIDTH_MAP: Record<string, string> = {
 // ---------------------------------------------------------------------------
 
 export const TEMPLATES: TemplateConfig[] = [
-  // -- Swiss (default) ------------------------------------------------------
+  // -- myEPK (brand default) ------------------------------------------------
   {
     id: 'default',
+    name: 'myEPK',
+    description: 'Platform brand — orange on dark with Sora + DM Sans',
+    defaults: {
+      accent_color: '#FF5500',
+      bg_color: '#1A1A1A',
+      font_family: 'DM Sans',
+
+      display: { font: 'Sora', size: '5rem', weight: '800' },
+      heading: { font: 'Sora', size: '2rem', weight: '700' },
+      subheading: { font: 'DM Sans', size: '1.125rem', weight: '500' },
+      body: { font: 'DM Sans', size: '1rem', weight: '400' },
+
+      text_color: '#F0F0F0',
+      heading_color: null,
+      link_color: null,
+      card_bg: 'rgba(255,255,255,0.05)',
+      border_color: 'rgba(255,255,255,0.08)',
+
+      section_padding: 'default',
+      content_width: 'default',
+      card_radius: 'sm',
+      element_gap: 'default',
+
+      button_style: 'rounded',
+      link_style: 'hover-underline',
+
+      card_border: 'subtle',
+      shadow: 'md',
+      divider_style: 'line',
+    },
+    sectionOrder: ['bio', 'music', 'events', 'photos', 'technical', 'press', 'contact'],
+    heroStyle: 'fullbleed',
+    bioLayout: 'two-column',
+  },
+
+  // -- Swiss ----------------------------------------------------------------
+  {
+    id: 'swiss',
     name: 'Swiss',
     description: 'Clean black and white with red accent',
     defaults: {
@@ -605,6 +643,576 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['music', 'events', 'bio', 'photos', 'technical', 'press', 'contact'],
     heroStyle: 'fullbleed',
     bioLayout: 'two-column',
+  },
+
+  // -- Deep House ------------------------------------------------------------
+  {
+    id: 'deep-house',
+    name: 'Deep House',
+    description: 'Warm gold on espresso — groovy and soulful',
+    defaults: {
+      accent_color: '#D4A040',
+      bg_color: '#1C1410',
+      font_family: 'DM Sans',
+
+      display: { font: 'Cormorant Garamond', size: '4.5rem', weight: '600' },
+      heading: { font: 'DM Sans', size: '2rem', weight: '600' },
+      subheading: { font: 'DM Sans', size: '1.125rem', weight: '500' },
+      body: { font: 'DM Sans', size: '1rem', weight: '400' },
+
+      text_color: '#E8DCC8',
+      heading_color: null,
+      link_color: null,
+      card_bg: 'rgba(212,160,64,0.06)',
+      border_color: 'rgba(212,160,64,0.12)',
+
+      section_padding: 'spacious',
+      content_width: 'narrow',
+      card_radius: 'md',
+      element_gap: 'default',
+
+      button_style: 'rounded',
+      link_style: 'hover-underline',
+
+      card_border: 'subtle',
+      shadow: 'sm',
+      divider_style: 'accent',
+    },
+    sectionOrder: ['music', 'bio', 'events', 'photos', 'press', 'technical', 'contact'],
+    heroStyle: 'contained',
+    bioLayout: 'single-column',
+  },
+
+  // -- Techno ----------------------------------------------------------------
+  {
+    id: 'techno',
+    name: 'Techno',
+    description: 'Stark grey on black — minimal Berlin energy',
+    defaults: {
+      accent_color: '#808080',
+      bg_color: '#000000',
+      font_family: 'Space Grotesk',
+
+      display: { font: 'Space Grotesk', size: '5rem', weight: '700' },
+      heading: { font: 'Space Grotesk', size: '2rem', weight: '600' },
+      subheading: { font: 'Inter', size: '1rem', weight: '500' },
+      body: { font: 'Inter', size: '1rem', weight: '400' },
+
+      text_color: '#B0B0B0',
+      heading_color: null,
+      link_color: null,
+      card_bg: 'rgba(255,255,255,0.03)',
+      border_color: 'rgba(255,255,255,0.06)',
+
+      section_padding: 'compact',
+      content_width: 'narrow',
+      card_radius: 'none',
+      element_gap: 'tight',
+
+      button_style: 'square',
+      link_style: 'none',
+
+      card_border: 'none',
+      shadow: 'none',
+      divider_style: 'line',
+    },
+    sectionOrder: ['music', 'bio', 'technical', 'events', 'photos', 'press', 'contact'],
+    heroStyle: 'minimal',
+    bioLayout: 'single-column',
+  },
+
+  // -- Drum & Bass -----------------------------------------------------------
+  {
+    id: 'drum-and-bass',
+    name: 'Drum & Bass',
+    description: 'Blazing orange on navy — fast and energetic',
+    defaults: {
+      accent_color: '#FF6A00',
+      bg_color: '#0A1628',
+      font_family: 'Oswald',
+
+      display: { font: 'Oswald', size: '5.5rem', weight: '700' },
+      heading: { font: 'Oswald', size: '2rem', weight: '700' },
+      subheading: { font: 'DM Sans', size: '1.125rem', weight: '500' },
+      body: { font: 'DM Sans', size: '1rem', weight: '400' },
+
+      text_color: '#D0D8E8',
+      heading_color: null,
+      link_color: null,
+      card_bg: 'rgba(255,106,0,0.05)',
+      border_color: 'rgba(255,106,0,0.12)',
+
+      section_padding: 'compact',
+      content_width: 'wide',
+      card_radius: 'sm',
+      element_gap: 'default',
+
+      button_style: 'pill',
+      link_style: 'hover-underline',
+
+      card_border: 'subtle',
+      shadow: 'md',
+      divider_style: 'accent',
+    },
+    sectionOrder: ['music', 'events', 'bio', 'photos', 'technical', 'press', 'contact'],
+    heroStyle: 'fullbleed',
+    bioLayout: 'two-column',
+  },
+
+  // -- Trance ----------------------------------------------------------------
+  {
+    id: 'trance',
+    name: 'Trance',
+    description: 'Cyan on deep blue — euphoric and expansive',
+    defaults: {
+      accent_color: '#00D4FF',
+      bg_color: '#0A1030',
+      font_family: 'Sora',
+
+      display: { font: 'Sora', size: '5rem', weight: '700' },
+      heading: { font: 'Sora', size: '2rem', weight: '600' },
+      subheading: { font: 'Inter', size: '1.125rem', weight: '500' },
+      body: { font: 'Inter', size: '1rem', weight: '400' },
+
+      text_color: '#C0D0E8',
+      heading_color: null,
+      link_color: null,
+      card_bg: 'rgba(0,212,255,0.04)',
+      border_color: 'rgba(0,212,255,0.10)',
+
+      section_padding: 'spacious',
+      content_width: 'default',
+      card_radius: 'md',
+      element_gap: 'default',
+
+      button_style: 'pill',
+      link_style: 'hover-underline',
+
+      card_border: 'subtle',
+      shadow: 'md',
+      divider_style: 'gradient',
+    },
+    sectionOrder: ['music', 'bio', 'events', 'photos', 'press', 'technical', 'contact'],
+    heroStyle: 'fullbleed',
+    bioLayout: 'single-column',
+  },
+
+  // -- Ambient ---------------------------------------------------------------
+  {
+    id: 'ambient',
+    name: 'Ambient',
+    description: 'Sage green on cream — calm and organic',
+    defaults: {
+      accent_color: '#7BA67B',
+      bg_color: '#FAF5F0',
+      font_family: 'DM Sans',
+
+      display: { font: 'Cormorant Garamond', size: '4rem', weight: '500' },
+      heading: { font: 'DM Sans', size: '1.75rem', weight: '500' },
+      subheading: { font: 'DM Sans', size: '1rem', weight: '400' },
+      body: { font: 'DM Sans', size: '1rem', weight: '400' },
+
+      text_color: '#3A3A32',
+      heading_color: null,
+      link_color: null,
+      card_bg: '#FFFFFF',
+      border_color: '#D8D0C4',
+
+      section_padding: 'spacious',
+      content_width: 'narrow',
+      card_radius: 'lg',
+      element_gap: 'relaxed',
+
+      button_style: 'rounded',
+      link_style: 'underline',
+
+      card_border: 'subtle',
+      shadow: 'sm',
+      divider_style: 'none',
+    },
+    sectionOrder: ['bio', 'music', 'photos', 'events', 'press', 'technical', 'contact'],
+    heroStyle: 'contained',
+    bioLayout: 'single-column',
+  },
+
+  // -- Garage ----------------------------------------------------------------
+  {
+    id: 'garage',
+    name: 'Garage',
+    description: 'Hot pink on white — UK urban energy',
+    defaults: {
+      accent_color: '#FF1493',
+      bg_color: '#FFFFFF',
+      font_family: 'Poppins',
+
+      display: { font: 'Bebas Neue', size: '5.5rem', weight: '400' },
+      heading: { font: 'Poppins', size: '2rem', weight: '700' },
+      subheading: { font: 'Poppins', size: '1.125rem', weight: '500' },
+      body: { font: 'Poppins', size: '1rem', weight: '400' },
+
+      text_color: '#1A1A1A',
+      heading_color: null,
+      link_color: null,
+      card_bg: '#FFF0F8',
+      border_color: '#FFD0E8',
+
+      section_padding: 'default',
+      content_width: 'default',
+      card_radius: 'md',
+      element_gap: 'default',
+
+      button_style: 'pill',
+      link_style: 'hover-underline',
+
+      card_border: 'subtle',
+      shadow: 'md',
+      divider_style: 'accent',
+    },
+    sectionOrder: ['music', 'events', 'bio', 'photos', 'press', 'technical', 'contact'],
+    heroStyle: 'fullbleed',
+    bioLayout: 'two-column',
+  },
+
+  // -- Dub -------------------------------------------------------------------
+  {
+    id: 'dub',
+    name: 'Dub',
+    description: 'Roots green on warm dark — organic and deep',
+    defaults: {
+      accent_color: '#3D8B37',
+      bg_color: '#1A1008',
+      font_family: 'DM Sans',
+
+      display: { font: 'Oswald', size: '5rem', weight: '700' },
+      heading: { font: 'DM Sans', size: '2rem', weight: '600' },
+      subheading: { font: 'DM Sans', size: '1.125rem', weight: '500' },
+      body: { font: 'DM Sans', size: '1rem', weight: '400' },
+
+      text_color: '#D8D0B8',
+      heading_color: null,
+      link_color: null,
+      card_bg: 'rgba(61,139,55,0.06)',
+      border_color: 'rgba(61,139,55,0.12)',
+
+      section_padding: 'default',
+      content_width: 'default',
+      card_radius: 'sm',
+      element_gap: 'default',
+
+      button_style: 'rounded',
+      link_style: 'hover-underline',
+
+      card_border: 'subtle',
+      shadow: 'sm',
+      divider_style: 'line',
+    },
+    sectionOrder: ['music', 'bio', 'events', 'photos', 'technical', 'press', 'contact'],
+    heroStyle: 'contained',
+    bioLayout: 'two-column',
+  },
+
+  // -- Y2K -------------------------------------------------------------------
+  {
+    id: 'y2k',
+    name: 'Y2K',
+    description: 'Chrome silver on light grey — futuristic millennium',
+    defaults: {
+      accent_color: '#C0C0C0',
+      bg_color: '#F0F0F0',
+      font_family: 'Space Grotesk',
+
+      display: { font: 'Space Grotesk', size: '5rem', weight: '700' },
+      heading: { font: 'Space Grotesk', size: '2rem', weight: '600' },
+      subheading: { font: 'Inter', size: '1rem', weight: '500' },
+      body: { font: 'Inter', size: '1rem', weight: '400' },
+
+      text_color: '#4A4A4A',
+      heading_color: null,
+      link_color: null,
+      card_bg: '#FFFFFF',
+      border_color: '#D0D0D0',
+
+      section_padding: 'default',
+      content_width: 'default',
+      card_radius: 'lg',
+      element_gap: 'default',
+
+      button_style: 'pill',
+      link_style: 'none',
+
+      card_border: 'solid',
+      shadow: 'md',
+      divider_style: 'line',
+    },
+    sectionOrder: ['music', 'bio', 'photos', 'events', 'technical', 'press', 'contact'],
+    heroStyle: 'contained',
+    bioLayout: 'two-column',
+  },
+
+  // -- Vaporwave -------------------------------------------------------------
+  {
+    id: 'vaporwave',
+    name: 'Vaporwave',
+    description: 'Pink on lavender — retro digital aesthetic',
+    defaults: {
+      accent_color: '#FF71CE',
+      bg_color: '#E0D0F0',
+      font_family: 'Sora',
+
+      display: { font: 'Sora', size: '4.5rem', weight: '800' },
+      heading: { font: 'Sora', size: '2rem', weight: '700' },
+      subheading: { font: 'DM Sans', size: '1.125rem', weight: '500' },
+      body: { font: 'DM Sans', size: '1rem', weight: '400' },
+
+      text_color: '#3A2050',
+      heading_color: null,
+      link_color: null,
+      card_bg: 'rgba(255,255,255,0.6)',
+      border_color: 'rgba(255,113,206,0.20)',
+
+      section_padding: 'default',
+      content_width: 'default',
+      card_radius: 'md',
+      element_gap: 'default',
+
+      button_style: 'pill',
+      link_style: 'hover-underline',
+
+      card_border: 'subtle',
+      shadow: 'md',
+      divider_style: 'accent',
+    },
+    sectionOrder: ['music', 'photos', 'bio', 'events', 'press', 'technical', 'contact'],
+    heroStyle: 'fullbleed',
+    bioLayout: 'single-column',
+  },
+
+  // -- Art Deco --------------------------------------------------------------
+  {
+    id: 'art-deco',
+    name: 'Art Deco',
+    description: 'Gold on black — elegant and geometric',
+    defaults: {
+      accent_color: '#D4AF37',
+      bg_color: '#0A0A0A',
+      font_family: 'Playfair Display',
+
+      display: { font: 'Playfair Display', size: '5rem', weight: '700' },
+      heading: { font: 'Playfair Display', size: '2rem', weight: '700' },
+      subheading: { font: 'Instrument Sans', size: '1.125rem', weight: '500' },
+      body: { font: 'Instrument Sans', size: '1rem', weight: '400' },
+
+      text_color: '#D8D0C0',
+      heading_color: null,
+      link_color: null,
+      card_bg: 'rgba(212,175,55,0.04)',
+      border_color: 'rgba(212,175,55,0.15)',
+
+      section_padding: 'spacious',
+      content_width: 'default',
+      card_radius: 'none',
+      element_gap: 'default',
+
+      button_style: 'square',
+      link_style: 'underline',
+
+      card_border: 'solid',
+      shadow: 'none',
+      divider_style: 'accent',
+    },
+    sectionOrder: ['bio', 'music', 'photos', 'events', 'press', 'technical', 'contact'],
+    heroStyle: 'fullbleed',
+    bioLayout: 'single-column',
+  },
+
+  // -- Midnight --------------------------------------------------------------
+  {
+    id: 'midnight',
+    name: 'Midnight',
+    description: 'Ice blue on navy — late-night cool',
+    defaults: {
+      accent_color: '#88C8E8',
+      bg_color: '#0C1424',
+      font_family: 'DM Sans',
+
+      display: { font: 'Sora', size: '4.5rem', weight: '700' },
+      heading: { font: 'DM Sans', size: '2rem', weight: '600' },
+      subheading: { font: 'DM Sans', size: '1.125rem', weight: '500' },
+      body: { font: 'DM Sans', size: '1rem', weight: '400' },
+
+      text_color: '#B8C8E0',
+      heading_color: null,
+      link_color: null,
+      card_bg: 'rgba(136,200,232,0.05)',
+      border_color: 'rgba(136,200,232,0.10)',
+
+      section_padding: 'default',
+      content_width: 'default',
+      card_radius: 'md',
+      element_gap: 'default',
+
+      button_style: 'rounded',
+      link_style: 'hover-underline',
+
+      card_border: 'subtle',
+      shadow: 'md',
+      divider_style: 'line',
+    },
+    sectionOrder: ['music', 'bio', 'events', 'photos', 'press', 'technical', 'contact'],
+    heroStyle: 'contained',
+    bioLayout: 'two-column',
+  },
+
+  // -- Ember -----------------------------------------------------------------
+  {
+    id: 'ember',
+    name: 'Ember',
+    description: 'Amber on dark brown — warm and intense',
+    defaults: {
+      accent_color: '#D4800A',
+      bg_color: '#1A0E08',
+      font_family: 'DM Sans',
+
+      display: { font: 'Bebas Neue', size: '5.5rem', weight: '400' },
+      heading: { font: 'DM Sans', size: '2rem', weight: '700' },
+      subheading: { font: 'DM Sans', size: '1.125rem', weight: '500' },
+      body: { font: 'DM Sans', size: '1rem', weight: '400' },
+
+      text_color: '#E0D0B8',
+      heading_color: null,
+      link_color: null,
+      card_bg: 'rgba(212,128,10,0.06)',
+      border_color: 'rgba(212,128,10,0.12)',
+
+      section_padding: 'default',
+      content_width: 'default',
+      card_radius: 'sm',
+      element_gap: 'default',
+
+      button_style: 'rounded',
+      link_style: 'hover-underline',
+
+      card_border: 'subtle',
+      shadow: 'md',
+      divider_style: 'accent',
+    },
+    sectionOrder: ['music', 'bio', 'events', 'photos', 'technical', 'press', 'contact'],
+    heroStyle: 'fullbleed',
+    bioLayout: 'two-column',
+  },
+
+  // -- Arctic ----------------------------------------------------------------
+  {
+    id: 'arctic',
+    name: 'Arctic',
+    description: 'Cyan on white — crisp, cold, clean',
+    defaults: {
+      accent_color: '#00BCD4',
+      bg_color: '#FFFFFF',
+      font_family: 'Instrument Sans',
+
+      display: { font: 'Instrument Sans', size: '5rem', weight: '800' },
+      heading: { font: 'Instrument Sans', size: '2rem', weight: '600' },
+      subheading: { font: 'Inter', size: '1.125rem', weight: '500' },
+      body: { font: 'Inter', size: '1rem', weight: '400' },
+
+      text_color: '#1A2A3A',
+      heading_color: null,
+      link_color: null,
+      card_bg: '#F0FAFB',
+      border_color: '#D0E8EC',
+
+      section_padding: 'default',
+      content_width: 'default',
+      card_radius: 'md',
+      element_gap: 'default',
+
+      button_style: 'pill',
+      link_style: 'hover-underline',
+
+      card_border: 'subtle',
+      shadow: 'sm',
+      divider_style: 'line',
+    },
+    sectionOrder: ['bio', 'music', 'events', 'photos', 'press', 'technical', 'contact'],
+    heroStyle: 'fullbleed',
+    bioLayout: 'two-column',
+  },
+
+  // -- Jungle ----------------------------------------------------------------
+  {
+    id: 'jungle',
+    name: 'Jungle',
+    description: 'Lime green on forest — lush and organic',
+    defaults: {
+      accent_color: '#A0FF00',
+      bg_color: '#0A1A0A',
+      font_family: 'Space Grotesk',
+
+      display: { font: 'Space Grotesk', size: '5rem', weight: '800' },
+      heading: { font: 'Space Grotesk', size: '2rem', weight: '700' },
+      subheading: { font: 'DM Sans', size: '1.125rem', weight: '500' },
+      body: { font: 'DM Sans', size: '1rem', weight: '400' },
+
+      text_color: '#C0D8B0',
+      heading_color: null,
+      link_color: null,
+      card_bg: 'rgba(160,255,0,0.04)',
+      border_color: 'rgba(160,255,0,0.10)',
+
+      section_padding: 'compact',
+      content_width: 'default',
+      card_radius: 'sm',
+      element_gap: 'default',
+
+      button_style: 'square',
+      link_style: 'none',
+
+      card_border: 'subtle',
+      shadow: 'md',
+      divider_style: 'accent',
+    },
+    sectionOrder: ['music', 'events', 'bio', 'photos', 'technical', 'press', 'contact'],
+    heroStyle: 'fullbleed',
+    bioLayout: 'two-column',
+  },
+
+  // -- Lo-Fi -----------------------------------------------------------------
+  {
+    id: 'lo-fi',
+    name: 'Lo-Fi',
+    description: 'Muted brown on cream — vintage and warm',
+    defaults: {
+      accent_color: '#8B7355',
+      bg_color: '#F5F0E8',
+      font_family: 'DM Sans',
+
+      display: { font: 'Cormorant Garamond', size: '4.5rem', weight: '600' },
+      heading: { font: 'DM Sans', size: '1.75rem', weight: '600' },
+      subheading: { font: 'DM Sans', size: '1rem', weight: '500' },
+      body: { font: 'DM Sans', size: '1rem', weight: '400' },
+
+      text_color: '#4A3C2E',
+      heading_color: null,
+      link_color: null,
+      card_bg: '#FFFDF8',
+      border_color: '#D8CFC0',
+
+      section_padding: 'spacious',
+      content_width: 'narrow',
+      card_radius: 'md',
+      element_gap: 'relaxed',
+
+      button_style: 'rounded',
+      link_style: 'underline',
+
+      card_border: 'subtle',
+      shadow: 'sm',
+      divider_style: 'none',
+    },
+    sectionOrder: ['bio', 'music', 'photos', 'events', 'press', 'technical', 'contact'],
+    heroStyle: 'contained',
+    bioLayout: 'single-column',
   },
 ]
 
