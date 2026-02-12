@@ -1,7 +1,9 @@
-import { createFileRoute, Link, redirect, isRedirect } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { z } from 'zod'
+import { useEffect, useState } from 'react'
 import { loginWithEmail, getCurrentUser } from '~/server/auth'
 import { AuthForm } from '~/components/AuthForm'
+import { EqBars } from '~/components/EqBars'
 
 export const Route = createFileRoute('/login')({
   validateSearch: z.object({
@@ -13,22 +15,34 @@ export const Route = createFileRoute('/login')({
       { name: 'description', content: 'Log in to your myEPK account to manage your electronic press kit.' },
     ],
   }),
-  beforeLoad: async () => {
-    try {
-      const result = await getCurrentUser()
-      if (result?.user?.email_confirmed_at) {
-        throw redirect({ to: '/dashboard' })
-      }
-    } catch (e) {
-      if (isRedirect(e)) throw e
-      // Swallow other errors — let them see the login page
-    }
-  },
   component: LoginPage,
 })
 
 function LoginPage() {
   const { error: urlError } = Route.useSearch()
+  const navigate = useNavigate()
+  const [checking, setChecking] = useState(true)
+
+  useEffect(() => {
+    getCurrentUser()
+      .then((result) => {
+        if (result?.user?.email_confirmed_at) {
+          navigate({ to: '/dashboard' })
+        } else {
+          setChecking(false)
+        }
+      })
+      .catch(() => setChecking(false))
+  }, [navigate])
+
+  if (checking) {
+    return (
+      <div className="theme-dark min-h-screen bg-bg flex flex-col items-center justify-center gap-6">
+        <EqBars className="h-12" barCount={24} />
+        <p className="text-text-secondary text-sm font-body animate-pulse">Loading...</p>
+      </div>
+    )
+  }
 
   return (
     <AuthForm

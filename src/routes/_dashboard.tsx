@@ -1,9 +1,10 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { getCurrentUser } from '~/server/auth'
 import { DashboardSidebar } from '~/components/DashboardSidebar'
+import { EqBars } from '~/components/EqBars'
 
 export const Route = createFileRoute('/_dashboard')({
-  beforeLoad: async () => {
+  loader: async () => {
     const result = await getCurrentUser()
     if (!result) {
       throw redirect({ to: '/login' })
@@ -21,11 +22,22 @@ export const Route = createFileRoute('/_dashboard')({
 
     return { user: result.user, profile: result.profile }
   },
+  pendingMs: 200,
+  pendingComponent: DashboardLoading,
   component: DashboardLayout,
 })
 
+function DashboardLoading() {
+  return (
+    <div className="theme-dark min-h-screen bg-bg flex flex-col items-center justify-center gap-6">
+      <EqBars className="h-12" barCount={24} />
+      <p className="text-text-secondary text-sm font-body animate-pulse">Loading...</p>
+    </div>
+  )
+}
+
 function DashboardLayout() {
-  const { profile } = Route.useRouteContext()
+  const { profile } = Route.useLoaderData()
 
   const safeProfile = {
     slug: profile?.slug || '',
