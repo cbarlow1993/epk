@@ -235,3 +235,71 @@ export const updateUserPassword = createServerFn({ method: 'POST' })
     if (error) return { error: error.message }
     return { data: { message: 'Password updated successfully.' } }
   })
+
+export const restorePremiumSnapshot = createServerFn({ method: 'POST' }).handler(async () => {
+  const { supabase, user } = await withAuth()
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('premium_snapshot, tier')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile) return { error: 'Profile not found' }
+  if (profile.tier !== 'pro') return { error: 'Pro plan required' }
+  if (!profile.premium_snapshot) return { error: 'No snapshot to restore' }
+
+  const snapshot = profile.premium_snapshot as {
+    profile_fields: Record<string, unknown>
+    integrations: Array<{ type: string; enabled: boolean; config: Record<string, unknown>; sort_order: number }>
+  }
+
+  // Restore profile fields (keep snapshot intact until everything succeeds)
+  const { error: profileErr } = await supabase
+    .from('profiles')
+    .update(snapshot.profile_fields)
+    .eq('id', user.id)
+
+  if (profileErr) return { error: profileErr.message }
+
+  // Restore integrations with error handling
+  for (const integration of snapshot.integrations) {
+    const { error: intErr } = await supabase
+      .from('integrations')
+      .upsert(
+        {
+          profile_id: user.id,
+          type: integration.type,
+          enabled: integration.enabled,
+          config: integration.config,
+          sort_order: integration.sort_order,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'profile_id,type' }
+      )
+
+    if (intErr) {
+      console.error(`[restorePremiumSnapshot] Failed to restore integration ${integration.type}:`, intErr.message)
+    }
+  }
+
+  // Clear snapshot only after successful restoration
+  await supabase
+    .from('profiles')
+    .update({ premium_snapshot: null })
+    .eq('id', user.id)
+
+  return { data: { restored: true } }
+})
+
+export const dismissPremiumSnapshot = createServerFn({ method: 'POST' }).handler(async () => {
+  const { supabase, user } = await withAuth()
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ premium_snapshot: null })
+    .eq('id', user.id)
+
+  if (error) return { error: error.message }
+  return { data: { dismissed: true } }
+})

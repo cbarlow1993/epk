@@ -34,6 +34,7 @@ function hasBioContent(bio: unknown, shortBio: string | null): boolean {
 export interface ChecklistLoaderData {
   checklist: ChecklistState
   tier: 'free' | 'pro'
+  hasSnapshot: boolean
 }
 
 export const getChecklistState = createServerFn({ method: 'GET' }).handler(async (): Promise<ChecklistLoaderData | null> => {
@@ -54,6 +55,7 @@ export const getChecklistState = createServerFn({ method: 'GET' }).handler(async
 
   return {
     tier: profile.tier === 'pro' ? 'pro' : 'free',
+    hasSnapshot: !!profile.premium_snapshot,
     checklist: {
       has_display_name: !!profile.display_name?.trim(),
       has_profile_image: !!profile.profile_image_url,

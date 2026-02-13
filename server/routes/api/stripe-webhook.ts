@@ -222,20 +222,138 @@ export default defineEventHandler(async (event) => {
         ? subscription.customer
         : subscription.customer.id
 
-      // Downgrade to free, clear custom domain
+      // Fetch current profile to snapshot premium data
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('stripe_customer_id', customerId)
+        .single()
+
+      if (!profile) {
+        console.error('[stripe-webhook] No profile found for customer:', customerId)
+        break
+      }
+
+      // Snapshot premium fields + integrations
+      const { data: integrations } = await supabase
+        .from('integrations')
+        .select('type, enabled, config, sort_order')
+        .eq('profile_id', profile.id)
+
+      const snapshot = {
+        snapshotted_at: new Date().toISOString(),
+        profile_fields: {
+          favicon_url: profile.favicon_url,
+          hide_platform_branding: profile.hide_platform_branding,
+          meta_description: profile.meta_description,
+          og_title: profile.og_title,
+          og_description: profile.og_description,
+          og_image_url: profile.og_image_url,
+          twitter_card_type: profile.twitter_card_type,
+          theme_display_font: profile.theme_display_font,
+          theme_display_size: profile.theme_display_size,
+          theme_display_weight: profile.theme_display_weight,
+          theme_heading_font: profile.theme_heading_font,
+          theme_heading_size: profile.theme_heading_size,
+          theme_heading_weight: profile.theme_heading_weight,
+          theme_subheading_font: profile.theme_subheading_font,
+          theme_subheading_size: profile.theme_subheading_size,
+          theme_subheading_weight: profile.theme_subheading_weight,
+          theme_body_font: profile.theme_body_font,
+          theme_body_size: profile.theme_body_size,
+          theme_body_weight: profile.theme_body_weight,
+          theme_text_color: profile.theme_text_color,
+          theme_heading_color: profile.theme_heading_color,
+          theme_link_color: profile.theme_link_color,
+          theme_card_bg: profile.theme_card_bg,
+          theme_border_color: profile.theme_border_color,
+          theme_section_padding: profile.theme_section_padding,
+          theme_content_width: profile.theme_content_width,
+          theme_card_radius: profile.theme_card_radius,
+          theme_element_gap: profile.theme_element_gap,
+          theme_button_style: profile.theme_button_style,
+          theme_link_style: profile.theme_link_style,
+          theme_card_border: profile.theme_card_border,
+          theme_shadow: profile.theme_shadow,
+          theme_divider_style: profile.theme_divider_style,
+          theme_custom_fonts: profile.theme_custom_fonts,
+          hero_style: profile.hero_style,
+          bio_layout: profile.bio_layout,
+        },
+        integrations: integrations || [],
+      }
+
+      // Save snapshot + reset all premium fields to defaults
       const { error } = await supabase
         .from('profiles')
         .update({
           tier: 'free',
           stripe_subscription_id: null,
           custom_domain: null,
+          premium_snapshot: snapshot,
+          // Reset branding
+          favicon_url: null,
+          hide_platform_branding: false,
+          meta_description: null,
+          // Reset OG/social
+          og_title: null,
+          og_description: null,
+          og_image_url: null,
+          twitter_card_type: null,
+          // Reset theme — Typography
+          theme_display_font: null,
+          theme_display_size: null,
+          theme_display_weight: null,
+          theme_heading_font: null,
+          theme_heading_size: null,
+          theme_heading_weight: null,
+          theme_subheading_font: null,
+          theme_subheading_size: null,
+          theme_subheading_weight: null,
+          theme_body_font: null,
+          theme_body_size: null,
+          theme_body_weight: null,
+          // Reset theme — Colors
+          theme_text_color: null,
+          theme_heading_color: null,
+          theme_link_color: null,
+          theme_card_bg: null,
+          theme_border_color: null,
+          // Reset theme — Spacing & Layout
+          theme_section_padding: null,
+          theme_content_width: null,
+          theme_card_radius: null,
+          theme_element_gap: null,
+          // Reset theme — Buttons & Links
+          theme_button_style: null,
+          theme_link_style: null,
+          // Reset theme — Effects
+          theme_card_border: null,
+          theme_shadow: null,
+          theme_divider_style: null,
+          // Reset theme — Custom Fonts
+          theme_custom_fonts: null,
+          // Reset layout
+          hero_style: null,
+          bio_layout: null,
         })
-        .eq('stripe_customer_id', customerId)
+        .eq('id', profile.id)
 
       if (error) {
         throw createError({ statusCode: 500, message: `Database update failed: ${error.message}` })
       }
 
+      // Disable all integrations (data preserved, just disabled)
+      const { error: intError } = await supabase
+        .from('integrations')
+        .update({ enabled: false })
+        .eq('profile_id', profile.id)
+
+      if (intError) {
+        console.error('[stripe-webhook] Failed to disable integrations:', intError.message)
+      }
+
+      console.log(`[stripe-webhook] Premium features reset for customer: ${customerId}`)
       break
     }
 

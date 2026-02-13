@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { getChecklistState, toggleChecklistItem, type ChecklistState } from '~/server/checklist'
 import { createCheckoutSession } from '~/server/billing'
+import { restorePremiumSnapshot, dismissPremiumSnapshot } from '~/server/profile'
 
 export const Route = createFileRoute('/_dashboard/dashboard/')({
   loader: () => getChecklistState(),
@@ -64,11 +65,38 @@ function Dashboard() {
     )
   }
 
-  return <DashboardContent initialState={loaderData.checklist} tier={loaderData.tier} />
+  return <DashboardContent initialState={loaderData.checklist} tier={loaderData.tier} hasSnapshot={loaderData.hasSnapshot} />
 }
 
-function DashboardContent({ initialState, tier }: { initialState: ChecklistState; tier: 'free' | 'pro' }) {
+function DashboardContent({ initialState, tier, hasSnapshot }: { initialState: ChecklistState; tier: 'free' | 'pro'; hasSnapshot: boolean }) {
   const [state, setState] = useState<ChecklistState>(initialState)
+  const [showRestore, setShowRestore] = useState(hasSnapshot && tier === 'pro')
+  const [restoring, setRestoring] = useState(false)
+  const [restoreError, setRestoreError] = useState('')
+
+  const handleRestore = async () => {
+    setRestoring(true)
+    setRestoreError('')
+    const result = await restorePremiumSnapshot()
+    if (result && 'error' in result) {
+      setRestoreError(result.error as string)
+      setRestoring(false)
+    } else {
+      window.location.reload()
+    }
+  }
+
+  const handleDismiss = async () => {
+    setRestoring(true)
+    const result = await dismissPremiumSnapshot()
+    if (result && 'error' in result) {
+      setRestoreError(result.error as string)
+      setRestoring(false)
+    } else {
+      setShowRestore(false)
+      setRestoring(false)
+    }
+  }
 
   const MANUAL_KEYS = new Set<keyof ChecklistState>(['shared_social', 'added_to_bio', 'sent_to_promoter', 'added_to_email_sig', 'included_in_demo'])
 
@@ -93,6 +121,36 @@ function DashboardContent({ initialState, tier }: { initialState: ChecklistState
         <h1 className="font-display font-extrabold text-2xl tracking-tight uppercase">Dashboard</h1>
         <p className="text-sm text-text-secondary mt-1">Make the most of your EPK with these steps.</p>
       </div>
+
+      {showRestore && (
+        <div className="border border-accent/30 bg-accent/5 p-5 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h2 className="text-sm font-bold text-text-primary">Welcome back!</h2>
+              <p className="text-xs text-text-secondary mt-0.5">We saved your previous Pro settings. Would you like to restore them?</p>
+            </div>
+            <div className="flex gap-2 flex-shrink-0">
+              <button
+                type="button"
+                onClick={handleRestore}
+                disabled={restoring}
+                className="px-4 py-2 text-xs font-bold uppercase tracking-wider bg-accent text-white hover:bg-accent/90 transition-colors disabled:opacity-50"
+              >
+                {restoring ? 'Restoring...' : 'Restore Settings'}
+              </button>
+              <button
+                type="button"
+                onClick={handleDismiss}
+                disabled={restoring}
+                className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-text-secondary hover:text-text-primary transition-colors disabled:opacity-50"
+              >
+                Start Fresh
+              </button>
+            </div>
+          </div>
+          {restoreError && <p className="text-xs text-red-500 mt-3">{restoreError}</p>}
+        </div>
+      )}
 
       <div className={`${isFree ? 'flex gap-8' : ''}`}>
         <div className={`space-y-6 ${isFree ? 'flex-1 min-w-0' : 'max-w-2xl'}`}>
