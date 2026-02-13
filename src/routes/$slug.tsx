@@ -568,32 +568,173 @@ function PublicEPK() {
                     <h3 className="text-lg font-semibold text-accent mb-6 capitalize">
                       {category.replace(/-/g, ' ')}
                     </h3>
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {categoryMixes.map((mix) => (
-                        <div key={mix.id} className="border overflow-hidden" style={cardStyle}>
-                          {mix.embed_html ? (
-                            <div
-                              className="w-full [&_iframe]:w-full [&_iframe]:rounded-none"
-                              dangerouslySetInnerHTML={{ __html: sanitizeEmbed(mix.embed_html) }}
-                            />
-                          ) : (
-                            <a href={mix.url} target="_blank" rel="noopener noreferrer"
-                              className="block hover:border-accent/30 transition-colors">
-                              {mix.image_url && (
-                                <img src={mix.image_url} alt={mix.title} className="w-full aspect-video object-cover" loading="lazy" />
-                              )}
-                              <div className="p-4">
-                                <p className="font-semibold text-sm mb-1">{mix.title}</p>
-                                {mix.description && (
-                                  <p className={`text-xs ${textSecClass} mb-1`}>{mix.description}</p>
+                    {musicLayout === 'featured' ? (
+                      <>
+                        {/* Hero first mix */}
+                        {categoryMixes[0] && (
+                          <div className="border overflow-hidden mb-6" style={cardStyle}>
+                            {categoryMixes[0].embed_html ? (
+                              <div
+                                className="w-full [&_iframe]:w-full [&_iframe]:rounded-none"
+                                dangerouslySetInnerHTML={{ __html: sanitizeEmbed(categoryMixes[0].embed_html) }}
+                              />
+                            ) : (
+                              <a href={categoryMixes[0].url} target="_blank" rel="noopener noreferrer" className="grid md:grid-cols-[2fr_3fr] group">
+                                <div className="aspect-video md:aspect-auto overflow-hidden">
+                                  {categoryMixes[0].image_url ? (
+                                    <img src={categoryMixes[0].image_url} alt={categoryMixes[0].title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                                  ) : (
+                                    <div className="w-full h-full" style={{ backgroundColor: 'var(--theme-card-bg)' }} />
+                                  )}
+                                </div>
+                                <div className="p-6">
+                                  <p className="text-lg font-semibold mb-2">{categoryMixes[0].title}</p>
+                                  {categoryMixes[0].description && (
+                                    <p className={`text-sm ${textSecClass} mb-2`}>{categoryMixes[0].description}</p>
+                                  )}
+                                  <p className={`text-xs ${textSecClass} truncate`}>{categoryMixes[0].url}</p>
+                                </div>
+                              </a>
+                            )}
+                          </div>
+                        )}
+                        {/* Remaining mixes */}
+                        {categoryMixes.length > 1 && (
+                          <div className="grid sm:grid-cols-2 gap-4">
+                            {categoryMixes.slice(1).map((mix) => (
+                              <div key={mix.id} className="border overflow-hidden" style={cardStyle}>
+                                {mix.embed_html ? (
+                                  <div
+                                    className="w-full [&_iframe]:w-full [&_iframe]:rounded-none"
+                                    dangerouslySetInnerHTML={{ __html: sanitizeEmbed(mix.embed_html) }}
+                                  />
+                                ) : (
+                                  <a href={mix.url} target="_blank" rel="noopener noreferrer"
+                                    className="block hover:border-accent/30 transition-colors">
+                                    {mix.image_url && (
+                                      <img src={mix.image_url} alt={mix.title} className="w-full aspect-video object-cover" loading="lazy" />
+                                    )}
+                                    <div className="p-4">
+                                      <p className="font-semibold text-sm mb-1">{mix.title}</p>
+                                      {mix.description && (
+                                        <p className={`text-xs ${textSecClass} mb-1`}>{mix.description}</p>
+                                      )}
+                                      <p className={`text-xs ${textSecClass} truncate`}>{mix.url}</p>
+                                    </div>
+                                  </a>
                                 )}
-                                <p className={`text-xs ${textSecClass} truncate`}>{mix.url}</p>
                               </div>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    ) : musicLayout === 'showcase' ? (
+                      <div className="space-y-4">
+                        {categoryMixes.map((mix, index) => (
+                          <div
+                            key={mix.id}
+                            className="border overflow-hidden"
+                            style={{ ...cardStyle, ...(index % 2 === 1 ? { backgroundColor: 'var(--theme-card-bg)' } : {}) }}
+                          >
+                            {mix.embed_html ? (
+                              <div
+                                className="w-full [&_iframe]:w-full [&_iframe]:rounded-none"
+                                dangerouslySetInnerHTML={{ __html: sanitizeEmbed(mix.embed_html) }}
+                              />
+                            ) : (
+                              <a href={mix.url} target="_blank" rel="noopener noreferrer" className="grid md:grid-cols-[1fr_2fr] group">
+                                <div className="aspect-video md:aspect-square overflow-hidden">
+                                  {mix.image_url ? (
+                                    <img src={mix.image_url} alt={mix.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                                  ) : (
+                                    <div className="w-full h-full" style={{ backgroundColor: 'var(--theme-card-bg)' }} />
+                                  )}
+                                </div>
+                                <div className="p-6">
+                                  <p className="text-base font-semibold mb-2">{mix.title}</p>
+                                  {mix.description && (
+                                    <p className={`text-sm ${textSecClass} mb-2`}>{mix.description}</p>
+                                  )}
+                                  <p className={`text-xs ${textSecClass} truncate`}>{mix.url}</p>
+                                </div>
+                              </a>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : musicLayout === 'compact' ? (
+                      <div className="divide-y" style={{ borderColor: 'var(--theme-border-color)' }}>
+                        {categoryMixes.map((mix) => (
+                          mix.embed_html ? (
+                            <div key={mix.id} className="py-2 overflow-hidden" style={{ maxHeight: '120px' }}>
+                              <div
+                                className="w-full [&_iframe]:w-full [&_iframe]:rounded-none"
+                                dangerouslySetInnerHTML={{ __html: sanitizeEmbed(mix.embed_html) }}
+                              />
+                            </div>
+                          ) : (
+                            <a
+                              key={mix.id}
+                              href={mix.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-4 py-3 hover:bg-accent/5 transition-colors group px-2"
+                            >
+                              {mix.image_url ? (
+                                <img
+                                  src={mix.image_url}
+                                  alt={mix.title}
+                                  className="w-12 h-12 object-cover shrink-0"
+                                  style={{ borderRadius: 'var(--theme-card-radius)' }}
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <div
+                                  className="w-12 h-12 shrink-0"
+                                  style={{ borderRadius: 'var(--theme-card-radius)', backgroundColor: 'var(--theme-card-bg)' }}
+                                />
+                              )}
+                              <div className="min-w-0 flex-1">
+                                <p className="font-semibold text-sm">{mix.title}</p>
+                                {mix.description && (
+                                  <p className={`text-xs ${textSecClass} truncate`}>{mix.description}</p>
+                                )}
+                              </div>
+                              <svg className="w-4 h-4 shrink-0 group-hover:text-accent transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path d="M9 5l7 7-7 7" />
+                              </svg>
                             </a>
-                          )}
-                        </div>
-                      ))}
-                    </div>
+                          )
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {categoryMixes.map((mix) => (
+                          <div key={mix.id} className="border overflow-hidden" style={cardStyle}>
+                            {mix.embed_html ? (
+                              <div
+                                className="w-full [&_iframe]:w-full [&_iframe]:rounded-none"
+                                dangerouslySetInnerHTML={{ __html: sanitizeEmbed(mix.embed_html) }}
+                              />
+                            ) : (
+                              <a href={mix.url} target="_blank" rel="noopener noreferrer"
+                                className="block hover:border-accent/30 transition-colors">
+                                {mix.image_url && (
+                                  <img src={mix.image_url} alt={mix.title} className="w-full aspect-video object-cover" loading="lazy" />
+                                )}
+                                <div className="p-4">
+                                  <p className="font-semibold text-sm mb-1">{mix.title}</p>
+                                  {mix.description && (
+                                    <p className={`text-xs ${textSecClass} mb-1`}>{mix.description}</p>
+                                  )}
+                                  <p className={`text-xs ${textSecClass} truncate`}>{mix.url}</p>
+                                </div>
+                              </a>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
               </EPKSection>
