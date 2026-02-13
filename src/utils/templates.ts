@@ -57,6 +57,8 @@ export interface TemplateConfig {
   sectionOrder: string[]
   heroStyle: 'fullbleed' | 'contained' | 'minimal'
   bioLayout: 'two-column' | 'single-column'
+  eventsLayout: 'grid' | 'marquee' | 'carousel' | 'timeline'
+  musicLayout: 'grid' | 'featured' | 'showcase' | 'compact'
 }
 
 // ---------------------------------------------------------------------------
@@ -149,6 +151,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['bio', 'music', 'events', 'photos', 'technical', 'press', 'contact'],
     heroStyle: 'fullbleed',
     bioLayout: 'two-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 
   // -- Swiss ----------------------------------------------------------------
@@ -187,6 +191,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['bio', 'music', 'events', 'photos', 'technical', 'press', 'contact'],
     heroStyle: 'fullbleed',
     bioLayout: 'two-column',
+    eventsLayout: 'timeline',
+    musicLayout: 'compact',
   },
 
   // -- Minimal ---------------------------------------------------------------
@@ -225,6 +231,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['bio', 'music', 'events', 'photos', 'press', 'technical', 'contact'],
     heroStyle: 'minimal',
     bioLayout: 'single-column',
+    eventsLayout: 'timeline',
+    musicLayout: 'compact',
   },
 
   // -- Editorial (id: festival) ---------------------------------------------
@@ -263,6 +271,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['music', 'bio', 'events', 'photos', 'press', 'technical', 'contact'],
     heroStyle: 'fullbleed',
     bioLayout: 'single-column',
+    eventsLayout: 'marquee',
+    musicLayout: 'featured',
   },
 
   // -- Dark (id: underground) -----------------------------------------------
@@ -301,6 +311,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['music', 'bio', 'technical', 'events', 'photos', 'press', 'contact'],
     heroStyle: 'contained',
     bioLayout: 'two-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 
   // -- Neon ------------------------------------------------------------------
@@ -339,6 +351,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['music', 'bio', 'events', 'photos', 'technical', 'press', 'contact'],
     heroStyle: 'fullbleed',
     bioLayout: 'two-column',
+    eventsLayout: 'carousel',
+    musicLayout: 'showcase',
   },
 
   // -- Warehouse -------------------------------------------------------------
@@ -377,6 +391,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['music', 'bio', 'technical', 'events', 'photos', 'press', 'contact'],
     heroStyle: 'minimal',
     bioLayout: 'single-column',
+    eventsLayout: 'carousel',
+    musicLayout: 'showcase',
   },
 
   // -- Sunset ----------------------------------------------------------------
@@ -415,6 +431,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['bio', 'music', 'events', 'photos', 'press', 'technical', 'contact'],
     heroStyle: 'fullbleed',
     bioLayout: 'single-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 
   // -- Haze ------------------------------------------------------------------
@@ -453,6 +471,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['music', 'bio', 'photos', 'events', 'technical', 'press', 'contact'],
     heroStyle: 'contained',
     bioLayout: 'single-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 
   // -- Acid ------------------------------------------------------------------
@@ -491,6 +511,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['music', 'bio', 'events', 'photos', 'technical', 'press', 'contact'],
     heroStyle: 'fullbleed',
     bioLayout: 'two-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 
   // -- Festival (mainstage) --------------------------------------------------
@@ -529,6 +551,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['music', 'events', 'bio', 'photos', 'press', 'technical', 'contact'],
     heroStyle: 'fullbleed',
     bioLayout: 'two-column',
+    eventsLayout: 'marquee',
+    musicLayout: 'featured',
   },
 
   // -- Monochrome ------------------------------------------------------------
@@ -567,6 +591,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['bio', 'music', 'technical', 'events', 'photos', 'press', 'contact'],
     heroStyle: 'minimal',
     bioLayout: 'single-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 
   // -- Tropicália ------------------------------------------------------------
@@ -605,6 +631,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['music', 'events', 'bio', 'photos', 'press', 'technical', 'contact'],
     heroStyle: 'fullbleed',
     bioLayout: 'two-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 
   // -- Strobe ----------------------------------------------------------------
@@ -643,6 +671,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['music', 'events', 'bio', 'photos', 'technical', 'press', 'contact'],
     heroStyle: 'fullbleed',
     bioLayout: 'two-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 
   // -- Deep House ------------------------------------------------------------
@@ -681,6 +711,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['music', 'bio', 'events', 'photos', 'press', 'technical', 'contact'],
     heroStyle: 'contained',
     bioLayout: 'single-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 
   // -- Techno ----------------------------------------------------------------
@@ -719,6 +751,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['music', 'bio', 'technical', 'events', 'photos', 'press', 'contact'],
     heroStyle: 'minimal',
     bioLayout: 'single-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 
   // -- Drum & Bass -----------------------------------------------------------
@@ -757,6 +791,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['music', 'events', 'bio', 'photos', 'technical', 'press', 'contact'],
     heroStyle: 'fullbleed',
     bioLayout: 'two-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 
   // -- Trance ----------------------------------------------------------------
@@ -795,6 +831,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['music', 'bio', 'events', 'photos', 'press', 'technical', 'contact'],
     heroStyle: 'fullbleed',
     bioLayout: 'single-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 
   // -- Ambient ---------------------------------------------------------------
@@ -833,6 +871,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['bio', 'music', 'photos', 'events', 'press', 'technical', 'contact'],
     heroStyle: 'contained',
     bioLayout: 'single-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 
   // -- Garage ----------------------------------------------------------------
@@ -871,6 +911,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['music', 'events', 'bio', 'photos', 'press', 'technical', 'contact'],
     heroStyle: 'fullbleed',
     bioLayout: 'two-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 
   // -- Dub -------------------------------------------------------------------
@@ -909,6 +951,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['music', 'bio', 'events', 'photos', 'technical', 'press', 'contact'],
     heroStyle: 'contained',
     bioLayout: 'two-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 
   // -- Y2K -------------------------------------------------------------------
@@ -947,6 +991,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['music', 'bio', 'photos', 'events', 'technical', 'press', 'contact'],
     heroStyle: 'contained',
     bioLayout: 'two-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 
   // -- Vaporwave -------------------------------------------------------------
@@ -985,6 +1031,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['music', 'photos', 'bio', 'events', 'press', 'technical', 'contact'],
     heroStyle: 'fullbleed',
     bioLayout: 'single-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 
   // -- Art Deco --------------------------------------------------------------
@@ -1023,6 +1071,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['bio', 'music', 'photos', 'events', 'press', 'technical', 'contact'],
     heroStyle: 'fullbleed',
     bioLayout: 'single-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 
   // -- Midnight --------------------------------------------------------------
@@ -1061,6 +1111,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['music', 'bio', 'events', 'photos', 'press', 'technical', 'contact'],
     heroStyle: 'contained',
     bioLayout: 'two-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 
   // -- Ember -----------------------------------------------------------------
@@ -1099,6 +1151,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['music', 'bio', 'events', 'photos', 'technical', 'press', 'contact'],
     heroStyle: 'fullbleed',
     bioLayout: 'two-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 
   // -- Arctic ----------------------------------------------------------------
@@ -1137,6 +1191,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['bio', 'music', 'events', 'photos', 'press', 'technical', 'contact'],
     heroStyle: 'fullbleed',
     bioLayout: 'two-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 
   // -- Jungle ----------------------------------------------------------------
@@ -1175,6 +1231,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['music', 'events', 'bio', 'photos', 'technical', 'press', 'contact'],
     heroStyle: 'fullbleed',
     bioLayout: 'two-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 
   // -- Lo-Fi -----------------------------------------------------------------
@@ -1213,6 +1271,8 @@ export const TEMPLATES: TemplateConfig[] = [
     sectionOrder: ['bio', 'music', 'photos', 'events', 'press', 'technical', 'contact'],
     heroStyle: 'contained',
     bioLayout: 'single-column',
+    eventsLayout: 'grid',
+    musicLayout: 'grid',
   },
 ]
 
@@ -1281,6 +1341,8 @@ export interface ResolvedTheme {
   // Layout
   heroStyle: string
   bioLayout: string
+  eventsLayout: string
+  musicLayout: string
 }
 
 // ---------------------------------------------------------------------------
@@ -1528,5 +1590,7 @@ export function resolveTheme(
     // Layout
     heroStyle: templateConfig.heroStyle,
     bioLayout: templateConfig.bioLayout,
+    eventsLayout: templateConfig.eventsLayout,
+    musicLayout: templateConfig.musicLayout,
   }
 }
