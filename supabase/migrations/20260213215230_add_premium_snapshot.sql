@@ -1,0 +1,1 @@
+ALTER TABLE profiles ADD COLUMN premium_snapshot JSONB DEFAULT NULL;

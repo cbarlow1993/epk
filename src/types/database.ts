@@ -75,6 +75,7 @@ export interface ProfileRow {
   organization_id: string | null
   managed_by: string | null
   onboarding_completed: boolean
+  premium_snapshot: Record<string, unknown> | null
   created_at: string
 }
 
