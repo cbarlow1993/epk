@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useForm, type UseFormSetValue, type UseFormWatch, type UseFormRegister, type FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { z } from 'zod'
 import { getProfile, updateProfile } from '~/server/profile'
 import { profileUpdateSchema, type ProfileUpdate } from '~/schemas/profile'
@@ -28,6 +28,8 @@ const themeSchema = profileUpdateSchema
     // Layout
     hero_style: true,
     bio_layout: true,
+    events_layout: true,
+    music_layout: true,
     // Typography
     theme_display_font: true,
     theme_display_size: true,
@@ -518,6 +520,8 @@ function ThemeEditor() {
       // Layout
       hero_style: initial?.hero_style ?? undefined,
       bio_layout: initial?.bio_layout ?? undefined,
+      events_layout: initial?.events_layout ?? null,
+      music_layout: initial?.music_layout ?? null,
       // Typography
       theme_display_font: initial?.theme_display_font ?? null,
       theme_display_size: initial?.theme_display_size ?? null,
@@ -580,6 +584,8 @@ function ThemeEditor() {
     // Layout
     setValue('hero_style', tpl.heroStyle, { shouldDirty: true })
     setValue('bio_layout', tpl.bioLayout, { shouldDirty: true })
+    setValue('events_layout', tpl.eventsLayout, { shouldDirty: true })
+    setValue('music_layout', tpl.musicLayout, { shouldDirty: true })
 
     // Typography
     setValue('theme_display_font', d.display.font, { shouldDirty: true })
@@ -625,32 +631,47 @@ function ThemeEditor() {
   }
 
   // -------------------------------------------------------------------------
-  // Iframe preview with debounced URL params (watch subscription pattern)
+  // Iframe preview — load once, update via postMessage (no reload flicker)
   // -------------------------------------------------------------------------
+  const iframeRef = useRef<HTMLIFrameElement>(null)
   const [previewSrc, setPreviewSrc] = useState('')
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
-  const updatePreview = useCallback((values: ThemeFormValues) => {
+  // Build initial iframe URL (runs once)
+  useEffect(() => {
     if (!initial?.slug) return
-    clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(() => {
-      const params = new URLSearchParams()
-      params.set('preview', 'true')
-      for (const [key, value] of Object.entries(values)) {
-        if (value != null && value !== '' && key !== 'theme_custom_fonts') {
-          params.set(key, String(value))
-        }
+    const values = watch()
+    const params = new URLSearchParams()
+    params.set('preview', 'true')
+    for (const [key, value] of Object.entries(values)) {
+      if (value != null && value !== '' && key !== 'theme_custom_fonts') {
+        params.set(key, String(value))
       }
-      setPreviewSrc(`/${initial.slug}?${params.toString()}`)
-    }, 300)
+    }
+    setPreviewSrc(`/${initial.slug}?${params.toString()}`)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initial?.slug])
 
+  // Send subsequent updates via postMessage (no iframe reload)
   useEffect(() => {
-    const subscription = watch((values) => updatePreview(values as ThemeFormValues))
-    // Trigger initial preview
-    updatePreview(watch() as ThemeFormValues)
+    const subscription = watch((values) => {
+      clearTimeout(debounceRef.current)
+      debounceRef.current = setTimeout(() => {
+        const payload: Record<string, string> = {}
+        for (const [key, value] of Object.entries(values)) {
+          if (key === 'theme_custom_fonts') continue
+          if (value != null && value !== '') {
+            payload[key] = String(value)
+          }
+        }
+        iframeRef.current?.contentWindow?.postMessage(
+          { type: 'theme-update', values: payload },
+          window.location.origin
+        )
+      }, 50)
+    })
     return () => subscription.unsubscribe()
-  }, [watch, updatePreview])
+  }, [watch])
 
   // -------------------------------------------------------------------------
   // Accordion sections
@@ -738,6 +759,28 @@ function ThemeEditor() {
                 { value: 'single-column', label: 'Single Column' },
               ]}
               onChange={(v) => setValue('bio_layout', v as ProfileUpdate['bio_layout'], { shouldDirty: true })}
+            />
+            <OptionPicker
+              label="Events Layout"
+              value={watch('events_layout')}
+              options={[
+                { value: 'grid', label: 'Grid' },
+                { value: 'marquee', label: 'Marquee' },
+                { value: 'carousel', label: 'Carousel' },
+                { value: 'timeline', label: 'Timeline' },
+              ]}
+              onChange={(v) => setValue('events_layout', v as ProfileUpdate['events_layout'], { shouldDirty: true })}
+            />
+            <OptionPicker
+              label="Music Layout"
+              value={watch('music_layout')}
+              options={[
+                { value: 'grid', label: 'Grid' },
+                { value: 'featured', label: 'Featured' },
+                { value: 'showcase', label: 'Showcase' },
+                { value: 'compact', label: 'Compact' },
+              ]}
+              onChange={(v) => setValue('music_layout', v as ProfileUpdate['music_layout'], { shouldDirty: true })}
             />
             <OptionPicker
               label="Section Padding"
@@ -957,6 +1000,7 @@ function ThemeEditor() {
             <div className="border border-border overflow-hidden bg-white h-[calc(100vh-12rem)] sticky top-4">
               {previewSrc && (
                 <iframe
+                  ref={iframeRef}
                   src={previewSrc}
                   className="w-full h-full"
                   title="EPK Preview"
