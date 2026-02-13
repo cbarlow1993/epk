@@ -35,6 +35,8 @@ export interface ProfileRow {
   event_category_order: string[] | null
   hero_style: 'fullbleed' | 'contained' | 'minimal' | null
   bio_layout: 'two-column' | 'single-column' | null
+  events_layout: 'grid' | 'marquee' | 'carousel' | 'timeline' | null
+  music_layout: 'grid' | 'featured' | 'showcase' | 'compact' | null
   // Theme — Typography
   theme_display_font: string | null
   theme_display_size: string | null

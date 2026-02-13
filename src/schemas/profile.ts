@@ -58,6 +58,8 @@ export const profileUpdateSchema = z.object({
   hero_video_url: z.string().url('Invalid URL').optional().or(z.literal('')),
   animate_sections: z.boolean().optional(),
   bio_layout: z.enum(['two-column', 'single-column']).optional(),
+  events_layout: z.enum(['grid', 'marquee', 'carousel', 'timeline']).optional().nullable(),
+  music_layout: z.enum(['grid', 'featured', 'showcase', 'compact']).optional().nullable(),
   press_kit_url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
   // Theme — Typography (4 tiers)
   theme_display_font: z.string().max(100).optional().nullable(),
