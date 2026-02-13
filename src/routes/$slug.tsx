@@ -16,7 +16,7 @@ type PhotoRow = { id: string; image_url: string; caption: string | null; sort_or
 // Theme search params accepted in preview mode
 const THEME_SEARCH_KEYS = [
   'accent_color', 'bg_color', 'font_family', 'template',
-  'hero_style', 'bio_layout', 'animate_sections',
+  'hero_style', 'bio_layout', 'events_layout', 'music_layout', 'animate_sections',
   'theme_display_font', 'theme_display_size', 'theme_display_weight',
   'theme_heading_font', 'theme_heading_size', 'theme_heading_weight',
   'theme_subheading_font', 'theme_subheading_size', 'theme_subheading_weight',
@@ -219,6 +219,19 @@ function PublicEPK() {
   const data = Route.useLoaderData()
   const search = Route.useSearch()
 
+  // Preview mode: receive live theme updates via postMessage (no iframe reload)
+  const [previewOverrides, setPreviewOverrides] = useState<Record<string, string>>({})
+  useEffect(() => {
+    if (!search.preview) return
+    function handleMessage(e: MessageEvent) {
+      if (e.data?.type === 'theme-update' && e.data.values) {
+        setPreviewOverrides(e.data.values)
+      }
+    }
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [search.preview])
+
   if (!data) return (
     <div className="min-h-screen bg-bg flex items-center justify-center">
       <p className="text-text-secondary">Page not found.</p>
@@ -228,27 +241,35 @@ function PublicEPK() {
   const { profile, socialLinks, mixes, events, technicalRider, bookingContact, pressAssets, photos: rawPhotos } = data
   const photos = (rawPhotos || []) as PhotoRow[]
 
-  // Build search overrides from all theme params in URL
+  // Build search overrides from URL params or postMessage (preview mode)
   const s = search as Record<string, string | boolean | undefined>
-  const searchOverrides: Record<string, string | undefined> = {
-    // Legacy short names → canonical field names
-    accent_color: (s.accent_color as string) || (search.accent as string | undefined),
-    bg_color: (s.bg_color as string) || (search.bg as string | undefined),
-  }
-  // Map legacy ?font= to both display and body fonts
-  if (search.font) {
-    searchOverrides.theme_display_font = search.font as string
-    searchOverrides.theme_body_font = search.font as string
-  }
-  // Copy all theme_* params from search
-  for (const key of THEME_SEARCH_KEYS) {
-    const val = s[key]
-    if (typeof val === 'string' && val && !(key in searchOverrides && searchOverrides[key])) {
-      searchOverrides[key] = val
+  const ov = Object.keys(previewOverrides).length > 0 ? previewOverrides : null
+
+  const searchOverrides: Record<string, string | undefined> = {}
+  if (ov) {
+    // postMessage overrides are the sole source of truth for theme keys
+    for (const [key, value] of Object.entries(ov)) {
+      if (value != null && value !== '') {
+        searchOverrides[key] = value
+      }
+    }
+  } else {
+    // Initial load: use URL search params
+    searchOverrides.accent_color = (s.accent_color as string) || (search.accent as string | undefined)
+    searchOverrides.bg_color = (s.bg_color as string) || (search.bg as string | undefined)
+    if (search.font) {
+      searchOverrides.theme_display_font = search.font as string
+      searchOverrides.theme_body_font = search.font as string
+    }
+    for (const key of THEME_SEARCH_KEYS) {
+      const val = s[key]
+      if (typeof val === 'string' && val && !(key in searchOverrides && searchOverrides[key])) {
+        searchOverrides[key] = val
+      }
     }
   }
 
-  const searchTemplate = s.template as string | undefined
+  const searchTemplate = ov ? ov.template : (s.template as string | undefined)
   const templateConfig = getTemplate(searchTemplate || profile.template || 'default')
   const theme = resolveTheme(
     profile as Record<string, unknown>,
@@ -256,14 +277,16 @@ function PublicEPK() {
     searchOverrides,
   )
 
-  const heroStyle = (s.hero_style as string) || (search.hero as string | undefined) || profile.hero_style || templateConfig.heroStyle
-  const bioLayout = (s.bio_layout as string) || (search.bioLayout as string | undefined) || profile.bio_layout || templateConfig.bioLayout
+  const heroStyle = (ov ? ov.hero_style : (s.hero_style as string)) || (search.hero as string | undefined) || profile.hero_style || templateConfig.heroStyle
+  const bioLayout = (ov ? ov.bio_layout : (s.bio_layout as string)) || (search.bioLayout as string | undefined) || profile.bio_layout || templateConfig.bioLayout
+  const eventsLayout = (ov ? ov.events_layout : (s.events_layout as string)) || profile.events_layout || templateConfig.eventsLayout
+  const musicLayout = (ov ? ov.music_layout : (s.music_layout as string)) || profile.music_layout || templateConfig.musicLayout
   const sectionOrder = search.sections
     ? (search.sections as string).split(',')
     : profile.section_order || templateConfig.sectionOrder
   const sectionVisibility = (profile.section_visibility || {}) as Record<string, boolean>
-  const searchAnimateSections = s.animate_sections as string | undefined
-  const animateSections = searchAnimateSections != null ? searchAnimateSections !== 'false' : profile.animate_sections !== false
+  const rawAnimateSections = ov ? ov.animate_sections : (s.animate_sections as string | undefined)
+  const animateSections = rawAnimateSections != null ? rawAnimateSections !== 'false' : profile.animate_sections !== false
 
   const accent = theme.accent
   const bg = theme.bg
