@@ -70,7 +70,7 @@ export const getChecklistState = createServerFn({ method: 'GET' }).handler(async
       has_custom_domain: !!profile.custom_domain,
       added_to_email_sig: !!manualProgress.added_to_email_sig,
       included_in_demo: !!manualProgress.included_in_demo,
-      has_custom_theme: (profile.template !== 'default' && profile.template !== 'swiss') || profile.accent_color !== null,
+      has_custom_theme: profile.template !== 'default' && profile.template !== 'swiss',
     },
   }
 })

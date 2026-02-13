@@ -10,7 +10,7 @@ export const Route = createFileRoute('/_dashboard/dashboard/analytics')({
   component: AnalyticsPage,
 })
 
-const CHART_COLORS = ['#FF0000', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981']
+const CHART_COLORS = ['#FF5500', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981']
 
 const TOOLTIP_STYLE = {
   contentStyle: {
