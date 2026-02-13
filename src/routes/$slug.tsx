@@ -601,30 +601,180 @@ function PublicEPK() {
 
             events: events.length > 0 ? (
               <EPKSection key="events" id="events" heading={<>Events <span className="text-accent">&amp;</span> Brands</>} animate={animateSections}>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                  {events.map((event: EventRow) => (
-                    <a
-                      key={event.id}
-                      href={event.link_url || '#'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group block overflow-hidden border hover:border-accent/30 transition-all hover:scale-105"
-                      style={cardStyle}
+                {eventsLayout === 'marquee' ? (
+                  <div>
+                    {/* Hero first event */}
+                    {events[0] && (
+                      <a
+                        href={events[0].link_url || '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group relative block overflow-hidden border hover:border-accent/30 transition-colors mb-4"
+                        style={cardStyle}
+                      >
+                        <div className="aspect-[3/1] overflow-hidden">
+                          {events[0].image_url && (
+                            <img
+                              src={events[0].image_url}
+                              alt={events[0].name}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              loading="lazy"
+                            />
+                          )}
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                        <div className="absolute bottom-0 p-6">
+                          <p className="text-white font-semibold text-lg">{events[0].name}</p>
+                          {formatEventDate(events[0].event_date, events[0].event_date_end) && (
+                            <p className="text-white/70 text-sm mt-1">{formatEventDate(events[0].event_date, events[0].event_date_end)}</p>
+                          )}
+                        </div>
+                      </a>
+                    )}
+                    {/* Remaining events grid */}
+                    {events.length > 1 && (
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {events.slice(1).map((event: EventRow) => (
+                          <a
+                            key={event.id}
+                            href={event.link_url || '#'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group block overflow-hidden border hover:border-accent/30 transition-all hover:scale-105"
+                            style={cardStyle}
+                          >
+                            <div className="aspect-square overflow-hidden" style={{ backgroundColor: 'var(--theme-card-bg)' }}>
+                              {event.image_url && (
+                                <img src={event.image_url} alt={event.name} className="w-full h-full object-cover object-center" loading="lazy" />
+                              )}
+                            </div>
+                            <div className="backdrop-blur-sm px-3 py-2" style={{ backgroundColor: 'var(--theme-card-bg)' }}>
+                              <p className={`text-xs text-center ${textSecClass} leading-tight`}>{event.name}</p>
+                              {formatEventDate(event.event_date, event.event_date_end) && (
+                                <p className={`text-[10px] text-center ${textSecClass} opacity-70 mt-0.5`}>{formatEventDate(event.event_date, event.event_date_end)}</p>
+                              )}
+                            </div>
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : eventsLayout === 'carousel' ? (
+                  <div className="relative">
+                    <div
+                      className="flex gap-4 overflow-x-auto pb-4"
+                      style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}
                     >
-                      <div className="aspect-square overflow-hidden" style={{ backgroundColor: 'var(--theme-card-bg)' }}>
-                        {event.image_url && (
-                          <img src={event.image_url} alt={event.name} className="w-full h-full object-cover object-center" loading="lazy" />
-                        )}
-                      </div>
-                      <div className="backdrop-blur-sm px-3 py-2" style={{ backgroundColor: 'var(--theme-card-bg)' }}>
-                        <p className={`text-xs text-center ${textSecClass} leading-tight`}>{event.name}</p>
-                        {formatEventDate(event.event_date, event.event_date_end) && (
-                          <p className={`text-[10px] text-center ${textSecClass} opacity-70 mt-0.5`}>{formatEventDate(event.event_date, event.event_date_end)}</p>
-                        )}
-                      </div>
-                    </a>
-                  ))}
-                </div>
+                      {events.map((event: EventRow) => (
+                        <a
+                          key={event.id}
+                          href={event.link_url || '#'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group relative flex-none w-[280px] block overflow-hidden border hover:border-accent/30 transition-colors"
+                          style={{ ...cardStyle, scrollSnapAlign: 'start' }}
+                        >
+                          <div className="aspect-[3/4] overflow-hidden">
+                            {event.image_url && (
+                              <img
+                                src={event.image_url}
+                                alt={event.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                loading="lazy"
+                              />
+                            )}
+                          </div>
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                          <div className="absolute bottom-0 p-4">
+                            <p className="text-white font-semibold text-sm">{event.name}</p>
+                            {formatEventDate(event.event_date, event.event_date_end) && (
+                              <p className="text-white/70 text-xs mt-1">{formatEventDate(event.event_date, event.event_date_end)}</p>
+                            )}
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                    {/* Fade edges */}
+                    <div
+                      className="pointer-events-none absolute left-0 top-0 bottom-4 w-8 bg-gradient-to-r from-[var(--bg)] to-transparent"
+                      style={{ '--bg': bg } as React.CSSProperties}
+                    />
+                    <div
+                      className="pointer-events-none absolute right-0 top-0 bottom-4 w-8 bg-gradient-to-l from-[var(--bg)] to-transparent"
+                      style={{ '--bg': bg } as React.CSSProperties}
+                    />
+                  </div>
+                ) : eventsLayout === 'timeline' ? (
+                  <div className="relative">
+                    {/* Vertical accent line */}
+                    <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-accent/30 -translate-x-1/2" />
+                    <div className="space-y-8">
+                      {events.map((event: EventRow, index: number) => (
+                        <div key={event.id} className={`relative flex flex-col ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
+                          {/* Accent dot */}
+                          <div
+                            className="absolute left-4 md:left-1/2 w-3 h-3 rounded-full bg-accent border-2 -translate-x-1/2 mt-4 z-10"
+                            style={{ borderColor: bg }}
+                          />
+                          {/* Hidden spacer */}
+                          <div className="hidden md:block md:w-1/2" />
+                          {/* Card */}
+                          <a
+                            href={event.link_url || '#'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ml-10 md:ml-0 md:w-1/2 flex items-start gap-4 border p-4 hover:border-accent/30 transition-colors"
+                            style={cardStyle}
+                          >
+                            {event.image_url && (
+                              <img
+                                src={event.image_url}
+                                alt={event.name}
+                                className="w-16 h-16 object-cover shrink-0"
+                                loading="lazy"
+                              />
+                            )}
+                            <div className="min-w-0">
+                              <p className="font-semibold text-sm">{event.name}</p>
+                              {formatEventDate(event.event_date, event.event_date_end) && (
+                                <p className={`text-xs ${textSecClass} mt-0.5`}>{formatEventDate(event.event_date, event.event_date_end)}</p>
+                              )}
+                              {event.description && (
+                                <p className={`text-xs ${textSecClass} mt-1 line-clamp-2`}>{event.description}</p>
+                              )}
+                            </div>
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  /* Grid (default) */
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    {events.map((event: EventRow) => (
+                      <a
+                        key={event.id}
+                        href={event.link_url || '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group block overflow-hidden border hover:border-accent/30 transition-all hover:scale-105"
+                        style={cardStyle}
+                      >
+                        <div className="aspect-square overflow-hidden" style={{ backgroundColor: 'var(--theme-card-bg)' }}>
+                          {event.image_url && (
+                            <img src={event.image_url} alt={event.name} className="w-full h-full object-cover object-center" loading="lazy" />
+                          )}
+                        </div>
+                        <div className="backdrop-blur-sm px-3 py-2" style={{ backgroundColor: 'var(--theme-card-bg)' }}>
+                          <p className={`text-xs text-center ${textSecClass} leading-tight`}>{event.name}</p>
+                          {formatEventDate(event.event_date, event.event_date_end) && (
+                            <p className={`text-[10px] text-center ${textSecClass} opacity-70 mt-0.5`}>{formatEventDate(event.event_date, event.event_date_end)}</p>
+                          )}
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                )}
               </EPKSection>
             ) : null,
 
