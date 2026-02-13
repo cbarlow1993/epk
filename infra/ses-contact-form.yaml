@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Vercel OIDC → IAM role with SES send permission for myepk.bio
+
+Resources:
+  VercelSESRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: epk-vercel-ses
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: arn:aws:iam::007511345033:oidc-provider/oidc.vercel.com/chrisjbarlow
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                'oidc.vercel.com/chrisjbarlow:aud': https://vercel.com/chrisjbarlow
+      Policies:
+        - PolicyName: SESSendOnly
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ses:SendEmail
+                  - ses:SendRawEmail
+                Resource: arn:aws:ses:eu-west-1:007511345033:identity/myepk.bio
+
+Outputs:
+  RoleArn:
+    Description: Set as AWS_ROLE_ARN in Vercel
+    Value: !GetAtt VercelSESRole.Arn
