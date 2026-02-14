@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useForm, type UseFormSetValue, type UseFormWatch, type UseFormRegister, type FieldErrors } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { z } from 'zod'
 import { getProfile, updateProfile } from '~/server/profile'
 import { profileUpdateSchema, type ProfileUpdate } from '~/schemas/profile'
@@ -506,6 +506,7 @@ function ThemeEditor() {
     register,
     handleSubmit,
     watch,
+    getValues,
     formState: { errors, isDirty },
     setValue,
   } = useForm<ThemeFormValues>({
@@ -631,16 +632,15 @@ function ThemeEditor() {
   }
 
   // -------------------------------------------------------------------------
-  // Iframe preview — load once, update via postMessage (no reload flicker)
+  // Iframe preview — debounced URL reload on any form change
   // -------------------------------------------------------------------------
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const [previewSrc, setPreviewSrc] = useState('')
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
-  // Build initial iframe URL (runs once)
-  useEffect(() => {
-    if (!initial?.slug) return
-    const values = watch()
+  const buildPreviewUrl = useCallback(() => {
+    if (!initial?.slug) return ''
+    const values = getValues()
     const params = new URLSearchParams()
     params.set('preview', 'true')
     for (const [key, value] of Object.entries(values)) {
@@ -648,30 +648,29 @@ function ThemeEditor() {
         params.set(key, String(value))
       }
     }
-    setPreviewSrc(`/${initial.slug}?${params.toString()}`)
+    return `/${initial.slug}?${params.toString()}`
+  }, [initial?.slug, getValues])
+
+  // Initial iframe load
+  useEffect(() => {
+    if (!initial?.slug) return
+    setPreviewSrc(buildPreviewUrl())
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initial?.slug])
 
-  // Send subsequent updates via postMessage (no iframe reload)
+  // Live preview: debounced iframe URL update on any form change
   useEffect(() => {
-    const subscription = watch((values) => {
+    const subscription = watch(() => {
       clearTimeout(debounceRef.current)
       debounceRef.current = setTimeout(() => {
-        const payload: Record<string, string> = {}
-        for (const [key, value] of Object.entries(values)) {
-          if (key === 'theme_custom_fonts') continue
-          if (value != null && value !== '') {
-            payload[key] = String(value)
-          }
+        const url = buildPreviewUrl()
+        if (url && iframeRef.current) {
+          iframeRef.current.src = url
         }
-        iframeRef.current?.contentWindow?.postMessage(
-          { type: 'theme-update', values: payload },
-          window.location.origin
-        )
-      }, 50)
+      }, 150)
     })
     return () => subscription.unsubscribe()
-  }, [watch])
+  }, [watch, buildPreviewUrl])
 
   // -------------------------------------------------------------------------
   // Accordion sections

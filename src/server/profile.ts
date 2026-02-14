@@ -35,6 +35,8 @@ const ALLOWED_PROFILE_FIELDS = new Set([
   'hero_video_url',
   'animate_sections',
   'bio_layout',
+  'events_layout',
+  'music_layout',
   'press_kit_url',
   // Theme — Typography
   'theme_display_font',

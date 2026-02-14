@@ -294,6 +294,29 @@ function PublicEPK() {
   const name = profile.display_name || 'DJ'
   const isLight = isLightBackground(bg)
 
+  // Dynamically load Google Fonts for preview (search param fonts may differ from DB)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const customFontNames = new Set(
+      ((profile.theme_custom_fonts as Array<{name: string}>) || []).map(f => f.name)
+    )
+    const googleFonts = new Set<string>()
+    for (const font of [theme.displayFont, theme.headingFont, theme.subheadingFont, theme.bodyFont]) {
+      if (font && !customFontNames.has(font)) googleFonts.add(font)
+    }
+    if (googleFonts.size === 0) return
+    const fontParam = [...googleFonts].map(f => `family=${f.replace(/ /g, '+')}:wght@300;400;500;600;700;800;900`).join('&')
+    const linkId = 'preview-google-fonts'
+    let link = document.getElementById(linkId) as HTMLLinkElement | null
+    if (!link) {
+      link = document.createElement('link')
+      link.id = linkId
+      link.rel = 'stylesheet'
+      document.head.appendChild(link)
+    }
+    link.href = `https://fonts.googleapis.com/css2?${fontParam}&display=swap`
+  }, [theme.displayFont, theme.headingFont, theme.subheadingFont, theme.bodyFont, profile.theme_custom_fonts])
+
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
   // Track section views via IntersectionObserver
