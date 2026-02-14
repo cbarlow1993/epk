@@ -676,7 +676,7 @@ function OnboardingWizard() {
                     <CheckLine className="text-accent flex-shrink-0 mt-0.5" />
                     <span className="text-text-primary font-medium">Everything in Free, plus:</span>
                   </li>
-                  {['Custom domain', 'Remove platform branding', 'SEO & social preview controls', 'Advanced theme customization'].map((f) => (
+                  {['Custom domain', 'Remove platform branding', 'Custom social sharing controls', 'Advanced theme customization'].map((f) => (
                     <li key={f} className="flex gap-2.5 text-sm">
                       <CheckLine className="text-accent flex-shrink-0 mt-0.5" />
                       <span className="text-text-primary">{f}</span>

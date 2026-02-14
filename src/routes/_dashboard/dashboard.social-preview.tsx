@@ -9,52 +9,97 @@ import { useDashboardSave } from '~/hooks/useDashboardSave'
 import { DashboardHeader } from '~/components/DashboardHeader'
 import { uploadFileFromInput } from '~/utils/upload'
 import { createCheckoutSession } from '~/server/billing'
-import type { ProfileRow } from '~/types/database'
 
-type SocialPreviewFields = Pick<ProfileUpdate, 'og_title' | 'og_description' | 'og_image_url' | 'twitter_card_type'>
+type SeoFields = Pick<ProfileUpdate, 'meta_description' | 'og_image_url'>
+type ProSocialFields = Pick<ProfileUpdate, 'og_title' | 'og_description' | 'twitter_card_type'>
 
 export const Route = createFileRoute('/_dashboard/dashboard/social-preview')({
   loader: () => getProfile(),
-  component: SocialPreviewEditor,
+  component: SeoSharingEditor,
 })
 
 type PreviewTab = 'facebook' | 'twitter' | 'linkedin'
 
-function SocialPreviewEditor() {
+function SeoSharingEditor() {
   const initial = Route.useLoaderData()
+  const isPro = initial?.tier === 'pro'
 
-  if (initial?.tier !== 'pro') {
-    return <SocialPreviewUpgrade name={initial?.display_name || 'DJ'} initial={initial} />
-  }
   const { saving, saved, error, onSave: save } = useDashboardSave(updateProfile)
   const [uploading, setUploading] = useState(false)
   const [activeTab, setActiveTab] = useState<PreviewTab>('facebook')
+  const [upgradeLoading, setUpgradeLoading] = useState(false)
+  const [upgradeError, setUpgradeError] = useState('')
 
-  const { register, handleSubmit, watch, formState: { errors, isDirty }, setValue } = useForm<SocialPreviewFields>({
+  // SEO fields — available to all users
+  const seoForm = useForm<SeoFields>({
     resolver: zodResolver(
-      profileUpdateSchema.pick({ og_title: true, og_description: true, og_image_url: true, twitter_card_type: true })
+      profileUpdateSchema.pick({ meta_description: true, og_image_url: true })
+    ),
+    defaultValues: {
+      meta_description: initial?.meta_description || '',
+      og_image_url: initial?.og_image_url || '',
+    },
+  })
+
+  // Pro social fields — only used by pro users
+  const proForm = useForm<ProSocialFields>({
+    resolver: zodResolver(
+      profileUpdateSchema.pick({ og_title: true, og_description: true, twitter_card_type: true })
     ),
     defaultValues: {
       og_title: initial?.og_title || '',
       og_description: initial?.og_description || '',
-      og_image_url: initial?.og_image_url || '',
       twitter_card_type: initial?.twitter_card_type || 'summary_large_image',
     },
   })
 
-  const onSave = handleSubmit(save)
+  const isDirty = seoForm.formState.isDirty || (isPro && proForm.formState.isDirty)
+
+  const onSave = async () => {
+    const seoValid = await seoForm.trigger()
+    const proValid = isPro ? await proForm.trigger() : true
+    if (!seoValid || !proValid) return
+
+    const data = {
+      ...seoForm.getValues(),
+      ...(isPro ? proForm.getValues() : {}),
+    }
+    const success = await save(data)
+    if (success) {
+      seoForm.reset(seoForm.getValues())
+      if (isPro) proForm.reset(proForm.getValues())
+    }
+  }
+
+  const handleUpgrade = async () => {
+    setUpgradeLoading(true)
+    setUpgradeError('')
+    try {
+      const result = await createCheckoutSession()
+      if ('url' in result && typeof result.url === 'string') {
+        window.location.href = result.url
+      } else if ('error' in result && typeof result.error === 'string') {
+        setUpgradeError(result.error)
+        setUpgradeLoading(false)
+      }
+    } catch {
+      setUpgradeError('Something went wrong')
+      setUpgradeLoading(false)
+    }
+  }
 
   // Watched values for live preview
-  const ogTitle = watch('og_title')
-  const ogDescription = watch('og_description')
-  const ogImageUrl = watch('og_image_url')
-  const twitterCardType = watch('twitter_card_type')
+  const ogTitle = isPro ? proForm.watch('og_title') : ''
+  const ogDescription = isPro ? proForm.watch('og_description') : ''
+  const ogImageUrl = seoForm.watch('og_image_url')
+  const twitterCardType = isPro ? proForm.watch('twitter_card_type') : 'summary_large_image'
+  const metaDescription = seoForm.watch('meta_description')
 
   // Fallback chain for effective preview values
   const name = initial?.display_name || 'DJ'
   const tagline = initial?.tagline || ''
   const genres = (initial?.genres as string[] | undefined) || []
-  const autoTitle = `${name} | DJ - Official Press Kit`
+  const autoTitle = isPro ? `${name} | DJ - Official Press Kit` : `${name} | myepk.bio`
   const autoDescription = [
     `Official Electronic Press Kit for ${name}.`,
     tagline,
@@ -62,7 +107,7 @@ function SocialPreviewEditor() {
   ].filter(Boolean).join(' — ')
 
   const effectiveTitle = ogTitle || autoTitle
-  const effectiveDescription = ogDescription || initial?.meta_description || autoDescription
+  const effectiveDescription = ogDescription || metaDescription || autoDescription
   const effectiveImage = ogImageUrl || initial?.profile_image_url || ''
   const domain = initial?.slug ? `myepk.bio/${initial.slug}` : 'myepk.bio'
 
@@ -72,12 +117,10 @@ function SocialPreviewEditor() {
     setUploading(true)
     const result = await uploadFileFromInput(file, 'og-images')
     if (result) {
-      setValue('og_image_url', result.url, { shouldDirty: true })
+      seoForm.setValue('og_image_url', result.url, { shouldDirty: true })
     }
     setUploading(false)
   }
-
-  const descriptionLength = (ogDescription || '').length
 
   const tabs: { id: PreviewTab; label: string }[] = [
     { id: 'facebook', label: 'Facebook' },
@@ -86,77 +129,118 @@ function SocialPreviewEditor() {
   ]
 
   return (
-    <form onSubmit={onSave}>
-      <DashboardHeader title="Social Preview" saving={saving} saved={saved} error={error} isDirty={isDirty} />
+    <div>
+      <DashboardHeader title="SEO & Sharing" saving={saving} saved={saved} error={error} isDirty={isDirty} onSave={onSave} />
 
       <div className="grid lg:grid-cols-2 gap-8">
-        {/* Form fields */}
-        <div className="space-y-6">
-          <FormInput
-            label="OG Title"
-            registration={register('og_title')}
-            error={errors.og_title}
-            placeholder={autoTitle}
-          />
+        <div className="space-y-8">
+          {/* SEO section — available to all */}
+          <div className="space-y-6">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-text-secondary">Search Engine (SEO)</h2>
 
-          <div>
-            <FormTextarea
-              label="OG Description"
-              registration={register('og_description')}
-              error={errors.og_description}
-              rows={3}
-              placeholder={initial?.meta_description || autoDescription}
-            />
-            <div className="flex items-center justify-between mt-1">
-              <p className="text-xs text-text-secondary">Leave blank to auto-generate from your profile</p>
-              <p className={`text-xs ${descriptionLength > 300 ? 'text-red-500' : 'text-text-secondary'}`}>
-                {descriptionLength}/300
+            <div>
+              <FormTextarea
+                label="Meta Description"
+                registration={seoForm.register('meta_description')}
+                error={seoForm.formState.errors.meta_description}
+                rows={3}
+                placeholder="Custom description for search engine results..."
+              />
+              <p className="text-xs text-text-secondary mt-1">
+                Shown in Google search results. {(metaDescription || '').length}/300
               </p>
             </div>
           </div>
 
-          {/* OG Image upload */}
-          <div>
-            <label className={FORM_LABEL}>Social Card Image</label>
-            <p className="text-xs text-text-secondary mb-3">Recommended size: 1200 x 630 pixels</p>
-            {effectiveImage && (
-              <div className="mb-3 border border-border overflow-hidden">
-                <img
-                  src={effectiveImage}
-                  alt="Social card preview"
-                  className="w-full aspect-[1200/630] object-cover"
+          {/* Social sharing section */}
+          <div className="space-y-6">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-text-secondary">Social Sharing</h2>
+
+            {/* Social card image — available to all */}
+            <div>
+              <label className={FORM_LABEL}>Social Card Image</label>
+              <p className="text-xs text-text-secondary mb-3">Recommended size: 1200 x 630 pixels</p>
+              {effectiveImage && (
+                <div className="mb-3 border border-border overflow-hidden">
+                  <img
+                    src={effectiveImage}
+                    alt="Social card preview"
+                    className="w-full aspect-[1200/630] object-cover"
+                  />
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                disabled={uploading}
+                className={FORM_FILE_INPUT}
+              />
+              {uploading && <p className="text-xs text-text-secondary mt-1">Uploading...</p>}
+              {ogImageUrl && (
+                <button
+                  type="button"
+                  onClick={() => seoForm.setValue('og_image_url', '', { shouldDirty: true })}
+                  className="text-xs text-red-500 hover:underline mt-1"
+                >
+                  Remove image
+                </button>
+              )}
+            </div>
+
+            {isPro ? (
+              <>
+                <FormInput
+                  label="OG Title"
+                  registration={proForm.register('og_title')}
+                  error={proForm.formState.errors.og_title}
+                  placeholder={autoTitle}
                 />
+
+                <div>
+                  <FormTextarea
+                    label="OG Description"
+                    registration={proForm.register('og_description')}
+                    error={proForm.formState.errors.og_description}
+                    rows={3}
+                    placeholder={metaDescription || autoDescription}
+                  />
+                  <div className="flex items-center justify-between mt-1">
+                    <p className="text-xs text-text-secondary">Leave blank to use meta description or auto-generate</p>
+                    <p className={`text-xs ${(ogDescription || '').length > 300 ? 'text-red-500' : 'text-text-secondary'}`}>
+                      {(ogDescription || '').length}/300
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <label className={FORM_LABEL}>Twitter Card Type</label>
+                  <select
+                    {...proForm.register('twitter_card_type')}
+                    className={FORM_INPUT}
+                  >
+                    <option value="summary_large_image">Large Image Card</option>
+                    <option value="summary">Summary Card (small thumbnail)</option>
+                  </select>
+                </div>
+              </>
+            ) : (
+              <div className="border border-border rounded-lg p-5 space-y-3">
+                <p className="text-sm font-medium text-text-primary">Upgrade to customise title & description</p>
+                <p className="text-sm text-text-secondary">
+                  Free accounts display <span className="font-medium text-text-primary">"{autoTitle}"</span> as the social preview title. Upgrade to Pro to set a custom title, description, and Twitter card type.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleUpgrade}
+                  disabled={upgradeLoading}
+                  className="bg-accent hover:brightness-110 disabled:opacity-30 text-white text-sm font-medium px-6 py-2 transition-colors"
+                >
+                  {upgradeLoading ? 'Loading...' : 'Upgrade to Pro'}
+                </button>
+                {upgradeError && <p className="text-xs text-red-500 mt-2">{upgradeError}</p>}
               </div>
             )}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              disabled={uploading}
-              className={FORM_FILE_INPUT}
-            />
-            {uploading && <p className="text-xs text-text-secondary mt-1">Uploading...</p>}
-            {ogImageUrl && (
-              <button
-                type="button"
-                onClick={() => setValue('og_image_url', '', { shouldDirty: true })}
-                className="text-xs text-red-500 hover:underline mt-1"
-              >
-                Remove image
-              </button>
-            )}
-          </div>
-
-          {/* Twitter card type */}
-          <div>
-            <label className={FORM_LABEL}>Twitter Card Type</label>
-            <select
-              {...register('twitter_card_type')}
-              className={FORM_INPUT}
-            >
-              <option value="summary_large_image">Large Image Card</option>
-              <option value="summary">Summary Card (small thumbnail)</option>
-            </select>
           </div>
         </div>
 
@@ -212,7 +296,7 @@ function SocialPreviewEditor() {
           </p>
         </div>
       </div>
-    </form>
+    </div>
   )
 }
 
@@ -315,140 +399,3 @@ function LinkedInPreview({ title, imageUrl, domain }: {
   )
 }
 
-/* ---------- Pro Upgrade Prompt ---------- */
-
-function SocialPreviewUpgrade({ name, initial }: { name: string; initial: ProfileRow | null }) {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [uploading, setUploading] = useState(false)
-  const [ogImageUrl, setOgImageUrl] = useState(initial?.og_image_url || '')
-  const [savedImageUrl, setSavedImageUrl] = useState(initial?.og_image_url || '')
-  const [saving, setSaving] = useState(false)
-  const [saved, setSaved] = useState(false)
-  const [saveError, setSaveError] = useState('')
-
-  const handleUpgrade = async () => {
-    setLoading(true)
-    setError('')
-    try {
-      const result = await createCheckoutSession()
-      if ('url' in result && typeof result.url === 'string') {
-        window.location.href = result.url
-      } else if ('error' in result && typeof result.error === 'string') {
-        setError(result.error)
-        setLoading(false)
-      }
-    } catch {
-      setError('Something went wrong')
-      setLoading(false)
-    }
-  }
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setUploading(true)
-    const result = await uploadFileFromInput(file, 'og-images')
-    if (result) {
-      setOgImageUrl(result.url)
-    }
-    setUploading(false)
-  }
-
-  const handleSaveImage = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSaving(true)
-    setSaved(false)
-    setSaveError('')
-    try {
-      const result = await updateProfile({ data: { og_image_url: ogImageUrl } })
-      if ('error' in result && typeof result.error === 'string') {
-        setSaveError(result.error)
-      } else {
-        setSaved(true)
-        setSavedImageUrl(ogImageUrl)
-        setTimeout(() => setSaved(false), 3000)
-      }
-    } catch {
-      setSaveError('Failed to save. Please try again.')
-    }
-    setSaving(false)
-  }
-
-  const effectiveImage = ogImageUrl || initial?.profile_image_url || ''
-  const defaultTitle = `${name} | myepk.bio`
-  const isDirty = ogImageUrl !== savedImageUrl
-
-  return (
-    <form onSubmit={handleSaveImage}>
-      <DashboardHeader title="Social Preview" saving={saving} saved={saved} error={saveError} isDirty={isDirty} />
-
-      <div className="grid lg:grid-cols-2 gap-8">
-        <div className="space-y-6">
-          {/* Image upload — available on free plan */}
-          <div>
-            <label className={FORM_LABEL}>Social Card Image</label>
-            <p className="text-xs text-text-secondary mb-3">Recommended size: 1200 x 630 pixels</p>
-            {effectiveImage && (
-              <div className="mb-3 border border-border overflow-hidden">
-                <img
-                  src={effectiveImage}
-                  alt="Social card preview"
-                  className="w-full aspect-[1200/630] object-cover"
-                />
-              </div>
-            )}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              disabled={uploading}
-              className={FORM_FILE_INPUT}
-            />
-            {uploading && <p className="text-xs text-text-secondary mt-1">Uploading...</p>}
-            {ogImageUrl && (
-              <button
-                type="button"
-                onClick={() => setOgImageUrl('')}
-                className="text-xs text-red-500 hover:underline mt-1"
-              >
-                Remove image
-              </button>
-            )}
-          </div>
-
-          {/* Pro upsell for title/description/card type */}
-          <div className="border border-border rounded-lg p-5 space-y-3">
-            <p className="text-sm font-medium text-text-primary">Upgrade to customise title & description</p>
-            <p className="text-sm text-text-secondary">
-              Free accounts display <span className="font-medium text-text-primary">"{defaultTitle}"</span> as the social preview title. Upgrade to Pro to set a custom title, description, and Twitter card type.
-            </p>
-            <button
-              type="button"
-              onClick={handleUpgrade}
-              disabled={loading}
-              className="bg-accent hover:brightness-110 disabled:opacity-30 text-white text-sm font-medium px-6 py-2 transition-colors"
-            >
-              {loading ? 'Loading...' : 'Upgrade to Pro'}
-            </button>
-            {error && <p className="text-xs text-red-500 mt-2">{error}</p>}
-          </div>
-        </div>
-
-        {/* Preview */}
-        <div>
-          <label className={FORM_LABEL}>Preview</label>
-          <FacebookPreview
-            title={defaultTitle}
-            description={`Official Electronic Press Kit for ${name}.`}
-            imageUrl={effectiveImage}
-            domain="myepk.bio"
-          />
-          <p className="text-xs text-text-secondary mt-4">
-            This preview is an approximation. Actual appearance may vary by platform.
-          </p>
-        </div>
-      </div>
-    </form>
-  )
-}

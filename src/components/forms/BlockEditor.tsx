@@ -77,10 +77,7 @@ export const BlockEditor = forwardRef<BlockEditorHandle, BlockEditorProps>(
             { default: NestedList },
             { default: Quote },
             { default: Delimiter },
-            { default: ImageTool },
             { default: Embed },
-            { default: AttachesTool },
-            { default: Table },
             { default: Columns },
             { default: TextVariantTune },
           ] = await Promise.all([
@@ -89,10 +86,7 @@ export const BlockEditor = forwardRef<BlockEditorHandle, BlockEditorProps>(
             import('@editorjs/nested-list'),
             import('@editorjs/quote'),
             import('@editorjs/delimiter'),
-            import('@editorjs/image'),
             import('@editorjs/embed'),
-            import('@editorjs/attaches'),
-            import('@editorjs/table'),
             import('@calumk/editorjs-columns'),
             import('@editorjs/text-variant-tune'),
           ])
@@ -120,20 +114,6 @@ export const BlockEditor = forwardRef<BlockEditorHandle, BlockEditorProps>(
               inlineToolbar: true,
             },
             delimiter: Delimiter as unknown as EditorJS.BlockToolConstructable,
-            image: {
-              class: ImageTool as unknown as EditorJS.BlockToolConstructable,
-              config: {
-                uploader: {
-                  async uploadByFile(file: Blob) {
-                    const formData = new FormData()
-                    formData.append('file', file)
-                    formData.append('type', 'image')
-                    const res = await fetch('/api/upload', { method: 'POST', body: formData })
-                    return res.json()
-                  },
-                },
-              },
-            },
             embed: {
               class: Embed as unknown as EditorJS.BlockToolConstructable,
               config: {
@@ -148,24 +128,6 @@ export const BlockEditor = forwardRef<BlockEditorHandle, BlockEditorProps>(
                   },
                 },
               },
-            },
-            attaches: {
-              class: AttachesTool as unknown as EditorJS.BlockToolConstructable,
-              config: {
-                uploader: {
-                  async uploadByFile(file: File) {
-                    const formData = new FormData()
-                    formData.append('file', file)
-                    formData.append('type', 'attachment')
-                    const res = await fetch('/api/upload', { method: 'POST', body: formData })
-                    return res.json()
-                  },
-                },
-              },
-            },
-            table: {
-              class: Table as unknown as EditorJS.BlockToolConstructable,
-              inlineToolbar: true,
             },
           }
 

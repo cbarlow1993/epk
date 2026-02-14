@@ -117,7 +117,6 @@ function SettingsPage() {
 function BrandingSection({ profile }: { profile: ProfileRow | null }) {
   const [faviconUrl, setFaviconUrl] = useState(profile?.favicon_url || '')
   const [hideBranding, setHideBranding] = useState(profile?.hide_platform_branding || false)
-  const [metaDescription, setMetaDescription] = useState(profile?.meta_description || '')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
@@ -139,7 +138,6 @@ function BrandingSection({ profile }: { profile: ProfileRow | null }) {
       data: {
         favicon_url: faviconUrl || undefined,
         hide_platform_branding: hideBranding,
-        meta_description: metaDescription || undefined,
       },
     })
     setSaving(false)
@@ -176,18 +174,6 @@ function BrandingSection({ profile }: { profile: ProfileRow | null }) {
           <label htmlFor="hide-branding" className="text-sm text-text-secondary cursor-pointer">
             Hide &ldquo;Built with myEPK&rdquo; footer
           </label>
-        </div>
-        <div>
-          <label className={FORM_LABEL}>
-            Custom Meta Description <span className="text-text-secondary/50 normal-case font-normal">({metaDescription.length}/300)</span>
-          </label>
-          <textarea
-            value={metaDescription}
-            onChange={(e) => setMetaDescription(e.target.value.slice(0, 300))}
-            placeholder="Custom description for search engines and social sharing..."
-            rows={3}
-            className={FORM_INPUT + ' resize-none'}
-          />
         </div>
         <div className="flex items-center gap-3">
           <button

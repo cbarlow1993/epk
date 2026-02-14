@@ -6,9 +6,10 @@ interface DashboardHeaderProps {
   isDirty: boolean
   sectionEnabled?: boolean
   onToggleSection?: () => void
+  onSave?: () => void
 }
 
-export function DashboardHeader({ title, saving, saved, error, isDirty, sectionEnabled, onToggleSection }: DashboardHeaderProps) {
+export function DashboardHeader({ title, saving, saved, error, isDirty, sectionEnabled, onToggleSection, onSave }: DashboardHeaderProps) {
   return (
     <div className="flex items-center justify-between mb-8 pb-6 border-b border-border">
       <div className="flex items-center gap-4">
@@ -39,7 +40,8 @@ export function DashboardHeader({ title, saving, saved, error, isDirty, sectionE
         {saved && <span className="text-xs font-semibold uppercase tracking-wider text-green-400">Saved</span>}
         {error && <span className="text-xs text-red-500">{error}</span>}
         <button
-          type="submit"
+          type={onSave ? 'button' : 'submit'}
+          onClick={onSave}
           disabled={saving || !isDirty}
           className="px-6 py-2 text-xs font-semibold uppercase tracking-wider bg-accent text-white hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >

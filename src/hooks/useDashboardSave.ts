@@ -8,10 +8,11 @@ export function useDashboardSave<T extends Record<string, unknown>>(mutationFn: 
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
 
-  const onSave = async (data: T) => {
+  const onSave = async (data: T): Promise<boolean> => {
     setSaving(true)
     setSaved(false)
     setError('')
+    let success = false
     try {
       const result = await mutationFn({ data })
       if ('error' in result && typeof result.error === 'string') {
@@ -19,11 +20,13 @@ export function useDashboardSave<T extends Record<string, unknown>>(mutationFn: 
       } else {
         setSaved(true)
         setTimeout(() => setSaved(false), 3000)
+        success = true
       }
     } catch {
       setError('Failed to save. Please try again.')
     }
     setSaving(false)
+    return success
   }
 
   return { saving, saved, error, onSave }

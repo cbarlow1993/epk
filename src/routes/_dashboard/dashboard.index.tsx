@@ -34,7 +34,7 @@ const PHASES: { title: string; items: ChecklistItem[] }[] = [
     title: 'Go live & share',
     items: [
       { key: 'is_published', label: 'Publish your EPK', description: 'Flip the switch in the sidebar to make your page live.', type: 'auto' },
-      { key: 'has_social_preview', label: 'Set up your social preview', description: 'Control how your link looks when shared on social media.', type: 'auto', link: '/dashboard/social-preview' },
+      { key: 'has_social_preview', label: 'Set up SEO & sharing', description: 'Control how your link looks in search results and social media.', type: 'auto', link: '/dashboard/social-preview' },
       { key: 'shared_social', label: 'Share your EPK on social media', description: 'Post your EPK link on Instagram, Twitter, or Facebook.', type: 'manual' },
       { key: 'added_to_bio', label: 'Add your EPK link to your bio/Linktree', description: 'Make your EPK easy to find from your social profiles.', type: 'manual' },
       { key: 'sent_to_promoter', label: 'Send your EPK to a promoter or venue', description: 'Email your link to someone who books shows.', type: 'manual' },
@@ -188,7 +188,7 @@ function DashboardContent({ initialState, tier, hasSnapshot }: { initialState: C
 const PRO_FEATURES = [
   { label: 'Custom domain', description: 'Use your own domain for a professional look' },
   { label: 'Remove platform branding', description: 'A clean page with just your brand' },
-  { label: 'SEO & social preview controls', description: 'Control how your link appears when shared' },
+  { label: 'Custom social sharing controls', description: 'Set custom OG title, description & Twitter card type' },
   { label: 'Advanced theme customization', description: 'Custom colors, fonts, spacing & effects' },
 ]
 
