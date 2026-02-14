@@ -10,6 +10,7 @@ import { getTemplate, resolveTheme } from '~/utils/templates'
 import { isLightBackground } from '~/utils/color'
 import type { MixRow, EventRow, SocialLinkRow, FileRow } from '~/types/database'
 import { formatEventDate } from '~/utils/dates'
+import { SocialIcon } from '~/components/SocialIcon'
 
 type PhotoRow = { id: string; image_url: string; caption: string | null; sort_order: number }
 
@@ -510,9 +511,9 @@ function PublicEPK() {
                     rel="noopener noreferrer"
                     title={link.platform}
                     aria-label={`${link.platform} profile`}
-                    className={`w-10 h-10 rounded-full border ${profile.hero_image_url || profile.hero_video_url ? 'border-white/20 hover:border-accent hover:text-accent' : `${socialBorderClass} hover:border-accent hover:text-accent`} flex items-center justify-center text-sm font-semibold transition-colors`}
+                    className={`w-10 h-10 rounded-full border ${profile.hero_image_url || profile.hero_video_url ? 'border-white/20 hover:border-accent hover:text-accent' : `${socialBorderClass} hover:border-accent hover:text-accent`} flex items-center justify-center transition-colors`}
                   >
-                    {link.platform.charAt(0)}
+                    <SocialIcon platform={link.platform} />
                   </a>
                 ))}
               </div>
