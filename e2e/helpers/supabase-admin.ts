@@ -78,3 +78,315 @@ export async function resetTestProfile(email: string) {
     published: false,
   }).eq('id', user.id)
 }
+
+// --- Profile-specific resets ---
+
+export async function resetTestProfileBio(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found`)
+  await admin.from('profiles').update({
+    bio: null,
+    bio_layout: 'two-column',
+    profile_image_url: null,
+  }).eq('id', user.id)
+}
+
+export async function resetTestProfileHero(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found`)
+  await admin.from('profiles').update({
+    hero_style: 'fullbleed',
+    tagline: '',
+    hero_image_url: null,
+    hero_video_url: null,
+  }).eq('id', user.id)
+}
+
+export async function getTestProfileHeroData(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found`)
+  const { data } = await admin.from('profiles')
+    .select('hero_style, tagline, hero_image_url, hero_video_url, bio, bio_layout, profile_image_url')
+    .eq('id', user.id).single()
+  return data
+}
+
+export async function publishTestProfile(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found`)
+  await admin.from('profiles').update({ published: true }).eq('id', user.id)
+}
+
+export async function getTestProfileSlug(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found`)
+  const { data } = await admin.from('profiles').select('slug').eq('id', user.id).single()
+  return data?.slug as string
+}
+
+export async function resetOnboardingStatus(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found`)
+  await admin.from('profiles').update({ onboarding_completed: false }).eq('id', user.id)
+}
+
+// --- Theme ---
+
+export async function resetTestTheme(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found`)
+  await admin.from('profiles').update({
+    accent_color: '#6366f1',
+    bg_color: '#0f0f23',
+    template: null,
+    animate_sections: true,
+  }).eq('id', user.id)
+}
+
+export async function getTestThemeData(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found`)
+  const { data } = await admin.from('profiles')
+    .select('accent_color, bg_color, template, animate_sections')
+    .eq('id', user.id).single()
+  return data
+}
+
+// --- Mixes ---
+
+export async function deleteTestMixes(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) return
+  await admin.from('mixes').delete().eq('profile_id', user.id)
+}
+
+export async function getTestMixes(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found`)
+  const { data } = await admin.from('mixes')
+    .select('*')
+    .eq('profile_id', user.id)
+    .order('sort_order', { ascending: true })
+  return data || []
+}
+
+// --- Events ---
+
+export async function deleteTestEvents(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) return
+  await admin.from('events').delete().eq('profile_id', user.id)
+}
+
+export async function getTestEvents(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found`)
+  const { data } = await admin.from('events')
+    .select('*')
+    .eq('profile_id', user.id)
+    .order('sort_order', { ascending: true })
+  return data || []
+}
+
+// --- Photos ---
+
+export async function deleteTestPhotos(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) return
+  await admin.from('photos').delete().eq('profile_id', user.id)
+}
+
+export async function getTestPhotos(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found`)
+  const { data } = await admin.from('photos')
+    .select('*')
+    .eq('profile_id', user.id)
+    .order('sort_order', { ascending: true })
+  return data || []
+}
+
+// --- Booking Contact ---
+
+export async function resetTestBookingContact(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found`)
+  await admin.from('booking_contact').delete().eq('profile_id', user.id)
+}
+
+export async function getTestBookingContact(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found`)
+  const { data } = await admin.from('booking_contact')
+    .select('*')
+    .eq('profile_id', user.id)
+    .single()
+  return data
+}
+
+// --- Technical Rider ---
+
+export async function resetTestTechnicalRider(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found`)
+  await admin.from('technical_rider').delete().eq('profile_id', user.id)
+}
+
+export async function getTestTechnicalRider(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found`)
+  const { data } = await admin.from('technical_rider')
+    .select('*')
+    .eq('profile_id', user.id)
+    .single()
+  return data
+}
+
+// --- Files & Folders ---
+
+export async function deleteTestFiles(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) return
+  await admin.from('files').delete().eq('profile_id', user.id)
+}
+
+export async function deleteTestFolders(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) return
+  await admin.from('folders').delete().eq('profile_id', user.id)
+}
+
+// --- Integrations ---
+
+export async function resetTestIntegrations(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found`)
+  await admin.from('profiles').update({ integrations: null }).eq('id', user.id)
+}
+
+export async function getTestIntegrations(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found`)
+  const { data } = await admin.from('profiles')
+    .select('integrations')
+    .eq('id', user.id)
+    .single()
+  return (data?.integrations as Array<{ type: string; enabled: boolean; config: Record<string, string> }>) || []
+}
+
+// --- Social Links ---
+
+export async function deleteTestSocialLinks(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) return
+  await admin.from('social_links').delete().eq('profile_id', user.id)
+}
+
+export async function getTestSocialLinks(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found`)
+  const { data } = await admin.from('social_links')
+    .select('*')
+    .eq('profile_id', user.id)
+    .order('sort_order', { ascending: true })
+  return data || []
+}
+
+// --- Full profile data (extended) ---
+
+export async function getTestProfileFull(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found`)
+  const { data } = await admin.from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single()
+  return data
+}
+
+// --- Reset all flow test data ---
+
+export async function resetAllFlowTestData(email: string) {
+  await deleteTestMixes(email)
+  await deleteTestEvents(email)
+  await deleteTestPhotos(email)
+  await deleteTestFiles(email)
+  await deleteTestFolders(email)
+  await deleteTestSocialLinks(email)
+  await resetTestBookingContact(email).catch(() => {})
+  await resetTestTechnicalRider(email).catch(() => {})
+  await resetTestIntegrations(email)
+
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) return
+
+  await admin.from('profiles').update({
+    display_name: 'DJ FlowTest',
+    tagline: '',
+    genres: [],
+    published: false,
+    bio: null,
+    bio_layout: 'two-column',
+    hero_style: 'fullbleed',
+    hero_image_url: null,
+    hero_video_url: null,
+    profile_image_url: null,
+    accent_color: '#6366f1',
+    bg_color: '#0f0f23',
+    template: null,
+    animate_sections: true,
+    onboarding_completed: true,
+  }).eq('id', user.id)
+}
