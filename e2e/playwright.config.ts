@@ -33,6 +33,34 @@ export default defineConfig({
       name: 'auth',
       testMatch: 'auth.spec.ts',
     },
+    {
+      name: 'landing',
+      testMatch: 'landing.spec.ts',
+    },
+    {
+      name: 'onboarding',
+      testMatch: 'onboarding.spec.ts',
+    },
+    {
+      name: 'password-reset',
+      testMatch: 'password-reset.spec.ts',
+    },
+    {
+      name: 'public-epk',
+      testMatch: 'public-epk.spec.ts',
+    },
+    {
+      name: 'flow-setup',
+      testMatch: 'flow-01-auth.spec.ts',
+    },
+    {
+      name: 'flow',
+      testMatch: /flow-(?!01).*\.spec\.ts/,
+      dependencies: ['flow-setup'],
+      use: {
+        storageState: path.resolve(__dirname, '.auth/flow-user.json'),
+      },
+    },
   ],
   webServer: {
     command: 'npm run dev',
