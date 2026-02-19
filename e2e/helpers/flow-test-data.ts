@@ -31,9 +31,9 @@ export const HERO_DATA = {
 }
 
 export const MIXES = [
-  { title: 'Summer Vibes 2025', url: 'https://soundcloud.com/test/summer-vibes', category: 'DJ Sets' },
-  { title: 'Warehouse Sessions', url: 'https://soundcloud.com/test/warehouse', category: 'DJ Sets' },
-  { title: 'Original - Midnight', url: 'https://soundcloud.com/test/midnight', category: 'Originals' },
+  { title: 'Summer Vibes 2025', url: 'https://example.com/mixes/summer-vibes', category: 'DJ Sets' },
+  { title: 'Warehouse Sessions', url: 'https://example.com/mixes/warehouse', category: 'DJ Sets' },
+  { title: 'Original - Midnight', url: 'https://example.com/mixes/midnight', category: 'Originals' },
 ] as const
 
 export const EVENTS = [
@@ -57,7 +57,7 @@ export const CONTACT_DATA = {
 export const THEME_DATA = {
   accentColor: '#ff6600',
   bgColor: '#1a1a2e',
-  template: 'Underground',
+  template: 'Dark',
   animateSections: true,
 }
 
@@ -83,8 +83,8 @@ export const EDITS = {
   bioLayout: 'two-column' as const,
   accentColor: '#00ff88',
   bgColor: '#0d0d1a',
-  newMix: { title: 'Winter Mix 2025', url: 'https://soundcloud.com/test/winter-mix', category: 'DJ Sets' },
+  newMix: { title: 'Winter Mix 2025', url: 'https://example.com/mixes/winter-mix', category: 'DJ Sets' },
   editedMixTitle: 'Summer Vibes 2025 (Remastered)',
   editedEventName: 'Fabric London 2025',
-  contactPhone: '+44 7700 900001',
+  contactPhone: '+44 7700 900002',
 }

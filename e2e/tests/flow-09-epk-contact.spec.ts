@@ -1,10 +1,16 @@
 import { test, expect } from '@playwright/test'
 import { fillRHFInput, navigateTo, clickSaveAndWait } from '../helpers/flow-helpers'
 import { FLOW_USER, CONTACT_DATA } from '../helpers/flow-test-data'
-import { getTestBookingContact } from '../helpers/supabase-admin'
+import { getTestBookingContact, ensureTestBookingContact } from '../helpers/supabase-admin'
 
 test.describe('Flow 09: EPK Contact', () => {
   test.describe.configure({ mode: 'serial' })
+
+  test.beforeAll(async () => {
+    // Ensure a booking_contact row exists — the server uses .update().single()
+    // which fails if no row exists
+    await ensureTestBookingContact(FLOW_USER.email)
+  })
 
   test('load contact page and verify empty fields', async ({ page }) => {
     await navigateTo(page, '/dashboard/contact', 'input[name="manager_name"]')

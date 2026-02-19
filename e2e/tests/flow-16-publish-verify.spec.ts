@@ -43,8 +43,8 @@ test.describe('Flow 16: Publish & Verify Public EPK', () => {
     await waitForHydration(page, 'h1')
 
     // Genres set during flow-03: House, Techno, Drum & Bass
-    await expect(page.getByText('House')).toBeVisible()
-    await expect(page.getByText('Techno')).toBeVisible()
+    await expect(page.getByText('House', { exact: true })).toBeVisible()
+    await expect(page.getByText('Techno', { exact: true })).toBeVisible()
   })
 
   // -----------------------------------------------------------------------

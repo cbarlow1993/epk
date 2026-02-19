@@ -124,7 +124,7 @@ function MusicEditor() {
 
     const payload: Record<string, unknown> = {
       ...data,
-      image_url: imageUrl || null,
+      image_url: imageUrl || '',
       platform,
       embed_html,
     }

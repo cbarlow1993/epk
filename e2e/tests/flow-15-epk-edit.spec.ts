@@ -115,10 +115,9 @@ test.describe('Flow 15: EPK Edit', () => {
   test('edit first mix title via Edit modal', async ({ page }) => {
     await navigateTo(page, '/dashboard/music', 'h1')
 
-    // Find the first mix's Edit button — it is the first "Edit" button on the page.
-    // The mixes are grouped by category; "DJ Sets" category contains our first mix.
-    const firstEditButton = page.locator('button', { hasText: 'Edit' }).first()
-    await firstEditButton.click()
+    // Find the Summer Vibes mix row and click its Edit button (items are divs, not li)
+    const mixRow = page.locator('.bg-surface').filter({ hasText: 'Summer Vibes 2025' }).first()
+    await mixRow.locator('button', { hasText: 'Edit' }).click()
 
     // Verify edit modal opened
     await expect(page.locator('h2', { hasText: 'Edit Mix' })).toBeVisible()
@@ -140,9 +139,9 @@ test.describe('Flow 15: EPK Edit', () => {
     await navigateTo(page, '/dashboard/events', 'h1')
     await expect(page.locator('h1')).toHaveText('Events / Brands')
 
-    // Click the first Edit button (for the first event)
-    const firstEditButton = page.locator('button', { hasText: 'Edit' }).first()
-    await firstEditButton.click()
+    // Find the Fabric London event row and click its Edit button (items are divs, not li)
+    const fabricRow = page.locator('.bg-surface').filter({ hasText: 'Fabric London' }).first()
+    await fabricRow.locator('button', { hasText: 'Edit' }).click()
 
     // Verify edit modal opened
     await expect(page.locator('h2', { hasText: 'Edit Event' })).toBeVisible()
@@ -190,8 +189,13 @@ test.describe('Flow 15: EPK Edit', () => {
     // Fill accent color
     await fillRHFInput(page, 'input[name="accent_color"]', EDITS.accentColor)
 
-    // Fill background color
-    await fillRHFInput(page, 'input[name="bg_color"]', EDITS.bgColor)
+    // Fill background color (use focus() instead of click — accordion header overlaps the input)
+    const bgInput = page.locator('input[name="bg_color"]')
+    await bgInput.focus()
+    await page.keyboard.press('Meta+a')
+    await page.keyboard.press('Backspace')
+    await bgInput.pressSequentially(EDITS.bgColor, { delay: 20 })
+    await bgInput.blur()
 
     // Save
     await clickSaveAndWait(page)

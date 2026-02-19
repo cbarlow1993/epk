@@ -2,7 +2,7 @@ import { chromium, type FullConfig } from '@playwright/test'
 import dotenv from 'dotenv'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { createTestUser, deleteTestUser } from './helpers/supabase-admin'
+import { createTestUser, deleteTestUser, completeOnboarding } from './helpers/supabase-admin'
 import { TEST_USER } from './helpers/test-data'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -13,8 +13,9 @@ export default async function globalSetup(_config: FullConfig) {
   // Clean up any leftover test user from previous failed runs
   await deleteTestUser(TEST_USER.email)
 
-  // Create fresh test user
+  // Create fresh test user and mark onboarding complete so login redirects to /dashboard
   await createTestUser(TEST_USER.email, TEST_USER.password, TEST_USER.displayName)
+  await completeOnboarding(TEST_USER.email)
 
   // Log in via browser to capture auth cookies
   const browser = await chromium.launch()

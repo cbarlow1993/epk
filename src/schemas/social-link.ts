@@ -27,9 +27,11 @@ export const socialLinkUpsertSchema = z.object({
   sort_order: z.number().int().min(0).optional(),
 })
 
-/** Schema for bulk-saving all social links from the profile page */
+/** Schema for bulk-saving all social links from the profile page.
+ *  Uses z.string() for keys because z.record(z.enum(...)) requires ALL enum
+ *  values, but the UI only sends FIXED_SOCIAL_PLATFORMS (excludes 'other'). */
 export const socialLinksBulkSchema = z.record(
-  z.enum(SOCIAL_PLATFORMS),
+  z.string(),
   z.string().url('Must be a valid URL').or(z.literal('')),
 )
 

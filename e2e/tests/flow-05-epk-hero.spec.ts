@@ -37,14 +37,14 @@ test.describe('Flow 05: EPK Hero', () => {
     await expect(page.getByText('Hero Media')).toBeVisible()
 
     // Image media type should be selected by default
-    const imageBtn = page.locator('button', { hasText: 'Image' }).first()
+    const imageBtn = page.locator('button', { hasText: 'Static image background' })
     await expect(imageBtn).toHaveClass(/border-accent/)
 
     // Upload hero image
-    await uploadFixture(page, 'input[type="file"]', 'test-hero.jpg')
+    await uploadFixture(page, 'input[type="file"][accept="image/*"]', 'test-hero.jpg')
 
-    // Wait for upload to complete
-    await expect(page.getByText('Uploading...')).not.toBeVisible({ timeout: 15_000 })
+    // Wait for upload to complete — "Remove Image" button appears when done
+    await expect(page.locator('button', { hasText: 'Remove Image' })).toBeVisible({ timeout: 15_000 })
   })
 
   test('save and verify hero data in DB', async ({ page }) => {
@@ -58,8 +58,10 @@ test.describe('Flow 05: EPK Hero', () => {
     await fillRHFInput(page, 'input[name="tagline"]', HERO_DATA.tagline)
 
     // Upload hero image
-    await uploadFixture(page, 'input[type="file"]', 'test-hero.jpg')
-    await expect(page.getByText('Uploading...')).not.toBeVisible({ timeout: 15_000 })
+    await uploadFixture(page, 'input[type="file"][accept="image/*"]', 'test-hero.jpg')
+
+    // Wait for upload to complete
+    await expect(page.locator('button', { hasText: 'Remove Image' })).toBeVisible({ timeout: 15_000 })
 
     // Save
     await clickSaveAndWait(page)
@@ -83,28 +85,24 @@ test.describe('Flow 05: EPK Hero', () => {
     await minimalBtn.click()
     await expect(minimalBtn).toHaveClass(/border-accent/)
 
-    // Hero Media section should be hidden
-    await expect(page.getByText('Hero Media')).not.toBeVisible()
+    // Hero Media label should be hidden (use label locator to avoid matching preview text)
+    await expect(page.locator('label', { hasText: 'Hero Media' })).not.toBeVisible()
 
     // Preview should show minimal message
     await expect(page.getByText('Minimal style does not display hero media.')).toBeVisible()
   })
 
-  test('switch back to Contained and save', async ({ page }) => {
+  test('reload confirms Contained is still saved (Minimal was not saved)', async ({ page }) => {
     await navigateTo(page, '/dashboard/hero', 'h1')
 
-    // Switch to Contained
+    // Contained should still be selected (Minimal click in previous test was not saved)
     const containedBtn = page.locator('button', { hasText: 'Contained' })
-    await containedBtn.click()
     await expect(containedBtn).toHaveClass(/border-accent/)
 
-    // Hero Media section should reappear
-    await expect(page.getByText('Hero Media')).toBeVisible()
+    // Hero Media section should be visible
+    await expect(page.locator('label', { hasText: 'Hero Media' })).toBeVisible()
 
-    // Save
-    await clickSaveAndWait(page)
-
-    // Verify style is back to contained in DB
+    // Verify style is still contained in DB
     const profile = await getTestProfileHeroData(FLOW_USER.email)
     expect(profile!.hero_style).toBe('contained')
   })

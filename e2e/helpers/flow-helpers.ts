@@ -32,27 +32,19 @@ export async function waitForHydration(page: Page, waitForSelector?: string) {
 
 /** Locator for the green "Saved" indicator in DashboardHeader. */
 export function savedIndicator(page: Page) {
-  return page.locator('span.text-green-600', { hasText: 'Saved' })
+  return page.locator('span.text-green-400', { hasText: 'Saved' })
 }
 
 /**
- * Click save and wait for the server function POST to complete.
- * Returns the Response object.
+ * Click save and wait for the "Saved" indicator to appear.
+ * Some pages trigger multiple server POSTs (data save + section toggle),
+ * so we just wait for the green "Saved" indicator rather than matching a specific POST.
  */
 export async function clickSaveAndWait(page: Page) {
   const saveButton = page.locator('button[type="submit"]', { hasText: 'Save' })
   await expect(saveButton).toBeEnabled({ timeout: 5_000 })
-
-  const [response] = await Promise.all([
-    page.waitForResponse(
-      (resp) => resp.url().includes('_serverFn') && resp.request().method() === 'POST',
-      { timeout: 10_000 },
-    ),
-    saveButton.click(),
-  ])
-
-  await expect(savedIndicator(page)).toBeVisible({ timeout: 5_000 })
-  return response
+  await saveButton.click()
+  await expect(savedIndicator(page)).toBeVisible({ timeout: 15_000 })
 }
 
 /**
@@ -67,21 +59,17 @@ export async function fillModalField(page: Page, selector: string, value: string
 }
 
 /**
- * Submit a modal form and wait for the server response + modal to close.
+ * Submit a modal form and wait for the modal to close.
+ * Modal submit may trigger multiple server calls (e.g. oEmbed resolution + DB upsert),
+ * so we just click and wait for the modal title to disappear.
  * @param modalTitle - The text in the modal header (e.g. "Add Mix") used to detect close.
  */
 export async function submitModalAndWait(page: Page, modalTitle: string) {
-  const [response] = await Promise.all([
-    page.waitForResponse(
-      (resp) => resp.url().includes('_serverFn') && resp.request().method() === 'POST',
-      { timeout: 15_000 },
-    ),
-    page.locator('button[type="submit"]', { hasText: 'Save' }).click(),
-  ])
+  // Scope to dialog to avoid matching the DashboardHeader Save button
+  await page.locator('dialog button[type="submit"]', { hasText: 'Save' }).click()
 
-  // Wait for modal to close
-  await expect(page.locator(`text=${modalTitle}`).first()).not.toBeVisible({ timeout: 5_000 })
-  return response
+  // Wait for modal to close — may take a while due to oEmbed + DB upsert
+  await expect(page.locator('h2', { hasText: modalTitle })).not.toBeVisible({ timeout: 20_000 })
 }
 
 /**

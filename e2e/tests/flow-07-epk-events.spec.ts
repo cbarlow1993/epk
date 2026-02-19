@@ -99,8 +99,8 @@ test.describe('Flow 07: EPK Events', () => {
     await page.locator('button', { hasText: '+ Add Event' }).click()
     await expect(page.locator('h2', { hasText: 'Add Event' })).toBeVisible()
 
-    // Submit without filling required fields
-    await page.locator('button[type="submit"]', { hasText: 'Save' }).click()
+    // Submit without filling required fields (scope to dialog to avoid DashboardHeader Save)
+    await page.locator('dialog button[type="submit"]', { hasText: 'Save' }).click()
 
     // Validation error should appear
     await expect(page.getByText('Name is required')).toBeVisible({ timeout: 5_000 })

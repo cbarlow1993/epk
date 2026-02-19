@@ -14,6 +14,8 @@ import {
 const PROFILE_URL = '/dashboard/profile'
 
 test.describe('Flow 03: EPK Profile', () => {
+  test.describe.configure({ mode: 'serial' })
+
   test.beforeEach(async ({ page }) => {
     await navigateTo(page, PROFILE_URL, 'h1')
     await expect(page.locator('h1', { hasText: 'Profile' })).toBeVisible()
@@ -49,9 +51,8 @@ test.describe('Flow 03: EPK Profile', () => {
     const errorText = page.locator('text=/reserved/i')
     await expect(errorText.first()).toBeVisible({ timeout: 5_000 })
 
-    // Restore the valid slug so subsequent tests are not affected
-    await fillRHFInput(page, 'input[name="slug"]', PROFILE_DATA.slug)
-    await clickSaveAndWait(page)
+    // No restore needed — the server rejects the save, so DB slug is unchanged.
+    // The next test's beforeEach will reload the page with the correct slug from DB.
   })
 
   test('select genres and set BPM range', async ({ page }) => {
@@ -81,9 +82,7 @@ test.describe('Flow 03: EPK Profile', () => {
   })
 
   test('add social links and save', async ({ page }) => {
-    // Social links are fixed platform inputs on the profile page.
-    // Each platform row has a label span and a url input.
-    // The inputs are identified by their placeholder pattern: https://<platform>.com/...
+    // Social links are controlled React inputs (not RHF-registered).
     const socialEntries: [string, string][] = [
       ['soundcloud', SOCIAL_LINKS.soundcloud],
       ['instagram', SOCIAL_LINKS.instagram],
@@ -92,19 +91,23 @@ test.describe('Flow 03: EPK Profile', () => {
 
     for (const [platform, url] of socialEntries) {
       const input = page.locator(`input[type="url"][placeholder*="${platform}"]`)
-      await input.click()
-      await page.keyboard.press('Meta+a')
-      await page.keyboard.press('Backspace')
-      await input.pressSequentially(url, { delay: 20 })
+      await input.fill(url)
+      await expect(input).toHaveValue(url)
     }
 
+    // Verify save button is enabled (confirms socialDirty is true)
+    await expect(page.locator('button[type="submit"]', { hasText: 'Save' })).toBeEnabled({ timeout: 3_000 })
+
     await clickSaveAndWait(page)
+
+    // Wait for parallel server calls (profile + social links) to complete
+    await page.waitForTimeout(2_000)
 
     // Verify in database
     const socialLinks = await getTestSocialLinks(FLOW_USER.email)
     for (const [platform, url] of socialEntries) {
       const link = socialLinks.find((l: { platform: string }) => l.platform === platform)
-      expect(link, `Expected social link for ${platform} to exist`).toBeTruthy()
+      expect(link, `Expected social link for ${platform} to exist (found ${socialLinks.length} total links)`).toBeTruthy()
       expect((link as { url: string }).url).toBe(url)
     }
   })

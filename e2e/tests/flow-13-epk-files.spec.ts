@@ -1,8 +1,16 @@
 import { test, expect } from '@playwright/test'
 import { navigateTo, uploadFixture } from '../helpers/flow-helpers'
+import { FLOW_USER } from '../helpers/flow-test-data'
+import { deleteTestFiles, deleteTestFolders } from '../helpers/supabase-admin'
 
 test.describe('Flow 13: EPK Files', () => {
   test.describe.configure({ mode: 'serial' })
+
+  test.beforeAll(async () => {
+    // Clean up any leftover files from previous runs
+    await deleteTestFiles(FLOW_USER.email)
+    await deleteTestFolders(FLOW_USER.email)
+  })
 
   test('load files page and verify empty state', async ({ page }) => {
     await navigateTo(page, '/dashboard/files', 'h1')

@@ -134,6 +134,14 @@ export async function getTestProfileSlug(email: string) {
   return data?.slug as string
 }
 
+export async function completeOnboarding(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found`)
+  await admin.from('profiles').update({ onboarding_completed: true }).eq('id', user.id)
+}
+
 export async function resetOnboardingStatus(email: string) {
   const admin = getAdminClient()
   const { data: { users } } = await admin.auth.admin.listUsers()
@@ -244,6 +252,22 @@ export async function resetTestBookingContact(email: string) {
   await admin.from('booking_contact').delete().eq('profile_id', user.id)
 }
 
+export async function ensureTestBookingContact(email: string) {
+  const admin = getAdminClient()
+  const { data: { users } } = await admin.auth.admin.listUsers()
+  const user = users.find((u) => u.email === email)
+  if (!user) throw new Error(`Test user ${email} not found`)
+  const { data } = await admin.from('booking_contact').select('id').eq('profile_id', user.id).maybeSingle()
+  if (data) return
+  await admin.from('booking_contact').insert({
+    profile_id: user.id,
+    manager_name: '',
+    email: '',
+    phone: '',
+    address: '',
+  })
+}
+
 export async function getTestBookingContact(email: string) {
   const admin = getAdminClient()
   const { data: { users } } = await admin.auth.admin.listUsers()
@@ -303,7 +327,8 @@ export async function resetTestIntegrations(email: string) {
   const { data: { users } } = await admin.auth.admin.listUsers()
   const user = users.find((u) => u.email === email)
   if (!user) throw new Error(`Test user ${email} not found`)
-  await admin.from('profiles').update({ integrations: null }).eq('id', user.id)
+  // Integrations are stored in the `integrations` table, not on profiles
+  await admin.from('integrations').delete().eq('profile_id', user.id)
 }
 
 export async function getTestIntegrations(email: string) {
@@ -311,11 +336,11 @@ export async function getTestIntegrations(email: string) {
   const { data: { users } } = await admin.auth.admin.listUsers()
   const user = users.find((u) => u.email === email)
   if (!user) throw new Error(`Test user ${email} not found`)
-  const { data } = await admin.from('profiles')
-    .select('integrations')
-    .eq('id', user.id)
-    .single()
-  return (data?.integrations as Array<{ type: string; enabled: boolean; config: Record<string, string> }>) || []
+  const { data } = await admin.from('integrations')
+    .select('*')
+    .eq('profile_id', user.id)
+    .order('sort_order')
+  return (data as Array<{ type: string; enabled: boolean; config: Record<string, string> }>) || []
 }
 
 // --- Social Links ---
@@ -373,7 +398,8 @@ export async function resetAllFlowTestData(email: string) {
   if (!user) return
 
   await admin.from('profiles').update({
-    display_name: 'DJ FlowTest',
+    display_name: 'Test Playwright DJ',
+    slug: 'test-playwright-dj',
     tagline: '',
     genres: [],
     published: false,
@@ -389,4 +415,10 @@ export async function resetAllFlowTestData(email: string) {
     animate_sections: true,
     onboarding_completed: true,
   }).eq('id', user.id)
+
+  // Ensure a technical rider row exists (updateTechnicalRider does UPDATE, not UPSERT)
+  const { data: existingRider } = await admin.from('technical_rider').select('id').eq('profile_id', user.id).maybeSingle()
+  if (!existingRider) {
+    await admin.from('technical_rider').insert({ profile_id: user.id })
+  }
 }

@@ -102,8 +102,8 @@ test.describe('Flow 06: EPK Music', () => {
     await page.locator('button', { hasText: '+ Add Mix' }).click()
     await expect(page.locator('h2', { hasText: 'Add Mix' })).toBeVisible()
 
-    // Submit without filling required fields
-    await page.locator('button[type="submit"]', { hasText: 'Save' }).click()
+    // Submit without filling required fields (scope to dialog to avoid DashboardHeader Save)
+    await page.locator('dialog button[type="submit"]', { hasText: 'Save' }).click()
 
     // Validation errors should appear
     await expect(page.getByText('Title is required')).toBeVisible({ timeout: 5_000 })

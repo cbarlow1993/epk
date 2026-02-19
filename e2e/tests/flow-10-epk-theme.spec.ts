@@ -15,10 +15,10 @@ test.describe('Flow 10: EPK Theme', () => {
     // Template section should be visible
     await expect(page.locator('label', { hasText: 'Template' })).toBeVisible()
 
-    // Accordion sections should be visible
-    await expect(page.getByText('Typography')).toBeVisible()
-    await expect(page.getByText('Colours')).toBeVisible()
-    await expect(page.getByText('Animation')).toBeVisible()
+    // Accordion section headers should be visible (use button locator to avoid matching ProGate text)
+    await expect(page.locator('button', { hasText: 'Typography' })).toBeVisible()
+    await expect(page.locator('button', { hasText: 'Colours' })).toBeVisible()
+    await expect(page.locator('button', { hasText: 'Animation' })).toBeVisible()
 
     // Save button should be disabled (no changes)
     await expect(page.locator('button[type="submit"]', { hasText: 'Save' })).toBeDisabled()
@@ -27,10 +27,7 @@ test.describe('Flow 10: EPK Theme', () => {
   test('set accent and background colours', async ({ page }) => {
     await navigateTo(page, '/dashboard/theme', 'h1')
 
-    // Open the Colours accordion section
-    const coloursButton = page.locator('button', { hasText: /^Colours$/ })
-    await coloursButton.click()
-
+    // Colours is the defaultOpen accordion section — no need to click
     // Wait for the accent colour input to appear
     const accentInput = page.locator('input[name="accent_color"]')
     await expect(accentInput).toBeVisible({ timeout: 5_000 })
@@ -50,25 +47,33 @@ test.describe('Flow 10: EPK Theme', () => {
     expect(dbTheme?.bg_color).toBe(THEME_DATA.bgColor)
   })
 
-  test('select Underground template from dropdown', async ({ page }) => {
+  test('select Dark template from dropdown', async ({ page }) => {
     await navigateTo(page, '/dashboard/theme', 'h1')
 
     // Click the template dropdown trigger
     const templateTrigger = page.locator('button[aria-haspopup="listbox"]')
     await templateTrigger.click()
 
-    // Dropdown should be expanded
+    // Wait for dropdown to be expanded
     await expect(templateTrigger).toHaveAttribute('aria-expanded', 'true')
 
-    // Click the "Underground" template option — handle confirmation dialog
-    page.on('dialog', (dialog) => dialog.accept())
-    const undergroundOption = page.locator('button', { hasText: 'Underground' }).last()
-    await undergroundOption.click()
+    // Find the Dark template option by its unique description text
+    // (the trigger shows the current template, not Dark, so this only matches the dropdown)
+    const darkOption = page.locator('button', { hasText: 'Refined dark theme' })
+    await expect(darkOption).toBeVisible({ timeout: 5_000 })
+
+    // The click triggers window.confirm() — register handler BEFORE click
+    // (must use page.on pattern, NOT Promise.all with waitForEvent, which deadlocks)
+    page.once('dialog', (dialog) => dialog.accept())
+    await darkOption.click()
+
+    // Wait for setValue calls to propagate through React state
+    await page.waitForTimeout(500)
 
     // Save
     await clickSaveAndWait(page)
 
-    // Verify DB template
+    // Verify DB template (id is 'underground')
     const dbTheme = await getTestThemeData(FLOW_USER.email)
     expect(dbTheme?.template).toBe('underground')
   })
