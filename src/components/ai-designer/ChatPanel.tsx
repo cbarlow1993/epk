@@ -109,8 +109,15 @@ export function ChatPanel({
         })
 
         if (!response.ok) {
-          const errorText = await response.text()
-          throw new Error(errorText || `Request failed (${response.status})`)
+          let errorMsg = `Request failed (${response.status})`
+          try {
+            const errorJson = await response.json()
+            if (errorJson.message) errorMsg = errorJson.message
+          } catch {
+            const errorText = await response.text()
+            if (errorText) errorMsg = errorText
+          }
+          throw new Error(errorMsg)
         }
 
         if (!response.body) {

@@ -57,31 +57,34 @@ export default defineHandler(async (event) => {
   }
 
   // --- Rate limit: check monthly AI usage before calling Claude ---
+  // Gracefully skip if ai_usage table or RPC doesn't exist yet (migration not pushed)
   const AI_MONTHLY_LIMIT = 200
   const now = new Date()
   const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
 
-  const { data: usageRow } = await supabase
+  const { data: usageRow, error: usageQueryError } = await supabase
     .from('ai_usage')
     .select('message_count')
     .eq('user_id', user.id)
     .eq('month', month)
     .maybeSingle()
 
-  const currentCount = usageRow?.message_count ?? 0
-  if (currentCount >= AI_MONTHLY_LIMIT) {
-    throw createError({ statusCode: 429, message: 'Monthly AI message limit reached' })
-  }
+  if (!usageQueryError) {
+    const currentCount = usageRow?.message_count ?? 0
+    if (currentCount >= AI_MONTHLY_LIMIT) {
+      throw createError({ statusCode: 429, message: 'Monthly AI message limit reached' })
+    }
 
-  // Increment usage atomically via RPC (created in migration)
-  const { error: usageError } = await supabase.rpc('increment_ai_usage', {
-    p_user_id: user.id,
-    p_month: month,
-    p_limit: AI_MONTHLY_LIMIT,
-  })
-  if (usageError) {
-    // If the RPC returns an error (limit exceeded race condition), reject
-    throw createError({ statusCode: 429, message: 'Monthly AI message limit reached' })
+    // Increment usage atomically via RPC (created in migration)
+    const { error: rpcError } = await supabase.rpc('increment_ai_usage', {
+      p_user_id: user.id,
+      p_month: month,
+      p_limit: AI_MONTHLY_LIMIT,
+    })
+    // Only reject if the error is specifically about the limit, not about missing function
+    if (rpcError?.message?.includes('limit reached')) {
+      throw createError({ statusCode: 429, message: 'Monthly AI message limit reached' })
+    }
   }
 
   // --- Parse & validate request body ---
