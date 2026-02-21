@@ -25,7 +25,9 @@ Resources:
                 Action:
                   - ses:SendEmail
                   - ses:SendRawEmail
-                Resource: arn:aws:ses:eu-west-1:007511345033:identity/myepk.bio
+                Resource:
+                  - arn:aws:ses:eu-west-1:007511345033:identity/myepk.bio
+                  - arn:aws:ses:eu-west-1:007511345033:configuration-set/*
 
 Outputs:
   RoleArn:
