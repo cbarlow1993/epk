@@ -2,20 +2,13 @@ import { useState, useRef, useEffect } from 'react'
 import { GOOGLE_FONTS, ALL_GOOGLE_FONTS } from '~/utils/theme-options'
 import { FORM_LABEL } from './styles'
 
-interface CustomFont {
-  name: string
-  url: string
-  weight: string
-}
-
 interface FontPickerProps {
   label: string
   value: string
   onChange: (font: string) => void
-  customFonts?: CustomFont[]
 }
 
-export function FontPicker({ label, value, onChange, customFonts = [] }: FontPickerProps) {
+export function FontPicker({ label, value, onChange }: FontPickerProps) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const containerRef = useRef<HTMLDivElement>(null)
@@ -54,10 +47,6 @@ export function FontPicker({ label, value, onChange, customFonts = [] }: FontPic
     link.href = `https://fonts.googleapis.com/css2?${families}&display=swap`
   }, [open, search])
 
-  const filteredCustom = customFonts.filter(f =>
-    !search || f.name.toLowerCase().includes(search.toLowerCase())
-  )
-
   const filteredCategories = Object.entries(GOOGLE_FONTS)
     .map(([category, fonts]) => ({
       category,
@@ -95,28 +84,6 @@ export function FontPicker({ label, value, onChange, customFonts = [] }: FontPic
             />
           </div>
 
-          {/* Custom fonts group */}
-          {filteredCustom.length > 0 && (
-            <div>
-              <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-text-secondary bg-bg">
-                Your Fonts
-              </div>
-              {filteredCustom.map((font) => (
-                <button
-                  key={`custom-${font.name}`}
-                  type="button"
-                  onClick={() => { onChange(font.name); setOpen(false); setSearch('') }}
-                  className={`w-full text-left px-3 py-2 text-sm hover:bg-accent/10 transition-colors ${
-                    value === font.name ? 'bg-accent/5 text-accent' : 'text-text-primary'
-                  }`}
-                  style={{ fontFamily: `'${font.name}', sans-serif` }}
-                >
-                  {font.name}
-                </button>
-              ))}
-            </div>
-          )}
-
           {/* Google Fonts by category */}
           {filteredCategories.map(({ category, fonts }) => (
             <div key={category}>
@@ -139,7 +106,7 @@ export function FontPicker({ label, value, onChange, customFonts = [] }: FontPic
             </div>
           ))}
 
-          {filteredCustom.length === 0 && filteredCategories.length === 0 && (
+          {filteredCategories.length === 0 && (
             <div className="px-3 py-4 text-center text-xs text-text-secondary">
               No fonts found
             </div>

@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { z } from 'zod'
 import { getProfile, updateProfile } from '~/server/profile'
 import { profileUpdateSchema, type ProfileUpdate } from '~/schemas/profile'
-import { FormColorInput, FontPicker, FORM_LABEL, FORM_INPUT, FORM_FILE_INPUT } from '~/components/forms'
+import { FormColorInput, FontPicker, FORM_LABEL, FORM_INPUT } from '~/components/forms'
 import { useDashboardSave } from '~/hooks/useDashboardSave'
 import { DashboardHeader } from '~/components/DashboardHeader'
 import { Accordion } from '~/components/Accordion'
@@ -61,8 +61,6 @@ const themeSchema = profileUpdateSchema
     theme_card_border: true,
     theme_shadow: true,
     theme_divider_style: true,
-    // Custom Fonts
-    theme_custom_fonts: true,
     // Branding
     favicon_url: true,
     hide_platform_branding: true,
@@ -130,14 +128,12 @@ function TypographyTierControls({
   selectedTemplate,
   watch: formWatch,
   setValue: formSetValue,
-  customFonts,
 }: {
   tier: TypographyTierName
   label: string
   selectedTemplate: string
   watch: UseFormWatch<ThemeFormValues>
   setValue: UseFormSetValue<ThemeFormValues>
-  customFonts: Array<{ name: string; url: string; weight: string }>
 }) {
   const fontField = `theme_${tier}_font` as const
   const sizeField = `theme_${tier}_size` as const
@@ -161,7 +157,6 @@ function TypographyTierControls({
         label="Font"
         value={currentFont}
         onChange={(font) => formSetValue(fontField, font, { shouldDirty: true })}
-        customFonts={customFonts || undefined}
       />
 
       <div>
@@ -270,108 +265,6 @@ function ColorField({
 // ---------------------------------------------------------------------------
 // Font upload section — extracted as standalone component
 // ---------------------------------------------------------------------------
-
-type CustomFont = { name: string; url: string; weight: string }
-
-function FontUploadSection({
-  customFonts,
-  onAddFont,
-  onRemoveFont,
-}: {
-  customFonts: CustomFont[]
-  onAddFont: (font: CustomFont) => void
-  onRemoveFont: (index: number) => void
-}) {
-  const [uploading, setUploading] = useState(false)
-  const [uploadError, setUploadError] = useState('')
-
-  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    if (customFonts.length >= 4) {
-      setUploadError('Maximum 4 custom fonts allowed')
-      return
-    }
-
-    setUploading(true)
-    setUploadError('')
-
-    try {
-      const formData = new FormData()
-      formData.append('file', file)
-
-      const res = await fetch('/api/upload-font', { method: 'POST', body: formData })
-      const result = await res.json()
-
-      if (!result.success) {
-        setUploadError(result.message || 'Upload failed')
-      } else {
-        const fontName = file.name.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ')
-        onAddFont({ name: fontName, url: result.file.url, weight: '400' })
-      }
-    } catch {
-      setUploadError('Upload failed. Please try again.')
-    }
-
-    setUploading(false)
-    e.target.value = ''
-  }
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <label className={FORM_LABEL}>Upload Font</label>
-        <span className="text-[10px] text-text-secondary">
-          {customFonts.length} of 4 slots used
-        </span>
-      </div>
-
-      <input
-        type="file"
-        accept=".woff2,.woff,.ttf,.otf"
-        onChange={handleUpload}
-        disabled={uploading || customFonts.length >= 4}
-        className={FORM_FILE_INPUT}
-      />
-
-      {uploading && (
-        <p className="text-xs text-text-secondary">Uploading...</p>
-      )}
-      {uploadError && (
-        <p className="text-xs text-red-500">{uploadError}</p>
-      )}
-
-      {customFonts.length > 0 && (
-        <div className="space-y-2 mt-3">
-          {customFonts.map((font, i) => (
-            <div key={i} className="flex items-center justify-between border border-border p-3">
-              <div className="flex items-center gap-3">
-                <span
-                  className="text-lg font-medium"
-                  style={{ fontFamily: `'${font.name.replace(/['"\\}{;()<>]/g, '')}', sans-serif` }}
-                >
-                  Aa
-                </span>
-                <div>
-                  <p className="text-sm font-medium text-text-primary">{font.name}</p>
-                  <p className="text-[10px] text-text-secondary">Weight: {font.weight}</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => onRemoveFont(i)}
-                className="text-xs text-red-500 hover:text-red-700 font-semibold uppercase tracking-wider"
-              >
-                Remove
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
 
 // ---------------------------------------------------------------------------
 // Template dropdown — shows selected template as trigger, opens card list
@@ -599,23 +492,24 @@ function ThemeEditor() {
       theme_card_border: initial?.theme_card_border ?? null,
       theme_shadow: initial?.theme_shadow ?? null,
       theme_divider_style: initial?.theme_divider_style ?? null,
-      // Custom Fonts
-      theme_custom_fonts: initial?.theme_custom_fonts ?? null,
       // Branding
       favicon_url: initial?.favicon_url || '',
       hide_platform_branding: initial?.hide_platform_branding || false,
     },
   })
 
-  const onSave = handleSubmit(save)
+  const onSave = handleSubmit(async (data) => {
+    const success = await save(data)
+    if (success && iframeRef.current) {
+      iframeRef.current.contentWindow?.location.reload()
+    }
+  })
 
   // Watched values
   const selectedTemplate = watch('template') || 'default'
   const accentColor = watch('accent_color') || '#3b82f6'
   const bgColor = watch('bg_color') || '#0a0a0f'
   const animateSections = watch('animate_sections') !== false
-  const customFonts = watch('theme_custom_fonts') ?? []
-
   // -------------------------------------------------------------------------
   // Template card click — reset ALL fields to template defaults
   // -------------------------------------------------------------------------
@@ -692,7 +586,7 @@ function ThemeEditor() {
     const params = new URLSearchParams()
     params.set('preview', 'true')
     for (const [key, value] of Object.entries(values)) {
-      if (value != null && value !== '' && key !== 'theme_custom_fonts') {
+      if (value != null && value !== '') {
         params.set(key, String(value))
       }
     }
@@ -725,7 +619,7 @@ function ThemeEditor() {
   // -------------------------------------------------------------------------
   const proBadge = !isPro ? <span className="text-[9px] uppercase tracking-wider font-semibold text-text-secondary bg-text-secondary/10 px-1.5 py-0.5 rounded">Pro</span> : undefined
 
-  const typoProps = { selectedTemplate, watch, setValue, customFonts: customFonts || [] }
+  const typoProps = { selectedTemplate, watch, setValue }
   const colorProps = { watch, setValue, register, errors }
 
   const accordionSections = [
@@ -967,26 +861,6 @@ function ThemeEditor() {
               onChange={(v) => setValue('theme_divider_style', v as ProfileUpdate['theme_divider_style'], { shouldDirty: true })}
             />
           </div>
-        </ProGate>
-      ),
-    },
-    {
-      id: 'fonts',
-      title: 'Custom Fonts',
-      badge: proBadge,
-      children: (
-        <ProGate isPro={isPro} feature="Custom Font Uploads">
-          <FontUploadSection
-            customFonts={customFonts || []}
-            onAddFont={(font) => {
-              const current = customFonts || []
-              setValue('theme_custom_fonts', [...current, font], { shouldDirty: true })
-            }}
-            onRemoveFont={(index) => {
-              const current = customFonts || []
-              setValue('theme_custom_fonts', current.filter((_, i) => i !== index), { shouldDirty: true })
-            }}
-          />
         </ProGate>
       ),
     },

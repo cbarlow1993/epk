@@ -58,12 +58,9 @@ export const Route = createFileRoute('/$slug')({
     const theme = resolveTheme(profile as Record<string, unknown> || {}, templateConfig)
 
     // Collect unique Google Fonts from all tiers
-    const customFontNames = new Set(
-      ((profile?.theme_custom_fonts as Array<{name: string}>) || []).map(f => f.name)
-    )
     const googleFonts = new Set<string>()
     for (const font of [theme.displayFont, theme.headingFont, theme.subheadingFont, theme.bodyFont]) {
-      if (!customFontNames.has(font)) googleFonts.add(font)
+      googleFonts.add(font)
     }
     const fontParam = [...googleFonts].map(f => `family=${f.replace(/ /g, '+')}:wght@300;400;500;600;700;800;900`).join('&')
     const tagline = profile?.tagline
@@ -380,12 +377,9 @@ function PublicEPK() {
   // Dynamically load Google Fonts for preview (search param fonts may differ from DB)
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const customFontNames = new Set(
-      ((profile.theme_custom_fonts as Array<{name: string}>) || []).map(f => f.name)
-    )
     const googleFonts = new Set<string>()
     for (const font of [theme.displayFont, theme.headingFont, theme.subheadingFont, theme.bodyFont]) {
-      if (font && !customFontNames.has(font)) googleFonts.add(font)
+      if (font) googleFonts.add(font)
     }
     if (googleFonts.size === 0) return
     const fontParam = [...googleFonts].map(f => `family=${f.replace(/ /g, '+')}:wght@300;400;500;600;700;800;900`).join('&')
@@ -398,7 +392,7 @@ function PublicEPK() {
       document.head.appendChild(link)
     }
     link.href = `https://fonts.googleapis.com/css2?${fontParam}&display=swap`
-  }, [theme.displayFont, theme.headingFont, theme.subheadingFont, theme.bodyFont, profile.theme_custom_fonts])
+  }, [theme.displayFont, theme.headingFont, theme.subheadingFont, theme.bodyFont])
 
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
@@ -525,16 +519,6 @@ function PublicEPK() {
       } as React.CSSProperties}
       className="min-h-screen"
     >
-      {profile.theme_custom_fonts && (profile.theme_custom_fonts as Array<{name: string; url: string; weight: string}>).length > 0 && (
-        <style dangerouslySetInnerHTML={{ __html: (profile.theme_custom_fonts as Array<{name: string; url: string; weight: string}>).map(f => {
-          // Sanitize values to prevent CSS injection
-          const safeName = f.name.replace(/['"\\}{;()<>]/g, '')
-          const safeUrl = f.url.replace(/['"\\}{;()<>]/g, '')
-          const safeWeight = f.weight.replace(/[^0-9]/g, '') || '400'
-          const format = safeUrl.endsWith('.woff2') ? 'woff2' : safeUrl.endsWith('.woff') ? 'woff' : safeUrl.endsWith('.otf') ? 'opentype' : 'truetype'
-          return `@font-face{font-family:'${safeName}';src:url('${safeUrl}') format('${format}');font-weight:${safeWeight};font-display:swap;}`
-        }).join('\n') }} />
-      )}
       <Analytics slug={profile.slug as string} />
       <Nav displayName={name} sections={navSections} />
       <main ref={mainRef}>
