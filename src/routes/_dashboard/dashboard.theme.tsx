@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { z } from 'zod'
 import { getProfile, updateProfile } from '~/server/profile'
 import { profileUpdateSchema, type ProfileUpdate } from '~/schemas/profile'
-import { FormColorInput, FontPicker, FORM_LABEL, FORM_FILE_INPUT } from '~/components/forms'
+import { FormColorInput, FontPicker, FORM_LABEL, FORM_INPUT, FORM_FILE_INPUT, BTN_PRIMARY } from '~/components/forms'
 import { useDashboardSave } from '~/hooks/useDashboardSave'
 import { DashboardHeader } from '~/components/DashboardHeader'
 import { Accordion } from '~/components/Accordion'
@@ -492,6 +492,80 @@ function TemplateDropdown({ selectedTemplate, onSelect }: {
 }
 
 // ---------------------------------------------------------------------------
+// Branding section — standalone save (not part of the theme form)
+// ---------------------------------------------------------------------------
+
+function BrandingSection({ profile }: { profile: { tier?: string | null; favicon_url?: string | null; hide_platform_branding?: boolean | null } | null }) {
+  const [faviconUrl, setFaviconUrl] = useState(profile?.favicon_url || '')
+  const [hideBranding, setHideBranding] = useState(profile?.hide_platform_branding || false)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState('')
+
+  if (profile?.tier !== 'pro') {
+    return <p className="text-text-secondary text-sm">Upgrade to Pro to customise branding.</p>
+  }
+
+  const handleSave = async () => {
+    setSaving(true)
+    setSaved(false)
+    setError('')
+    const result = await updateProfile({
+      data: {
+        favicon_url: faviconUrl || undefined,
+        hide_platform_branding: hideBranding,
+      },
+    })
+    setSaving(false)
+    if (result && 'error' in result && result.error) {
+      setError(result.error as string)
+    } else {
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className={FORM_LABEL}>Favicon URL</label>
+        <input
+          type="text"
+          value={faviconUrl}
+          onChange={(e) => setFaviconUrl(e.target.value)}
+          placeholder="https://example.com/favicon.ico"
+          className={FORM_INPUT}
+        />
+      </div>
+      <div className="flex items-center gap-3">
+        <input
+          type="checkbox"
+          id="hide-branding"
+          checked={hideBranding}
+          onChange={(e) => setHideBranding(e.target.checked)}
+          className="accent-accent w-4 h-4"
+        />
+        <label htmlFor="hide-branding" className="text-sm text-text-secondary cursor-pointer">
+          Hide &ldquo;Built with myEPK&rdquo; footer
+        </label>
+      </div>
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={saving}
+          className={BTN_PRIMARY}
+        >
+          {saving ? 'Saving...' : 'Save'}
+        </button>
+        {saved && <span className="text-xs text-green-400">Saved!</span>}
+        {error && <span className="text-xs text-red-500">{error}</span>}
+      </div>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // Main component
 // ---------------------------------------------------------------------------
 
@@ -969,6 +1043,12 @@ function ThemeEditor() {
           </button>
         </div>
       ),
+    },
+    {
+      id: 'branding',
+      title: 'Branding',
+      badge: proBadge,
+      children: <BrandingSection profile={initial} />,
     },
   ]
 

@@ -14,7 +14,7 @@ const NAV_ITEMS = [
   { label: 'Music', href: '/dashboard/music' },
   { label: 'Events', href: '/dashboard/events' },
   { label: 'Photos', href: '/dashboard/photos' },
-  { label: 'Technical', href: '/dashboard/technical' },
+  { label: 'Rider', href: '/dashboard/technical' },
   { label: 'Press Assets', href: '/dashboard/press' },
   { label: 'Contact', href: '/dashboard/contact' },
   { label: 'Theme', href: '/dashboard/theme' },
@@ -22,7 +22,6 @@ const NAV_ITEMS = [
   { label: 'SEO & Sharing', href: '/dashboard/social-preview' },
   { label: 'Files', href: '/dashboard/files' },
   { label: 'Analytics', href: '/dashboard/analytics' },
-  { label: 'Integrations', href: '/dashboard/integrations' },
   { label: 'Settings', href: '/dashboard/settings' },
 ]
 

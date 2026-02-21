@@ -15,10 +15,10 @@ export const BTN_PRIMARY = `${BTN_BASE} bg-accent text-white hover:brightness-11
 export const BTN_DELETE = `${BTN_BASE} bg-red-500/10 text-red-500 hover:bg-red-500/20`
 
 // Card container used in dashboard add/upload forms
-export const CARD_SECTION = 'bg-surface border border-border rounded-xl p-6 mb-8'
+export const CARD_SECTION = 'bg-surface border border-border p-6 mb-8'
 
 // Card container used in settings page sections
-export const SETTINGS_CARD = 'bg-surface border border-border rounded-xl p-6'
+export const SETTINGS_CARD = 'bg-surface border border-border p-6'
 
 // Convert a readonly const array to { value, label } options for <select> elements
 export function toSelectOptions<T extends string>(values: readonly T[]): { value: T; label: string }[] {

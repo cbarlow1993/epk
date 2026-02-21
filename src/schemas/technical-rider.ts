@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const DECK_MODELS = [
-  'CDJ-3000', 'CDJ-2000NXS2', 'SC6000', 'SC6000M',
+  'CDJ-3000X', 'CDJ-3000', 'CDJ-2000NXS2', 'SC6000', 'SC6000M',
   'XDJ-XZ', 'XDJ-1000MK2', 'Turntables', 'Other',
 ] as const
 

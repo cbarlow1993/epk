@@ -5,22 +5,25 @@ import type { ProfileRow, DomainOrderRow } from '~/types/database'
 import { createCheckoutSession, createPortalSession } from '~/server/billing'
 import { addCustomDomain, removeCustomDomain, checkDomainStatus, searchDomain, getDomainOrder, createDomainCheckout, cancelDomainOrder } from '~/server/domains'
 import { contactInfoSchema, type ContactInfo } from '~/schemas/domain-order'
+import { getIntegrations, upsertIntegration } from '~/server/integrations'
+import type { IntegrationType } from '~/schemas/integrations'
 import { SETTINGS_CARD, FORM_LABEL, FORM_INPUT, FORM_INPUT_ERROR, BTN_PRIMARY } from '~/components/forms'
 
 export const Route = createFileRoute('/_dashboard/dashboard/settings')({
   loader: async () => {
-    const [profile, emailResult, domainResult] = await Promise.all([
+    const [profile, emailResult, domainResult, integrations] = await Promise.all([
       getProfile(),
       getUserEmail(),
       getDomainOrder(),
+      getIntegrations(),
     ])
-    return { profile, userEmail: emailResult.email, domainOrder: domainResult.order }
+    return { profile, userEmail: emailResult.email, domainOrder: domainResult.order, integrations }
   },
   component: SettingsPage,
 })
 
 function SettingsPage() {
-  const { profile, userEmail, domainOrder } = Route.useLoaderData()
+  const { profile, userEmail, domainOrder, integrations } = Route.useLoaderData()
   const [billingLoading, setBillingLoading] = useState(false)
   const [billingError, setBillingError] = useState('')
 
@@ -104,8 +107,8 @@ function SettingsPage() {
           {billingError && <p className="text-xs text-red-500 mt-3">{billingError}</p>}
         </div>
 
-        {/* Branding */}
-        <BrandingSection profile={profile} />
+        {/* Google Analytics */}
+        <GoogleAnalyticsSection integrations={integrations as { type: string; enabled: boolean; config: Record<string, string>; sort_order: number }[]} />
 
         {/* Custom Domain */}
         <CustomDomainSection profile={profile} initialOrder={domainOrder} />
@@ -114,34 +117,28 @@ function SettingsPage() {
   )
 }
 
-function BrandingSection({ profile }: { profile: ProfileRow | null }) {
-  const [faviconUrl, setFaviconUrl] = useState(profile?.favicon_url || '')
-  const [hideBranding, setHideBranding] = useState(profile?.hide_platform_branding || false)
+function GoogleAnalyticsSection({ integrations }: { integrations: { type: string; enabled: boolean; config: Record<string, string>; sort_order: number }[] }) {
+  const existing = integrations.find((i) => i.type === 'google_analytics')
+  const [measurementId, setMeasurementId] = useState(existing?.config?.measurement_id || '')
+  const [enabled, setEnabled] = useState(existing?.enabled || false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
-
-  if (profile?.tier !== 'pro') {
-    return (
-      <div className={SETTINGS_CARD}>
-        <h2 className="font-medium text-text-secondary text-sm mb-4">Branding</h2>
-        <p className="text-text-secondary text-sm">Upgrade to Pro to customise branding.</p>
-      </div>
-    )
-  }
 
   const handleSave = async () => {
     setSaving(true)
     setSaved(false)
     setError('')
-    const result = await updateProfile({
+    const result = await upsertIntegration({
       data: {
-        favicon_url: faviconUrl || undefined,
-        hide_platform_branding: hideBranding,
+        type: 'google_analytics' as IntegrationType,
+        config: { measurement_id: measurementId },
+        enabled,
+        sort_order: existing?.sort_order ?? 0,
       },
     })
     setSaving(false)
-    if (result && 'error' in result && result.error) {
+    if ('error' in result && result.error) {
       setError(result.error as string)
     } else {
       setSaved(true)
@@ -151,29 +148,26 @@ function BrandingSection({ profile }: { profile: ProfileRow | null }) {
 
   return (
     <div className={SETTINGS_CARD}>
-      <h2 className="font-medium text-text-secondary text-sm mb-4">Branding</h2>
+      <h2 className="font-medium text-text-secondary text-sm mb-4">Google Analytics</h2>
       <div className="space-y-4">
-        <div>
-          <label className={FORM_LABEL}>Favicon URL</label>
-          <input
-            type="text"
-            value={faviconUrl}
-            onChange={(e) => setFaviconUrl(e.target.value)}
-            placeholder="https://example.com/favicon.ico"
-            className={FORM_INPUT}
-          />
-        </div>
-        <div className="flex items-center gap-3">
+        <label className="flex items-center gap-3 cursor-pointer">
           <input
             type="checkbox"
-            id="hide-branding"
-            checked={hideBranding}
-            onChange={(e) => setHideBranding(e.target.checked)}
-            className="accent-accent w-4 h-4"
+            checked={enabled}
+            onChange={(e) => setEnabled(e.target.checked)}
+            className="w-4 h-4 accent-accent"
           />
-          <label htmlFor="hide-branding" className="text-sm text-text-secondary cursor-pointer">
-            Hide &ldquo;Built with myEPK&rdquo; footer
-          </label>
+          <span className="text-sm text-text-secondary">Enable on public EPK</span>
+        </label>
+        <div>
+          <label className={FORM_LABEL}>Measurement ID</label>
+          <input
+            type="text"
+            value={measurementId}
+            onChange={(e) => setMeasurementId(e.target.value)}
+            placeholder="G-XXXXXXXXXX"
+            className={FORM_INPUT}
+          />
         </div>
         <div className="flex items-center gap-3">
           <button
