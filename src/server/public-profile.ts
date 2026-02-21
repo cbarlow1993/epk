@@ -46,7 +46,7 @@ export const getPublicProfile = createServerFn({ method: 'GET' })
       supabase.from('events').select('*').eq('profile_id', profileId).order('sort_order'),
       supabase.from('photos').select('*').eq('profile_id', profileId).order('sort_order'),
       supabase.from('technical_rider').select('*').eq('profile_id', profileId).single(),
-      supabase.from('booking_contact').select('*').eq('profile_id', profileId).single(),
+      supabase.from('booking_contact').select('contact_mode, manager_name, email, phone, address').eq('profile_id', profileId).single(),
       supabase.from('files').select('*').eq('profile_id', profileId).eq('is_press_asset', true).order('sort_order'),
       supabase.from('integrations').select('*').eq('profile_id', profileId).eq('enabled', true).order('sort_order'),
     ])

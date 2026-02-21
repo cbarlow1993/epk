@@ -1,12 +1,18 @@
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses'
 
-const ses = new SESClient({
-  region: process.env.AWS_REGION || 'eu-west-1',
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-  },
-})
+let _ses: SESClient | null = null
+function getSESClient(): SESClient {
+  if (!_ses) {
+    const accessKeyId = process.env.AWS_ACCESS_KEY_ID
+    const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY
+    if (!accessKeyId || !secretAccessKey) throw new Error('AWS credentials not configured')
+    _ses = new SESClient({
+      region: process.env.AWS_REGION || 'eu-west-1',
+      credentials: { accessKeyId, secretAccessKey },
+    })
+  }
+  return _ses
+}
 
 interface SendContactEmailParams {
   toEmail: string
@@ -36,8 +42,9 @@ export async function sendContactEmail({ toEmail, djName, senderName, senderEmai
 
   const textBody = `New Booking Inquiry\n\nName: ${senderName}\nEmail: ${senderEmail}${senderPhone ? `\nPhone: ${senderPhone}` : ''}\n\nMessage:\n${message}\n\n---\nSent via ${djName} EPK contact form`
 
-  await ses.send(new SendEmailCommand({
-    Source: `"${djName} EPK" <${fromEmail}>`,
+  const safeDjName = djName.replace(/["\\]/g, '')
+  await getSESClient().send(new SendEmailCommand({
+    Source: `"${safeDjName} EPK" <${fromEmail}>`,
     Destination: { ToAddresses: [toEmail] },
     ReplyToAddresses: [senderEmail],
     Message: {

@@ -34,6 +34,21 @@ export const submitContactForm = createServerFn({ method: 'POST' })
     const ip = getRequestIP({ xForwardedFor: true }) || 'unknown'
     const ipHash = createHash('sha256').update(ip).digest('hex')
 
+    // Verify profile has contact form enabled
+    const { data: contact } = await admin
+      .from('booking_contact')
+      .select('contact_mode, booking_email')
+      .eq('profile_id', data.profile_id)
+      .single()
+
+    if (contact?.contact_mode !== 'form') {
+      return { error: 'Contact form is not enabled for this profile.' }
+    }
+
+    // Cleanup old submissions (older than 24 hours)
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+    await admin.from('contact_submissions').delete().lt('created_at', oneDayAgo)
+
     // Check rate limit: max 5 per IP per hour
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString()
     const { count } = await admin
@@ -49,15 +64,8 @@ export const submitContactForm = createServerFn({ method: 'POST' })
     // Log the submission for rate limiting
     await admin.from('contact_submissions').insert({ ip_hash: ipHash, profile_id: data.profile_id })
 
-    // Look up the DJ's booking email
-    const { data: contact } = await admin
-      .from('booking_contact')
-      .select('booking_email')
-      .eq('profile_id', data.profile_id)
-      .single()
-
     // Fall back to auth email if booking_email is empty
-    let toEmail = contact?.booking_email
+    let toEmail = contact.booking_email
     if (!toEmail) {
       const { data: authUser } = await admin.auth.admin.getUserById(data.profile_id)
       toEmail = authUser?.user?.email
