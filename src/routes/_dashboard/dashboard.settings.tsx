@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { getProfile, getUserEmail, updateProfile, updateUserEmail, updateUserPassword } from '~/server/profile'
 import type { ProfileRow, DomainOrderRow } from '~/types/database'
 import { createCheckoutSession, createPortalSession } from '~/server/billing'
@@ -406,54 +406,148 @@ function CustomDomainSection({ profile, initialOrder }: { profile: ProfileRow | 
   )
 }
 
+type VerificationRecord = {
+  type: string
+  domain: string
+  value: string
+  reason: string
+}
+
 function BYODFlow({ profile }: { profile: ProfileRow | null }) {
   const [domain, setDomain] = useState(profile?.custom_domain || '')
-  const [status, setStatus] = useState<string | null>(null)
+  const [verified, setVerified] = useState<boolean | null>(null)
+  const [verification, setVerification] = useState<VerificationRecord[]>([])
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [statusMessage, setStatusMessage] = useState('')
+
+  useEffect(() => {
+    if (profile?.custom_domain) {
+      handleCheckStatus(profile.custom_domain)
+    }
+  }, [])
+
+  const handleCheckStatus = async (domainToCheck: string) => {
+    setLoading(true)
+    setError('')
+    setStatusMessage('')
+    const result = await checkDomainStatus({ data: { domain: domainToCheck } })
+    setLoading(false)
+    setVerified(result.verified ?? false)
+    setVerification(result.verification ?? [])
+    if (result.verified) {
+      setStatusMessage('Domain is verified and active!')
+    }
+  }
 
   const handleAdd = async () => {
     setLoading(true)
+    setError('')
+    setStatusMessage('')
     const result = await addCustomDomain({ data: { domain } })
     setLoading(false)
     if ('error' in result) {
-      setStatus(result.error as string)
+      setError(result.error as string)
     } else {
-      setStatus('Domain added. Configure your DNS: CNAME → cname.vercel-dns.com')
+      setVerified(result.verified ?? false)
+      setVerification(result.verification ?? [])
+      setStatusMessage('Domain added! Configure the DNS records below.')
     }
   }
 
   const handleRemove = async () => {
     setLoading(true)
+    setError('')
     const result = await removeCustomDomain()
     setLoading(false)
     if (result && 'error' in result && result.error) {
-      setStatus(result.error as string)
+      setError(result.error as string)
     } else {
       setDomain('')
-      setStatus('Domain removed.')
+      setVerified(null)
+      setVerification([])
+      setStatusMessage('Domain removed.')
     }
   }
 
-  const handleCheck = async () => {
-    setLoading(true)
-    const result = await checkDomainStatus({ data: { domain } })
-    setLoading(false)
-    setStatus(result.configured ? 'Domain is verified and active.' : 'Domain not yet verified. Check your DNS settings.')
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text)
   }
 
   if (profile?.custom_domain) {
     return (
-      <div className="space-y-3">
-        <p className="text-sm">Current domain: <span className="font-mono text-accent">{profile.custom_domain}</span></p>
-        <div className="flex gap-2">
-          <button type="button" onClick={handleCheck} className="text-xs text-text-secondary hover:text-text-primary transition-colors">Check status</button>
-          <button type="button" onClick={handleRemove} disabled={loading} className="text-xs text-red-500 hover:text-red-600 transition-colors">Remove</button>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="font-mono text-sm text-accent">{profile.custom_domain}</span>
+            {verified === true && (
+              <span className="text-xs bg-green-500/10 text-green-400 px-2 py-0.5 font-medium uppercase tracking-wider">Verified</span>
+            )}
+            {verified === false && (
+              <span className="text-xs bg-yellow-500/10 text-yellow-400 px-2 py-0.5 font-medium uppercase tracking-wider">Pending</span>
+            )}
+          </div>
+          <button type="button" onClick={handleRemove} disabled={loading} className="text-xs text-red-500 hover:text-red-600 transition-colors">
+            {loading ? 'Removing...' : 'Remove'}
+          </button>
         </div>
-        {status && <p className="text-xs text-text-secondary mt-3">{status}</p>}
-        <div className="mt-4 text-xs text-text-secondary">
-          <p className="font-bold mb-1">DNS Configuration:</p>
-          <p>Add a CNAME record pointing your domain to <code className="text-accent">cname.vercel-dns.com</code></p>
+
+        {/* DNS Records Table */}
+        <div className="border border-border text-sm">
+          <div className="grid grid-cols-[80px_1fr_1fr] bg-card px-4 py-2 text-xs font-semibold uppercase tracking-wider text-text-secondary border-b border-border">
+            <span>Type</span>
+            <span>Name / Host</span>
+            <span>Value / Target</span>
+          </div>
+          <div className="grid grid-cols-[80px_1fr_1fr] px-4 py-3 border-b border-border items-center">
+            <span className="text-text-secondary text-xs font-mono">CNAME</span>
+            <span className="font-mono text-xs break-all">{profile.custom_domain.startsWith('www.') ? 'www' : '@'}</span>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-xs text-accent break-all">cname.vercel-dns.com</span>
+              <button type="button" onClick={() => copyToClipboard('cname.vercel-dns.com')} className="text-text-secondary hover:text-text-primary transition-colors shrink-0" title="Copy">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+              </button>
+            </div>
+          </div>
+          {verification.map((v, i) => (
+            <div key={i} className="grid grid-cols-[80px_1fr_1fr] px-4 py-3 border-b border-border last:border-b-0 items-center">
+              <span className="text-text-secondary text-xs font-mono">{v.type}</span>
+              <span className="font-mono text-xs break-all">{v.domain}</span>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-xs text-accent break-all">{v.value}</span>
+                <button type="button" onClick={() => copyToClipboard(v.value)} className="text-text-secondary hover:text-text-primary transition-colors shrink-0" title="Copy">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
+
+        {/* Root domain note */}
+        {!profile.custom_domain.startsWith('www.') && (
+          <p className="text-xs text-text-secondary/70">
+            Some registrars don't support CNAME records on root domains. If yours doesn't, use an ALIAS or ANAME record instead, or use a <code className="text-accent">www.</code> subdomain.
+          </p>
+        )}
+
+        {/* Actions */}
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => handleCheckStatus(profile.custom_domain!)}
+            disabled={loading}
+            className={BTN_PRIMARY + ' text-xs'}
+          >
+            {loading ? 'Checking...' : 'Verify DNS Configuration'}
+          </button>
+        </div>
+
+        {statusMessage && <p className="text-xs text-green-400">{statusMessage}</p>}
+        {error && <p className="text-xs text-red-500">{error}</p>}
+
+        <p className="text-xs text-text-secondary">
+          Need help? <a href="/support/custom-domain" target="_blank" className="text-accent hover:underline">Step-by-step guides for popular DNS providers</a>
+        </p>
       </div>
     )
   }
@@ -475,11 +569,11 @@ function BYODFlow({ profile }: { profile: ProfileRow | null }) {
       >
         {loading ? 'Adding...' : 'Add Domain'}
       </button>
-      {status && <p className="text-xs text-text-secondary mt-3">{status}</p>}
-      <div className="mt-4 text-xs text-text-secondary">
-        <p className="font-bold mb-1">DNS Configuration:</p>
-        <p>Add a CNAME record pointing your domain to <code className="text-accent">cname.vercel-dns.com</code></p>
-      </div>
+      {statusMessage && <p className="text-xs text-green-400">{statusMessage}</p>}
+      {error && <p className="text-xs text-red-500">{error}</p>}
+      <p className="text-xs text-text-secondary">
+        After adding your domain, you'll need to configure DNS records. <a href="/support/custom-domain" target="_blank" className="text-accent hover:underline">See our setup guides</a>
+      </p>
     </div>
   )
 }
