@@ -94,6 +94,7 @@ export const submitContactForm = createServerFn({ method: 'POST' })
       return { success: true }
     } catch (err) {
       console.error('SES send error:', err)
-      return { error: 'Failed to send message. Please try again later.' }
+      const msg = err instanceof Error ? err.message : String(err)
+      return { error: `Failed to send message: ${msg}` }
     }
   })
