@@ -18,6 +18,7 @@ const NAV_ITEMS = [
   { label: 'Press Assets', href: '/dashboard/press' },
   { label: 'Contact', href: '/dashboard/contact' },
   { label: 'Theme', href: '/dashboard/theme' },
+  { label: 'AI Designer', href: '/dashboard/ai-designer' },
   { label: 'Pages', href: '/dashboard/pages' },
   { label: 'SEO & Sharing', href: '/dashboard/social-preview' },
   { label: 'Files', href: '/dashboard/files' },

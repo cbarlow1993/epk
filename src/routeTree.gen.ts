@@ -44,6 +44,7 @@ import { Route as DashboardDashboardEventsRouteImport } from './routes/_dashboar
 import { Route as DashboardDashboardContactRouteImport } from './routes/_dashboard/dashboard.contact'
 import { Route as DashboardDashboardBioRouteImport } from './routes/_dashboard/dashboard.bio'
 import { Route as DashboardDashboardBillingRouteImport } from './routes/_dashboard/dashboard.billing'
+import { Route as DashboardDashboardAiDesignerRouteImport } from './routes/_dashboard/dashboard.ai-designer'
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
   id: '/verify-email',
@@ -228,6 +229,12 @@ const DashboardDashboardBillingRoute =
     path: '/billing',
     getParentRoute: () => DashboardDashboardRoute,
   } as any)
+const DashboardDashboardAiDesignerRoute =
+  DashboardDashboardAiDesignerRouteImport.update({
+    id: '/ai-designer',
+    path: '/ai-designer',
+    getParentRoute: () => DashboardDashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -246,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/invite/$token': typeof InviteTokenRoute
   '/support/custom-domain': typeof SupportCustomDomainRoute
   '/blog/': typeof BlogIndexRoute
+  '/dashboard/ai-designer': typeof DashboardDashboardAiDesignerRoute
   '/dashboard/billing': typeof DashboardDashboardBillingRoute
   '/dashboard/bio': typeof DashboardDashboardBioRoute
   '/dashboard/contact': typeof DashboardDashboardContactRoute
@@ -280,6 +288,7 @@ export interface FileRoutesByTo {
   '/invite/$token': typeof InviteTokenRoute
   '/support/custom-domain': typeof SupportCustomDomainRoute
   '/blog': typeof BlogIndexRoute
+  '/dashboard/ai-designer': typeof DashboardDashboardAiDesignerRoute
   '/dashboard/billing': typeof DashboardDashboardBillingRoute
   '/dashboard/bio': typeof DashboardDashboardBioRoute
   '/dashboard/contact': typeof DashboardDashboardContactRoute
@@ -318,6 +327,7 @@ export interface FileRoutesById {
   '/invite/$token': typeof InviteTokenRoute
   '/support/custom-domain': typeof SupportCustomDomainRoute
   '/blog/': typeof BlogIndexRoute
+  '/_dashboard/dashboard/ai-designer': typeof DashboardDashboardAiDesignerRoute
   '/_dashboard/dashboard/billing': typeof DashboardDashboardBillingRoute
   '/_dashboard/dashboard/bio': typeof DashboardDashboardBioRoute
   '/_dashboard/dashboard/contact': typeof DashboardDashboardContactRoute
@@ -356,6 +366,7 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/support/custom-domain'
     | '/blog/'
+    | '/dashboard/ai-designer'
     | '/dashboard/billing'
     | '/dashboard/bio'
     | '/dashboard/contact'
@@ -390,6 +401,7 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/support/custom-domain'
     | '/blog'
+    | '/dashboard/ai-designer'
     | '/dashboard/billing'
     | '/dashboard/bio'
     | '/dashboard/contact'
@@ -427,6 +439,7 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/support/custom-domain'
     | '/blog/'
+    | '/_dashboard/dashboard/ai-designer'
     | '/_dashboard/dashboard/billing'
     | '/_dashboard/dashboard/bio'
     | '/_dashboard/dashboard/contact'
@@ -711,10 +724,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardBillingRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
+    '/_dashboard/dashboard/ai-designer': {
+      id: '/_dashboard/dashboard/ai-designer'
+      path: '/ai-designer'
+      fullPath: '/dashboard/ai-designer'
+      preLoaderRoute: typeof DashboardDashboardAiDesignerRouteImport
+      parentRoute: typeof DashboardDashboardRoute
+    }
   }
 }
 
 interface DashboardDashboardRouteChildren {
+  DashboardDashboardAiDesignerRoute: typeof DashboardDashboardAiDesignerRoute
   DashboardDashboardBillingRoute: typeof DashboardDashboardBillingRoute
   DashboardDashboardBioRoute: typeof DashboardDashboardBioRoute
   DashboardDashboardContactRoute: typeof DashboardDashboardContactRoute
@@ -736,6 +757,7 @@ interface DashboardDashboardRouteChildren {
 }
 
 const DashboardDashboardRouteChildren: DashboardDashboardRouteChildren = {
+  DashboardDashboardAiDesignerRoute: DashboardDashboardAiDesignerRoute,
   DashboardDashboardBillingRoute: DashboardDashboardBillingRoute,
   DashboardDashboardBioRoute: DashboardDashboardBioRoute,
   DashboardDashboardContactRoute: DashboardDashboardContactRoute,
