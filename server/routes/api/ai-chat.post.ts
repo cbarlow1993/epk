@@ -11,9 +11,9 @@ import { defineHandler, readBody, createError, parseCookies, setCookie } from 'h
 import { anthropic } from '@ai-sdk/anthropic'
 import { streamText, tool } from 'ai'
 import { z } from 'zod'
-import { buildSystemPrompt, summarizeCMSContent } from '~/utils/ai-prompts'
-import type { AIDesignTokens, TokenLockState } from '~/schemas/ai-design-tokens'
-import { partialAIDesignTokensSchema } from '~/schemas/ai-design-tokens'
+import { buildSystemPrompt, summarizeCMSContent } from '../../../src/utils/ai-prompts'
+import type { AIDesignTokens, TokenLockState } from '../../../src/schemas/ai-design-tokens'
+import { partialAIDesignTokensSchema } from '../../../src/schemas/ai-design-tokens'
 
 const inputSchema = z.object({
   message: z.string().min(1),
