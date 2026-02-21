@@ -12,3 +12,14 @@ export { folderCreateSchema, folderRenameSchema } from './folder'
 export * from './organization'
 export { INTEGRATION_TYPES, integrationUpsertSchema, mailchimpSubscribeSchema, embedResolveSchema, CONFIG_SCHEMAS, type IntegrationType, type IntegrationUpsert } from './integrations'
 export { domainSearchSchema, contactInfoSchema, domainPurchaseSchema, type DomainSearch, type ContactInfo, type DomainPurchase } from './domain-order'
+export {
+  aiDesignTokensSchema,
+  partialAIDesignTokensSchema,
+  aiChatMessageSchema,
+  SECTION_KEYS,
+  type AIDesignTokens,
+  type PartialAIDesignTokens,
+  type TokenLockState,
+  type AIChatMessage,
+  type SectionKey,
+} from './ai-design-tokens'
