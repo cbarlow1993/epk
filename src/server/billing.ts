@@ -11,6 +11,8 @@ export const createCheckoutSession = createServerFn({ method: 'POST' })
   .handler(async () => {
     const { supabase, user } = await withAuth()
 
+    console.log('[billing] BASE_URL:', JSON.stringify(BASE_URL))
+
     if (!process.env.STRIPE_SECRET_KEY) return { error: 'Stripe is not configured' }
     if (!process.env.STRIPE_PRO_PRICE_ID) return { error: 'Stripe price is not configured' }
 
