@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { defineHandler, getRequestURL } from 'h3'
 
 const MAIN_DOMAINS = [
   'localhost',
@@ -13,7 +14,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
 )
 
-export default defineEventHandler(async (event) => {
+export default defineHandler(async (event) => {
   const url = getRequestURL(event)
   const hostname = url.hostname
   const host = url.host // includes port

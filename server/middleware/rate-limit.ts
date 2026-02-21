@@ -1,4 +1,5 @@
 // server/middleware/rate-limit.ts
+import { defineHandler, getRequestURL, getRequestHeader, createError } from 'h3'
 
 interface Bucket {
   tokens: number
@@ -41,9 +42,9 @@ const RATE_LIMITS: Record<string, { maxTokens: number; refillRate: number }> = {
   '/api/booking-request': { maxTokens: 3, refillRate: 3 / 60 }, // 3 per minute
 }
 
-export default defineEventHandler((event) => {
+export default defineHandler((event) => {
   const path = getRequestURL(event).pathname
-  const ip = getHeader(event, 'x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+  const ip = getRequestHeader(event, 'x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
 
   for (const [prefix, config] of Object.entries(RATE_LIMITS)) {
     if (path.startsWith(prefix)) {

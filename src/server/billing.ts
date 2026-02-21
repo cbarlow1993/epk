@@ -11,8 +11,6 @@ export const createCheckoutSession = createServerFn({ method: 'POST' })
   .handler(async () => {
     const { supabase, user } = await withAuth()
 
-    console.log('[billing] BASE_URL:', JSON.stringify(BASE_URL))
-
     if (!process.env.STRIPE_SECRET_KEY) return { error: 'Stripe is not configured' }
     if (!process.env.STRIPE_PRO_PRICE_ID) return { error: 'Stripe price is not configured' }
 
@@ -51,7 +49,7 @@ export const createCheckoutSession = createServerFn({ method: 'POST' })
       return { url: session.url }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Unknown billing error'
-      console.error('[billing] Checkout error:', message, err)
+      console.error('[billing] Checkout error:', message)
       return { error: 'Unable to start checkout. Please try again later.' }
     }
   })

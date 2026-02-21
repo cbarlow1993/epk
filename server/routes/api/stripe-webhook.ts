@@ -1,6 +1,7 @@
 // server/routes/api/stripe-webhook.ts
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
+import { defineHandler, readRawBody, getRequestHeader, createError, setResponseStatus, setResponseHeader } from 'h3'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
@@ -11,9 +12,9 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-export default defineEventHandler(async (event) => {
+export default defineHandler(async (event) => {
   const body = await readRawBody(event)
-  const sig = getHeader(event, 'stripe-signature')
+  const sig = getRequestHeader(event, 'stripe-signature')
 
   if (!body || !sig) {
     throw createError({ statusCode: 400, message: 'Missing body or signature' })

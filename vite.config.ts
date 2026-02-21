@@ -20,6 +20,6 @@ export default defineConfig({
     tsConfigPaths({ projects: ['./tsconfig.json'] }),
     tanstackStart({ tsr: { srcDir: 'src' } }),
     viteReact(),
-    nitro(),
+    nitro({ serverDir: 'server' }),
   ],
 })

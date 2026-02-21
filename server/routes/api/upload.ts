@@ -1,4 +1,5 @@
 import { createServerClient } from '@supabase/ssr'
+import { defineHandler, readMultipartFormData, createError, parseCookies, setCookie } from 'h3'
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024 // 5MB
 const MAX_ATTACHMENT_SIZE = 10 * 1024 * 1024 // 10MB
@@ -22,7 +23,7 @@ function verifyMagicBytes(buffer: Buffer, contentType: string): boolean {
   )
 }
 
-export default defineEventHandler(async (event) => {
+export default defineHandler(async (event) => {
   // Parse multipart form data
   const formData = await readMultipartFormData(event)
   if (!formData) {

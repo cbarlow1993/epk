@@ -1,4 +1,5 @@
 import { createServerClient } from '@supabase/ssr'
+import { defineHandler, readMultipartFormData, createError, parseCookies, setCookie } from 'h3'
 
 const MAX_FONT_SIZE = 500 * 1024 // 500KB
 
@@ -35,7 +36,7 @@ function getFileExtension(filename: string): string {
   return filename.slice(lastDot).toLowerCase()
 }
 
-export default defineEventHandler(async (event) => {
+export default defineHandler(async (event) => {
   // Parse multipart form data
   const formData = await readMultipartFormData(event)
   if (!formData) {
