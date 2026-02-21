@@ -3,12 +3,8 @@ import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses'
 let _ses: SESClient | null = null
 function getSESClient(): SESClient {
   if (!_ses) {
-    const accessKeyId = process.env.AWS_ACCESS_KEY_ID
-    const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY
-    if (!accessKeyId || !secretAccessKey) throw new Error('AWS credentials not configured')
     _ses = new SESClient({
       region: process.env.AWS_REGION || 'eu-west-1',
-      credentials: { accessKeyId, secretAccessKey },
     })
   }
   return _ses
