@@ -1,20 +1,15 @@
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses'
-import { fromWebToken } from '@aws-sdk/credential-providers'
+import { awsCredentialsProvider } from '@vercel/functions/oidc'
 
 function getSESClient(): SESClient {
   const region = process.env.AWS_REGION || 'eu-west-1'
   const roleArn = process.env.AWS_ROLE_ARN
-  const oidcToken = process.env.VERCEL_OIDC_TOKEN
 
-  // Use Vercel OIDC → STS AssumeRoleWithWebIdentity when available
-  if (roleArn && oidcToken) {
+  // Use Vercel OIDC credential provider when role ARN is configured
+  if (roleArn) {
     return new SESClient({
       region,
-      credentials: fromWebToken({
-        roleArn,
-        webIdentityToken: oidcToken,
-        roleSessionName: 'epk-ses-session',
-      }),
+      credentials: awsCredentialsProvider({ roleArn }),
     })
   }
 
