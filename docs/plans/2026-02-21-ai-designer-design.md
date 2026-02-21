@@ -49,7 +49,7 @@ Each section (hero, bio, music, events, photos, contact) gets its own token grou
 - `background`: Override — color, gradient reference, or image URL
 - `textColor`: Override for this section
 - `padding`: Override spacing
-- Section-specific layout options (e.g., events: `timeline`/`grid`/`list`; music: `cards`/`list`/`player`)
+- Section-specific layout options (e.g., events: `timeline`/`grid`/`list`; music: `cards`/`list`/`waveform`/`featured`)
 
 #### 4. Decorative Tokens
 

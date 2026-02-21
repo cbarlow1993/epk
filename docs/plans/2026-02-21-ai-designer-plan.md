@@ -220,6 +220,8 @@ export const aiDesignTokensSchema = z.object({
     heading: hexColor,
     link: hexColor,
     border: hexColor,
+    error: hexColor,
+    success: hexColor,
   }),
 
   // Gradients
@@ -299,6 +301,13 @@ export const aiDesignTokensSchema = z.object({
   decorative: z.object({
     dividerStyle: z.enum(['none', 'line', 'gradient', 'wave', 'diagonal', 'dots']),
     backgroundPattern: z.enum(['none', 'dots', 'grid', 'noise', 'topography']),
+    accentElements: z.object({
+      glow: z.object({ enabled: z.boolean(), color: hexColor.optional(), blur: z.string().optional() }).optional(),
+      blur: z.object({ enabled: z.boolean(), radius: z.string().optional() }).optional(),
+      geometricShapes: z.object({ enabled: z.boolean(), style: z.enum(['circles', 'lines', 'triangles', 'dots']).optional() }).optional(),
+    }).optional(),
+    cursorStyle: z.enum(['default', 'crosshair', 'pointer', 'custom']).optional(),
+    scrollbarStyle: z.enum(['default', 'thin', 'hidden', 'accent']).optional(),
     buttonStyle: z.enum(['rounded', 'square', 'pill']),
     linkStyle: z.enum(['underline', 'none', 'hover-underline']),
     cardBorder: z.enum(['none', 'subtle', 'solid']),
@@ -407,6 +416,8 @@ export const VIBE_PRESETS: VibePreset[] = [
         heading: '#ffffff',
         link: '#e94560',
         border: '#2a2a2a',
+        error: '#ef4444',
+        success: '#22c55e',
       },
       typography: {
         display: { fontFamily: 'Bebas Neue', fontSize: '5rem', fontWeight: '400', textTransform: 'uppercase' },
@@ -740,6 +751,7 @@ import type { AIDesignTokens, TokenLockState } from '~/schemas/ai-design-tokens'
 
 interface ChatInput {
   message: string
+  conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }>
   currentTokens: AIDesignTokens
   lockedTokens: TokenLockState
   profile: Record<string, unknown>
@@ -762,10 +774,19 @@ export const streamAIDesignChat = createServerFn({ method: 'POST' })
       summarizeCMSContent(data.profile),
     )
 
+    // Build full message list: previous conversation + new user message
+    const messages = [
+      ...(data.conversationHistory || []).map((msg) => ({
+        role: msg.role as 'user' | 'assistant',
+        content: msg.content,
+      })),
+      { role: 'user' as const, content: data.message },
+    ]
+
     const result = streamText({
       model: anthropic('claude-sonnet-4-20250514'),
       system: systemPrompt,
-      messages: [{ role: 'user', content: data.message }],
+      messages,
       tools: {
         updateDesignTokens: tool({
           description: 'Update the design tokens for the EPK page. Only include tokens that changed.',
@@ -1141,6 +1162,17 @@ interface WizardProps {
 
 Use CSS from `src/components/forms/styles.ts` for consistent styling (BTN_PRIMARY, CARD_SECTION, etc.).
 
+**Wizard restart:** The wizard must support being re-entered at any time. Add an `initialStep` prop (defaults to 0) and an `onCancel` callback so the parent route can toggle between wizard and editor mode. When user clicks "Restart Wizard" from the editor, the parent resets state and shows the wizard again.
+
+```typescript
+interface WizardProps {
+  onComplete: (tokens: AIDesignTokens, lockState: TokenLockState) => void
+  onCancel?: () => void  // Return to editor mode without changes
+  profile: Record<string, unknown>
+  initialStep?: number
+}
+```
+
 **Step 2: Verify TypeScript compiles**
 
 Run: `npx tsc --noEmit`
@@ -1268,23 +1300,29 @@ function AIDesignerPage() {
   // - tokens: AIDesignTokens (current working state)
   // - lockState: TokenLockState
   // - chatHistory: AIChatMessage[]
-  // - wizardComplete: boolean (show wizard vs chat)
+  // - showWizard: boolean (show wizard vs editor)
   // - undoStack / redoStack for undo/redo
 
-  // If no AI tokens exist yet, show wizard
-  // After wizard completes, show chat + preview layout
+  // If no AI tokens exist yet OR showWizard is true, show wizard
+  // After wizard completes, set showWizard=false and show editor
+  // "Restart Wizard" button in editor header resets showWizard=true
 
   // Preview iframe pointing to /$slug?preview=true
   // PostMessage to iframe on token changes
 
   // Save button persists to database via saveAIDesignTokens
   // Publish/Unpublish toggles renderer mode
+
+  // Wizard restart handler:
+  // const handleRestartWizard = () => setShowWizard(true)
+  // Pass to editor header as a button action
 }
 ```
 
-The page has two modes:
-1. **Wizard mode** — if no `ai_design_tokens` exist on profile
-2. **Editor mode** — split layout with chat panel (40%) + preview iframe (60%) + token inspector (collapsible bottom)
+The page has three modes:
+1. **Pro gate** — if user is on free tier, show an upgrade prompt. Check `profile.tier === 'pro'`.
+2. **Wizard mode** — if no `ai_design_tokens` exist on profile, OR user clicked "Restart Wizard"
+3. **Editor mode** — split layout with chat panel (40%) + preview iframe (60%) + token inspector (collapsible bottom). Header includes a "Restart Wizard" button that sets `showWizard=true`.
 
 **Pro tier gate:** If user is on free tier, show an upgrade prompt instead of the wizard. Check `profile.tier === 'pro'`.
 
