@@ -11,6 +11,7 @@ import { isLightBackground } from '~/utils/color'
 import type { MixRow, EventRow, SocialLinkRow, FileRow } from '~/types/database'
 import { formatEventDate } from '~/utils/dates'
 import { SocialIcon } from '~/components/SocialIcon'
+import { submitContactForm } from '~/server/booking-contact'
 
 type PhotoRow = { id: string; image_url: string; caption: string | null; sort_order: number }
 
@@ -216,6 +217,88 @@ function MailchimpForm({ profileId, heading, buttonText, textSecClass }: {
   )
 }
 
+function ContactForm({ profileId, accentColor, textSecClass }: { profileId: string; accentColor: string; textSecClass: string }) {
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  const [errorMsg, setErrorMsg] = useState('')
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setStatus('sending')
+    setErrorMsg('')
+
+    const form = e.currentTarget
+    const formData = new FormData(form)
+
+    const result = await submitContactForm({
+      data: {
+        name: formData.get('name') as string,
+        email: formData.get('email') as string,
+        phone: (formData.get('phone') as string) || '',
+        message: formData.get('message') as string,
+        profile_id: profileId,
+        _honey: formData.get('_honey') as string,
+      },
+    })
+
+    if ('error' in result && result.error) {
+      setStatus('error')
+      setErrorMsg(result.error)
+    } else {
+      setStatus('sent')
+      form.reset()
+    }
+  }
+
+  if (status === 'sent') {
+    return (
+      <div className={`${textSecClass} text-center py-8`}>
+        <p className="text-lg font-semibold mb-2">Message sent!</p>
+        <p>Thank you for your inquiry. We'll be in touch soon.</p>
+        <button type="button" onClick={() => setStatus('idle')} className="mt-4 text-sm underline" style={{ color: accentColor }}>
+          Send another message
+        </button>
+      </div>
+    )
+  }
+
+  const inputClass = `w-full bg-transparent border border-current/20 px-4 py-3 text-inherit placeholder:opacity-50 focus:outline-none transition-colors text-sm`
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Honeypot — hidden from humans */}
+      <input type="text" name="_honey" tabIndex={-1} autoComplete="off" className="absolute opacity-0 h-0 w-0 pointer-events-none" aria-hidden="true" />
+
+      <div>
+        <label className={`block text-xs font-semibold uppercase tracking-wider ${textSecClass} mb-2`}>Name *</label>
+        <input type="text" name="name" required maxLength={200} placeholder="Your name" className={inputClass} style={{ borderColor: `${accentColor}33` }} />
+      </div>
+      <div>
+        <label className={`block text-xs font-semibold uppercase tracking-wider ${textSecClass} mb-2`}>Email *</label>
+        <input type="email" name="email" required placeholder="your@email.com" className={inputClass} style={{ borderColor: `${accentColor}33` }} />
+      </div>
+      <div>
+        <label className={`block text-xs font-semibold uppercase tracking-wider ${textSecClass} mb-2`}>Phone</label>
+        <input type="tel" name="phone" maxLength={50} placeholder="+44 7xxx xxx xxx" className={inputClass} style={{ borderColor: `${accentColor}33` }} />
+      </div>
+      <div>
+        <label className={`block text-xs font-semibold uppercase tracking-wider ${textSecClass} mb-2`}>Message *</label>
+        <textarea name="message" required maxLength={2000} rows={5} placeholder="Tell us about your event..." className={`${inputClass} resize-none leading-relaxed`} style={{ borderColor: `${accentColor}33` }} />
+      </div>
+
+      {status === 'error' && <p className="text-sm text-red-500">{errorMsg}</p>}
+
+      <button
+        type="submit"
+        disabled={status === 'sending'}
+        className="px-6 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-colors disabled:opacity-50"
+        style={{ backgroundColor: accentColor }}
+      >
+        {status === 'sending' ? 'Sending...' : 'Send Message'}
+      </button>
+    </form>
+  )
+}
+
 function PublicEPK() {
   const data = Route.useLoaderData()
   const search = Route.useSearch()
@@ -383,7 +466,7 @@ function PublicEPK() {
     events.length > 0 && { label: 'Events', href: '#events' },
     technicalRider && (technicalRider.deck_model || technicalRider.mixer_model || technicalRider.monitor_type || technicalRider.additional_notes) && { label: 'Rider', href: '#technical' },
     (pressAssets.length > 0 || profile.press_kit_url) && { label: 'Press', href: '#press' },
-    bookingContact && bookingContact.manager_name && { label: 'Contact', href: '#contact' },
+    bookingContact && (bookingContact.contact_mode === 'form' || bookingContact.manager_name) && { label: 'Contact', href: '#contact' },
     (data?.integrations || []).some((i: { type: string }) => ['soundcloud', 'spotify', 'mixcloud'].includes(i.type)) && { label: 'Listen', href: '#listen-embeds' },
     (data?.integrations || []).some((i: { type: string }) => ['mailchimp', 'custom_embed'].includes(i.type)) && { label: 'Newsletter', href: '#newsletter' },
   ].filter((s): s is { label: string; href: string } => !!s)
@@ -1056,13 +1139,17 @@ function PublicEPK() {
               </EPKSection>
             ) : null,
 
-            contact: bookingContact && bookingContact.manager_name ? (
+            contact: bookingContact && (bookingContact.contact_mode === 'form' || bookingContact.manager_name) ? (
               <EPKSection key="contact" id="contact" heading="Booking Contact" animate={animateSections}>
-                <div className={`${textSecClass} space-y-2`}>
-                  <p><strong>Management:</strong> {bookingContact.manager_name}</p>
-                  {bookingContact.email && <p><strong>Email:</strong> {bookingContact.email}</p>}
-                  {bookingContact.phone && <p><strong>Phone:</strong> {bookingContact.phone}</p>}
-                </div>
+                {bookingContact.contact_mode === 'form' ? (
+                  <ContactForm profileId={data!.profileId} accentColor={accent} textSecClass={textSecClass} />
+                ) : (
+                  <div className={`${textSecClass} space-y-2`}>
+                    <p><strong>Management:</strong> {bookingContact.manager_name}</p>
+                    {bookingContact.email && <p><strong>Email:</strong> {bookingContact.email}</p>}
+                    {bookingContact.phone && <p><strong>Phone:</strong> {bookingContact.phone}</p>}
+                  </div>
+                )}
               </EPKSection>
             ) : null,
           }
