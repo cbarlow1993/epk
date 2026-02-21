@@ -9,6 +9,8 @@ import { FormInput, FORM_LABEL, FORM_FILE_INPUT } from '~/components/forms'
 import { useDashboardSave } from '~/hooks/useDashboardSave'
 import { DashboardHeader } from '~/components/DashboardHeader'
 import { uploadFileFromInput } from '~/utils/upload'
+import { useImageCrop } from '~/hooks/useImageCrop'
+import { CROP_ASPECTS } from '~/utils/crop'
 
 const heroFormSchema = profileUpdateSchema.pick({ hero_image_url: true, hero_video_url: true, hero_style: true, tagline: true }).partial()
 type HeroFormValues = z.infer<typeof heroFormSchema>
@@ -76,6 +78,11 @@ function HeroEditor() {
       setUploadError(result.error)
     }
   }
+
+  const { openCrop, cropModal } = useImageCrop({
+    aspect: CROP_ASPECTS.hero,
+    onCropped: handleUpload,
+  })
 
   const handleRemoveImage = () => {
     setValue('hero_image_url', '', { shouldDirty: true })
@@ -248,7 +255,8 @@ function HeroEditor() {
               accept="image/*"
               onChange={(e) => {
                 const file = e.target.files?.[0]
-                if (file) handleUpload(file)
+                if (file) openCrop(file)
+                e.target.value = ''
               }}
               className={FORM_FILE_INPUT}
             />
@@ -366,6 +374,7 @@ function HeroEditor() {
           )}
         </div>
       </div>
+      {cropModal}
     </form>
   )
 }

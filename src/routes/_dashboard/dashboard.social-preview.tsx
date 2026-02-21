@@ -8,6 +8,8 @@ import { FormInput, FormTextarea, FORM_LABEL, FORM_INPUT, FORM_FILE_INPUT } from
 import { useDashboardSave } from '~/hooks/useDashboardSave'
 import { DashboardHeader } from '~/components/DashboardHeader'
 import { uploadFileFromInput } from '~/utils/upload'
+import { useImageCrop } from '~/hooks/useImageCrop'
+import { CROP_ASPECTS } from '~/utils/crop'
 import { createCheckoutSession } from '~/server/billing'
 
 type SeoFields = Pick<ProfileUpdate, 'meta_description' | 'og_image_url'>
@@ -111,9 +113,7 @@ function SeoSharingEditor() {
   const effectiveImage = ogImageUrl || initial?.profile_image_url || ''
   const domain = initial?.slug ? `myepk.bio/${initial.slug}` : 'myepk.bio'
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+  const handleFile = async (file: File) => {
     setUploading(true)
     const result = await uploadFileFromInput(file, 'og-images')
     if (result.ok) {
@@ -121,6 +121,11 @@ function SeoSharingEditor() {
     }
     setUploading(false)
   }
+
+  const { openCrop, cropModal } = useImageCrop({
+    aspect: CROP_ASPECTS.og,
+    onCropped: handleFile,
+  })
 
   const tabs: { id: PreviewTab; label: string }[] = [
     { id: 'facebook', label: 'Facebook' },
@@ -172,7 +177,11 @@ function SeoSharingEditor() {
               <input
                 type="file"
                 accept="image/*"
-                onChange={handleImageUpload}
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) openCrop(file)
+                  e.target.value = ''
+                }}
                 disabled={uploading}
                 className={FORM_FILE_INPUT}
               />
@@ -296,6 +305,7 @@ function SeoSharingEditor() {
           </p>
         </div>
       </div>
+      {cropModal}
     </div>
   )
 }

@@ -37,15 +37,12 @@ import { Route as DashboardDashboardPressRouteImport } from './routes/_dashboard
 import { Route as DashboardDashboardPhotosRouteImport } from './routes/_dashboard/dashboard.photos'
 import { Route as DashboardDashboardPagesRouteImport } from './routes/_dashboard/dashboard.pages'
 import { Route as DashboardDashboardMusicRouteImport } from './routes/_dashboard/dashboard.music'
-import { Route as DashboardDashboardIntegrationsRouteImport } from './routes/_dashboard/dashboard.integrations'
 import { Route as DashboardDashboardHeroRouteImport } from './routes/_dashboard/dashboard.hero'
 import { Route as DashboardDashboardFilesRouteImport } from './routes/_dashboard/dashboard.files'
 import { Route as DashboardDashboardEventsRouteImport } from './routes/_dashboard/dashboard.events'
 import { Route as DashboardDashboardContactRouteImport } from './routes/_dashboard/dashboard.contact'
 import { Route as DashboardDashboardBioRouteImport } from './routes/_dashboard/dashboard.bio'
 import { Route as DashboardDashboardBillingRouteImport } from './routes/_dashboard/dashboard.billing'
-import { Route as DashboardDashboardAnalyticsOverviewRouteImport } from './routes/_dashboard/dashboard.analytics-overview'
-import { Route as DashboardDashboardAnalyticsRouteImport } from './routes/_dashboard/dashboard.analytics'
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
   id: '/verify-email',
@@ -192,12 +189,6 @@ const DashboardDashboardMusicRoute = DashboardDashboardMusicRouteImport.update({
   path: '/music',
   getParentRoute: () => DashboardDashboardRoute,
 } as any)
-const DashboardDashboardIntegrationsRoute =
-  DashboardDashboardIntegrationsRouteImport.update({
-    id: '/integrations',
-    path: '/integrations',
-    getParentRoute: () => DashboardDashboardRoute,
-  } as any)
 const DashboardDashboardHeroRoute = DashboardDashboardHeroRouteImport.update({
   id: '/hero',
   path: '/hero',
@@ -231,18 +222,6 @@ const DashboardDashboardBillingRoute =
     path: '/billing',
     getParentRoute: () => DashboardDashboardRoute,
   } as any)
-const DashboardDashboardAnalyticsOverviewRoute =
-  DashboardDashboardAnalyticsOverviewRouteImport.update({
-    id: '/analytics-overview',
-    path: '/analytics-overview',
-    getParentRoute: () => DashboardDashboardRoute,
-  } as any)
-const DashboardDashboardAnalyticsRoute =
-  DashboardDashboardAnalyticsRouteImport.update({
-    id: '/analytics',
-    path: '/analytics',
-    getParentRoute: () => DashboardDashboardRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -260,15 +239,12 @@ export interface FileRoutesByFullPath {
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$token': typeof InviteTokenRoute
   '/blog/': typeof BlogIndexRoute
-  '/dashboard/analytics': typeof DashboardDashboardAnalyticsRoute
-  '/dashboard/analytics-overview': typeof DashboardDashboardAnalyticsOverviewRoute
   '/dashboard/billing': typeof DashboardDashboardBillingRoute
   '/dashboard/bio': typeof DashboardDashboardBioRoute
   '/dashboard/contact': typeof DashboardDashboardContactRoute
   '/dashboard/events': typeof DashboardDashboardEventsRoute
   '/dashboard/files': typeof DashboardDashboardFilesRoute
   '/dashboard/hero': typeof DashboardDashboardHeroRoute
-  '/dashboard/integrations': typeof DashboardDashboardIntegrationsRoute
   '/dashboard/music': typeof DashboardDashboardMusicRoute
   '/dashboard/pages': typeof DashboardDashboardPagesRoute
   '/dashboard/photos': typeof DashboardDashboardPhotosRoute
@@ -296,15 +272,12 @@ export interface FileRoutesByTo {
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$token': typeof InviteTokenRoute
   '/blog': typeof BlogIndexRoute
-  '/dashboard/analytics': typeof DashboardDashboardAnalyticsRoute
-  '/dashboard/analytics-overview': typeof DashboardDashboardAnalyticsOverviewRoute
   '/dashboard/billing': typeof DashboardDashboardBillingRoute
   '/dashboard/bio': typeof DashboardDashboardBioRoute
   '/dashboard/contact': typeof DashboardDashboardContactRoute
   '/dashboard/events': typeof DashboardDashboardEventsRoute
   '/dashboard/files': typeof DashboardDashboardFilesRoute
   '/dashboard/hero': typeof DashboardDashboardHeroRoute
-  '/dashboard/integrations': typeof DashboardDashboardIntegrationsRoute
   '/dashboard/music': typeof DashboardDashboardMusicRoute
   '/dashboard/pages': typeof DashboardDashboardPagesRoute
   '/dashboard/photos': typeof DashboardDashboardPhotosRoute
@@ -336,15 +309,12 @@ export interface FileRoutesById {
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$token': typeof InviteTokenRoute
   '/blog/': typeof BlogIndexRoute
-  '/_dashboard/dashboard/analytics': typeof DashboardDashboardAnalyticsRoute
-  '/_dashboard/dashboard/analytics-overview': typeof DashboardDashboardAnalyticsOverviewRoute
   '/_dashboard/dashboard/billing': typeof DashboardDashboardBillingRoute
   '/_dashboard/dashboard/bio': typeof DashboardDashboardBioRoute
   '/_dashboard/dashboard/contact': typeof DashboardDashboardContactRoute
   '/_dashboard/dashboard/events': typeof DashboardDashboardEventsRoute
   '/_dashboard/dashboard/files': typeof DashboardDashboardFilesRoute
   '/_dashboard/dashboard/hero': typeof DashboardDashboardHeroRoute
-  '/_dashboard/dashboard/integrations': typeof DashboardDashboardIntegrationsRoute
   '/_dashboard/dashboard/music': typeof DashboardDashboardMusicRoute
   '/_dashboard/dashboard/pages': typeof DashboardDashboardPagesRoute
   '/_dashboard/dashboard/photos': typeof DashboardDashboardPhotosRoute
@@ -376,15 +346,12 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/invite/$token'
     | '/blog/'
-    | '/dashboard/analytics'
-    | '/dashboard/analytics-overview'
     | '/dashboard/billing'
     | '/dashboard/bio'
     | '/dashboard/contact'
     | '/dashboard/events'
     | '/dashboard/files'
     | '/dashboard/hero'
-    | '/dashboard/integrations'
     | '/dashboard/music'
     | '/dashboard/pages'
     | '/dashboard/photos'
@@ -412,15 +379,12 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/invite/$token'
     | '/blog'
-    | '/dashboard/analytics'
-    | '/dashboard/analytics-overview'
     | '/dashboard/billing'
     | '/dashboard/bio'
     | '/dashboard/contact'
     | '/dashboard/events'
     | '/dashboard/files'
     | '/dashboard/hero'
-    | '/dashboard/integrations'
     | '/dashboard/music'
     | '/dashboard/pages'
     | '/dashboard/photos'
@@ -451,15 +415,12 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/invite/$token'
     | '/blog/'
-    | '/_dashboard/dashboard/analytics'
-    | '/_dashboard/dashboard/analytics-overview'
     | '/_dashboard/dashboard/billing'
     | '/_dashboard/dashboard/bio'
     | '/_dashboard/dashboard/contact'
     | '/_dashboard/dashboard/events'
     | '/_dashboard/dashboard/files'
     | '/_dashboard/dashboard/hero'
-    | '/_dashboard/dashboard/integrations'
     | '/_dashboard/dashboard/music'
     | '/_dashboard/dashboard/pages'
     | '/_dashboard/dashboard/photos'
@@ -688,13 +649,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardMusicRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
-    '/_dashboard/dashboard/integrations': {
-      id: '/_dashboard/dashboard/integrations'
-      path: '/integrations'
-      fullPath: '/dashboard/integrations'
-      preLoaderRoute: typeof DashboardDashboardIntegrationsRouteImport
-      parentRoute: typeof DashboardDashboardRoute
-    }
     '/_dashboard/dashboard/hero': {
       id: '/_dashboard/dashboard/hero'
       path: '/hero'
@@ -737,33 +691,16 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardBillingRouteImport
       parentRoute: typeof DashboardDashboardRoute
     }
-    '/_dashboard/dashboard/analytics-overview': {
-      id: '/_dashboard/dashboard/analytics-overview'
-      path: '/analytics-overview'
-      fullPath: '/dashboard/analytics-overview'
-      preLoaderRoute: typeof DashboardDashboardAnalyticsOverviewRouteImport
-      parentRoute: typeof DashboardDashboardRoute
-    }
-    '/_dashboard/dashboard/analytics': {
-      id: '/_dashboard/dashboard/analytics'
-      path: '/analytics'
-      fullPath: '/dashboard/analytics'
-      preLoaderRoute: typeof DashboardDashboardAnalyticsRouteImport
-      parentRoute: typeof DashboardDashboardRoute
-    }
   }
 }
 
 interface DashboardDashboardRouteChildren {
-  DashboardDashboardAnalyticsRoute: typeof DashboardDashboardAnalyticsRoute
-  DashboardDashboardAnalyticsOverviewRoute: typeof DashboardDashboardAnalyticsOverviewRoute
   DashboardDashboardBillingRoute: typeof DashboardDashboardBillingRoute
   DashboardDashboardBioRoute: typeof DashboardDashboardBioRoute
   DashboardDashboardContactRoute: typeof DashboardDashboardContactRoute
   DashboardDashboardEventsRoute: typeof DashboardDashboardEventsRoute
   DashboardDashboardFilesRoute: typeof DashboardDashboardFilesRoute
   DashboardDashboardHeroRoute: typeof DashboardDashboardHeroRoute
-  DashboardDashboardIntegrationsRoute: typeof DashboardDashboardIntegrationsRoute
   DashboardDashboardMusicRoute: typeof DashboardDashboardMusicRoute
   DashboardDashboardPagesRoute: typeof DashboardDashboardPagesRoute
   DashboardDashboardPhotosRoute: typeof DashboardDashboardPhotosRoute
@@ -779,16 +716,12 @@ interface DashboardDashboardRouteChildren {
 }
 
 const DashboardDashboardRouteChildren: DashboardDashboardRouteChildren = {
-  DashboardDashboardAnalyticsRoute: DashboardDashboardAnalyticsRoute,
-  DashboardDashboardAnalyticsOverviewRoute:
-    DashboardDashboardAnalyticsOverviewRoute,
   DashboardDashboardBillingRoute: DashboardDashboardBillingRoute,
   DashboardDashboardBioRoute: DashboardDashboardBioRoute,
   DashboardDashboardContactRoute: DashboardDashboardContactRoute,
   DashboardDashboardEventsRoute: DashboardDashboardEventsRoute,
   DashboardDashboardFilesRoute: DashboardDashboardFilesRoute,
   DashboardDashboardHeroRoute: DashboardDashboardHeroRoute,
-  DashboardDashboardIntegrationsRoute: DashboardDashboardIntegrationsRoute,
   DashboardDashboardMusicRoute: DashboardDashboardMusicRoute,
   DashboardDashboardPagesRoute: DashboardDashboardPagesRoute,
   DashboardDashboardPhotosRoute: DashboardDashboardPhotosRoute,

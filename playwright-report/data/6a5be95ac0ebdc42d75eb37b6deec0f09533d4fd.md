@@ -1,0 +1,95 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - paragraph [ref=e5]: DJ FlowTest
+      - link "View EPK" [ref=e6] [cursor=pointer]:
+        - /url: /dj-flowtest
+    - navigation [ref=e7]:
+      - link "Dashboard" [ref=e8] [cursor=pointer]:
+        - /url: /dashboard
+      - link "Profile" [ref=e9] [cursor=pointer]:
+        - /url: /dashboard/profile
+      - link "Hero" [ref=e10] [cursor=pointer]:
+        - /url: /dashboard/hero
+      - link "Bio" [ref=e11] [cursor=pointer]:
+        - /url: /dashboard/bio
+      - link "Music" [ref=e12] [cursor=pointer]:
+        - /url: /dashboard/music
+      - link "Events" [ref=e13] [cursor=pointer]:
+        - /url: /dashboard/events
+      - link "Photos" [ref=e14] [cursor=pointer]:
+        - /url: /dashboard/photos
+      - link "Technical" [ref=e15] [cursor=pointer]:
+        - /url: /dashboard/technical
+      - link "Press Assets" [ref=e16] [cursor=pointer]:
+        - /url: /dashboard/press
+      - link "Contact" [ref=e17] [cursor=pointer]:
+        - /url: /dashboard/contact
+      - link "Theme" [ref=e18] [cursor=pointer]:
+        - /url: /dashboard/theme
+      - link "Pages" [ref=e19] [cursor=pointer]:
+        - /url: /dashboard/pages
+      - link "SEO & Sharing" [ref=e20] [cursor=pointer]:
+        - /url: /dashboard/social-preview
+      - link "Files" [ref=e21] [cursor=pointer]:
+        - /url: /dashboard/files
+      - link "Analytics" [ref=e22] [cursor=pointer]:
+        - /url: /dashboard/analytics
+      - link "Integrations" [ref=e23] [cursor=pointer]:
+        - /url: /dashboard/integrations
+      - link "Settings" [ref=e24] [cursor=pointer]:
+        - /url: /dashboard/settings
+    - generic [ref=e25]:
+      - generic [ref=e27]:
+        - generic [ref=e28]: Published
+        - generic [ref=e29]:
+          - button "Publish EPK" [ref=e30]
+          - generic [ref=e32]: Draft
+      - button "Log out" [ref=e34]
+  - main [ref=e35]:
+    - generic [ref=e36]:
+      - generic [ref=e38]:
+        - generic [ref=e39]:
+          - heading "Events / Brands" [level=1] [ref=e40]
+          - generic [ref=e41]:
+            - button "Disable Events / Brands section" [ref=e42]
+            - generic [ref=e44]: Enabled
+        - button "Save" [disabled] [ref=e46]
+      - button "+ Add Event" [ref=e48]
+      - paragraph [ref=e49]: No events yet. Add one above.
+      - dialog [ref=e50]:
+        - generic [ref=e51]:
+          - generic [ref=e52]:
+            - heading "Add Event" [level=2] [ref=e53]
+            - button "Close" [ref=e54]: ✕
+          - generic [ref=e55]:
+            - generic [ref=e56]:
+              - generic [ref=e57]: Name
+              - textbox "Event / Brand Name" [ref=e58]: Fabric London
+            - generic [ref=e59]:
+              - generic [ref=e60]: Category
+              - combobox "e.g. Residencies" [ref=e61]: Residencies
+            - generic [ref=e62]:
+              - generic [ref=e63]: Link URL (optional)
+              - textbox "https://..." [active] [ref=e64]: https://fabriclondon.com
+            - generic [ref=e65]:
+              - generic [ref=e66]: Description (optional)
+              - textbox "Short description" [ref=e67]
+            - generic [ref=e68]:
+              - generic [ref=e69]:
+                - generic [ref=e70]: Date (optional)
+                - textbox [ref=e71]
+              - generic [ref=e72]:
+                - generic [ref=e73]: End Date (optional)
+                - textbox [ref=e74]
+            - generic [ref=e75]:
+              - generic [ref=e76]: Image (optional)
+              - paragraph [ref=e77]: "Recommended: 800 x 800px"
+              - button "Choose File" [ref=e78]
+            - generic [ref=e79]:
+              - button "Save" [ref=e80]
+              - button "Cancel" [ref=e81]
+```

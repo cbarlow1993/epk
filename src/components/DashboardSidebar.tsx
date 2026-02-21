@@ -21,7 +21,6 @@ const NAV_ITEMS = [
   { label: 'Pages', href: '/dashboard/pages' },
   { label: 'SEO & Sharing', href: '/dashboard/social-preview' },
   { label: 'Files', href: '/dashboard/files' },
-  { label: 'Analytics', href: '/dashboard/analytics' },
   { label: 'Settings', href: '/dashboard/settings' },
 ]
 
@@ -29,7 +28,6 @@ const AGENCY_NAV_ITEMS = [
   { label: 'Roster', href: '/dashboard/roster' },
   { label: 'Team', href: '/dashboard/team' },
   { label: 'Billing', href: '/dashboard/billing' },
-  { label: 'Agency Analytics', href: '/dashboard/analytics-overview' },
 ]
 
 export function DashboardSidebar({ profile, isAgency = false }: { profile: SidebarProfile; isAgency?: boolean }) {

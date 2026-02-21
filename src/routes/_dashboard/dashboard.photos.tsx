@@ -12,6 +12,7 @@ import { useListEditor } from '~/hooks/useListEditor'
 import { useSectionToggle } from '~/hooks/useSectionToggle'
 import { uploadFileFromInput } from '~/utils/upload'
 import { BTN_PRIMARY } from '~/components/forms/styles'
+import { useImageCrop } from '~/hooks/useImageCrop'
 
 type PhotoRow = { id: string; image_url: string; caption: string | null; sort_order: number }
 
@@ -73,6 +74,10 @@ function PhotosEditor() {
       setUploadError(result.error)
     }
   }
+
+  const { openCrop, cropModal } = useImageCrop({
+    onCropped: handleUpload,
+  })
 
   const onSubmit = handleSubmit(async (data) => {
     setSaving(true)
@@ -193,7 +198,8 @@ function PhotosEditor() {
               accept="image/jpeg,image/png,image/webp"
               onChange={(e) => {
                 const file = e.target.files?.[0]
-                if (file) handleUpload(file)
+                if (file) openCrop(file)
+                e.target.value = ''
               }}
               className={FORM_FILE_INPUT}
             />
@@ -220,6 +226,7 @@ function PhotosEditor() {
           </div>
         </form>
       </Modal>
+      {cropModal}
     </>
   )
 }

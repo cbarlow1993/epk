@@ -6,6 +6,7 @@ import { getEvents, getEventCategories, upsertEvent, deleteEvent, reorderEvents 
 import { getProfile, updateProfile } from '~/server/profile'
 import { eventUpsertSchema, type EventUpsert } from '~/schemas/event'
 import { uploadFileFromInput } from '~/utils/upload'
+import { useImageCrop } from '~/hooks/useImageCrop'
 import { FORM_LABEL, FORM_INPUT, FORM_INPUT_ERROR, FORM_ERROR_MSG, BTN_BASE, BTN_PRIMARY, BTN_DELETE, FORM_FILE_INPUT } from '~/components/forms'
 import { useListEditor } from '~/hooks/useListEditor'
 import { ReorderButtons } from '~/components/ReorderButtons'
@@ -37,6 +38,7 @@ function EventsEditor() {
   const [sectionSaving, setSectionSaving] = useState(false)
   const [sectionSaved, setSectionSaved] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const croppedFileRef = useRef<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [categoryOrder, setCategoryOrder] = useState<string[]>(initialCategoryOrder || [])
 
@@ -94,6 +96,7 @@ function EventsEditor() {
       setImagePreview(item.image_url || null)
     }
     if (fileInputRef.current) fileInputRef.current.value = ''
+    croppedFileRef.current = null
     setModalItem(item)
   }
 
@@ -102,12 +105,13 @@ function EventsEditor() {
   const onSubmit = handleSubmit(async (data) => {
     setSubmitting(true)
 
-    // Handle image upload if a file was selected
+    // Handle image upload if a cropped file is available
     let imageUrl = data.image_url || undefined
-    const file = fileInputRef.current?.files?.[0]
+    const file = croppedFileRef.current
     if (file) {
       const result = await uploadFileFromInput(file, 'events')
       if (result.ok) imageUrl = result.url
+      croppedFileRef.current = null
     }
 
     const isEditing = modalItem !== 'add' && modalItem !== null
@@ -138,10 +142,18 @@ function EventsEditor() {
     setSubmitting(false)
   })
 
+  const { openCrop, cropModal } = useImageCrop({
+    onCropped: (file) => {
+      croppedFileRef.current = file
+      setImagePreview(URL.createObjectURL(file))
+    },
+  })
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      setImagePreview(URL.createObjectURL(file))
+      openCrop(file)
+      e.target.value = ''
     }
   }
 
@@ -398,6 +410,7 @@ function EventsEditor() {
           </div>
         </form>
       </Modal>
+      {cropModal}
     </div>
   )
 }

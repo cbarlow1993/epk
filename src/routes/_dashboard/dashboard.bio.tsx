@@ -9,6 +9,8 @@ import { useDashboardSave } from '~/hooks/useDashboardSave'
 import { DashboardHeader } from '~/components/DashboardHeader'
 import { useSectionToggle } from '~/hooks/useSectionToggle'
 import { uploadFileFromInput } from '~/utils/upload'
+import { useImageCrop } from '~/hooks/useImageCrop'
+import { CROP_ASPECTS } from '~/utils/crop'
 
 const bioFormSchema = z.object({
   profile_image_url: z.string().url('Invalid URL').optional().or(z.literal('')),
@@ -62,6 +64,11 @@ function BioEditor() {
       setUploadError(result.error)
     }
   }
+
+  const { openCrop, cropModal } = useImageCrop({
+    aspect: CROP_ASPECTS.square,
+    onCropped: handleProfileImage,
+  })
 
   return (
     <form onSubmit={handleSave}>
@@ -147,7 +154,8 @@ function BioEditor() {
                   accept="image/*"
                   onChange={(e) => {
                     const file = e.target.files?.[0]
-                    if (file) handleProfileImage(file)
+                    if (file) openCrop(file)
+                    e.target.value = ''
                   }}
                   className={FORM_FILE_INPUT}
                 />
@@ -176,6 +184,7 @@ function BioEditor() {
           />
         </div>
       </div>
+      {cropModal}
     </form>
   )
 }
