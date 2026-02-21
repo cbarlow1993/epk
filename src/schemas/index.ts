@@ -1,7 +1,7 @@
 export { editorDataSchema, type EditorData } from './editorData'
 export { profileUpdateSchema, type ProfileUpdate } from './profile'
 export { technicalRiderUpdateSchema, DECK_MODELS, MIXER_MODELS, MONITOR_TYPES, type TechnicalRiderUpdate } from './technical-rider'
-export { bookingContactUpdateSchema, type BookingContactUpdate } from './booking-contact'
+export { bookingContactUpdateSchema, CONTACT_MODES, contactFormSubmissionSchema, type BookingContactUpdate, type ContactFormSubmission } from './booking-contact'
 export { mixUpsertSchema, type MixUpsert } from './mix'
 export { eventUpsertSchema, type EventUpsert } from './event'
 export { socialLinkUpsertSchema, SOCIAL_PLATFORMS, type SocialLinkUpsert } from './social-link'
