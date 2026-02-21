@@ -20,6 +20,7 @@ import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
+import { Route as SupportCustomDomainRouteImport } from './routes/support/custom-domain'
 import { Route as InviteTokenRouteImport } from './routes/invite/$token'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
@@ -97,6 +98,11 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => BlogRoute,
+} as any)
+const SupportCustomDomainRoute = SupportCustomDomainRouteImport.update({
+  id: '/support/custom-domain',
+  path: '/support/custom-domain',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const InviteTokenRoute = InviteTokenRouteImport.update({
   id: '/invite/$token',
@@ -238,6 +244,7 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/support/custom-domain': typeof SupportCustomDomainRoute
   '/blog/': typeof BlogIndexRoute
   '/dashboard/billing': typeof DashboardDashboardBillingRoute
   '/dashboard/bio': typeof DashboardDashboardBioRoute
@@ -271,6 +278,7 @@ export interface FileRoutesByTo {
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/support/custom-domain': typeof SupportCustomDomainRoute
   '/blog': typeof BlogIndexRoute
   '/dashboard/billing': typeof DashboardDashboardBillingRoute
   '/dashboard/bio': typeof DashboardDashboardBioRoute
@@ -308,6 +316,7 @@ export interface FileRoutesById {
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/support/custom-domain': typeof SupportCustomDomainRoute
   '/blog/': typeof BlogIndexRoute
   '/_dashboard/dashboard/billing': typeof DashboardDashboardBillingRoute
   '/_dashboard/dashboard/bio': typeof DashboardDashboardBioRoute
@@ -345,6 +354,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/blog/$slug'
     | '/invite/$token'
+    | '/support/custom-domain'
     | '/blog/'
     | '/dashboard/billing'
     | '/dashboard/bio'
@@ -378,6 +388,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/blog/$slug'
     | '/invite/$token'
+    | '/support/custom-domain'
     | '/blog'
     | '/dashboard/billing'
     | '/dashboard/bio'
@@ -414,6 +425,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/blog/$slug'
     | '/invite/$token'
+    | '/support/custom-domain'
     | '/blog/'
     | '/_dashboard/dashboard/billing'
     | '/_dashboard/dashboard/bio'
@@ -449,6 +461,7 @@ export interface RootRouteChildren {
   AgencyOrgSlugRoute: typeof AgencyOrgSlugRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   InviteTokenRoute: typeof InviteTokenRoute
+  SupportCustomDomainRoute: typeof SupportCustomDomainRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -529,6 +542,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/blog/'
       preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof BlogRoute
+    }
+    '/support/custom-domain': {
+      id: '/support/custom-domain'
+      path: '/support/custom-domain'
+      fullPath: '/support/custom-domain'
+      preLoaderRoute: typeof SupportCustomDomainRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/invite/$token': {
       id: '/invite/$token'
@@ -777,16 +797,8 @@ const rootRouteChildren: RootRouteChildren = {
   AgencyOrgSlugRoute: AgencyOrgSlugRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   InviteTokenRoute: InviteTokenRoute,
+  SupportCustomDomainRoute: SupportCustomDomainRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
