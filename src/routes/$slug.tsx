@@ -12,6 +12,8 @@ import type { MixRow, EventRow, SocialLinkRow, FileRow } from '~/types/database'
 import { formatEventDate } from '~/utils/dates'
 import { SocialIcon } from '~/components/SocialIcon'
 import { submitContactForm } from '~/server/booking-contact'
+import { AIRenderer } from '~/components/ai-renderer/AIRenderer'
+import type { AIDesignTokens } from '~/schemas/ai-design-tokens'
 
 type PhotoRow = { id: string; image_url: string; caption: string | null; sort_order: number }
 
@@ -321,6 +323,24 @@ function PublicEPK() {
 
   const { profile, socialLinks, mixes, events, technicalRider, bookingContact, pressAssets, photos: rawPhotos } = data
   const photos = (rawPhotos || []) as PhotoRow[]
+
+  // AI Renderer branch: if profile uses AI renderer with saved tokens, render via AIRenderer
+  if (profile?.renderer === 'ai' && profile?.ai_design_tokens) {
+    return (
+      <AIRenderer
+        tokens={profile.ai_design_tokens as AIDesignTokens}
+        content={{
+          profile,
+          profileId: data.profileId,
+          mixes,
+          events,
+          photos,
+          socialLinks,
+          bookingContact,
+        }}
+      />
+    )
+  }
 
   // Build search overrides from URL params or postMessage (preview mode)
   const s = search as Record<string, string | boolean | undefined>
