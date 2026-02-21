@@ -106,7 +106,7 @@ function MusicEditor() {
     const file = fileInputRef.current?.files?.[0]
     if (file) {
       const result = await uploadFileFromInput(file, 'mixes')
-      if (result) imageUrl = result.url
+      if (result.ok) imageUrl = result.url
     }
 
     const isEditing = modalItem !== 'add' && modalItem !== null

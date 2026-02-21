@@ -67,10 +67,10 @@ function PhotosEditor() {
     setUploadError('')
     const result = await uploadFileFromInput(file, 'photos')
     setUploading(false)
-    if (result) {
+    if (result.ok) {
       setValue('image_url', result.url, { shouldDirty: true })
     } else {
-      setUploadError('Upload failed. Please try again.')
+      setUploadError(result.error)
     }
   }
 

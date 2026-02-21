@@ -1,6 +1,23 @@
 import { uploadFile } from '~/server/upload'
 
-export async function uploadFileFromInput(file: File, folder: string): Promise<{ url: string; fileId: string } | null> {
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024 // 10MB
+const MAX_VIDEO_SIZE = 50 * 1024 * 1024 // 50MB
+
+function formatMB(bytes: number): string {
+  return `${Math.round(bytes / 1024 / 1024)}MB`
+}
+
+export type UploadResult =
+  | { ok: true; url: string; fileId: string }
+  | { ok: false; error: string }
+
+export async function uploadFileFromInput(file: File, folder: string): Promise<UploadResult> {
+  const isVideo = file.type.startsWith('video/')
+  const maxSize = isVideo ? MAX_VIDEO_SIZE : MAX_IMAGE_SIZE
+  if (file.size > maxSize) {
+    return { ok: false, error: `File is ${formatMB(file.size)} — must be under ${formatMB(maxSize)}.` }
+  }
+
   const base64 = await fileToBase64(file)
   const result = await uploadFile({
     data: {
@@ -10,11 +27,13 @@ export async function uploadFileFromInput(file: File, folder: string): Promise<{
       folder,
     },
   })
-  if ('error' in result) {
-    console.error('Upload failed:', result.error)
-    return null
+  if ('error' in result && result.error) {
+    return { ok: false, error: result.error }
   }
-  return { url: result.url, fileId: result.fileId }
+  if (!('url' in result) || !result.url) {
+    return { ok: false, error: 'Upload failed. Please try again.' }
+  }
+  return { ok: true, url: result.url, fileId: result.fileId as string }
 }
 
 function fileToBase64(file: File): Promise<string> {

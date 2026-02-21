@@ -116,7 +116,7 @@ function SeoSharingEditor() {
     if (!file) return
     setUploading(true)
     const result = await uploadFileFromInput(file, 'og-images')
-    if (result) {
+    if (result.ok) {
       seoForm.setValue('og_image_url', result.url, { shouldDirty: true })
     }
     setUploading(false)

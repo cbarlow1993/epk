@@ -38,6 +38,7 @@ function PressEditor() {
     { deleteFn: deletePressAsset, reorderFn: reorderPressAssets }
   )
   const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const sectionToggle = useSectionToggle('press', (profile as ProfileRow | null)?.section_visibility as Record<string, boolean> | null)
   const [saving, setSaving] = useState(false)
@@ -57,9 +58,11 @@ function PressEditor() {
     const file = fileInputRef.current?.files?.[0]
     if (!file) return
     setUploading(true)
+    setUploadError('')
 
     const uploadResult = await uploadFileFromInput(file, 'press')
-    if (!uploadResult) {
+    if (!uploadResult.ok) {
+      setUploadError(uploadResult.error)
       setUploading(false)
       return
     }
@@ -164,6 +167,7 @@ function PressEditor() {
         >
           {uploading ? 'Uploading...' : 'Upload'}
         </button>
+        {uploadError && <p className="text-xs text-red-500 mt-2">{uploadError}</p>}
       </div>
 
       {/* Assets Grid */}

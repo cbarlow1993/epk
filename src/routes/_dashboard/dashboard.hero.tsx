@@ -70,10 +70,10 @@ function HeroEditor() {
     setUploadError('')
     const result = await uploadFileFromInput(file, 'hero')
     setUploading(false)
-    if (result) {
+    if (result.ok) {
       setValue('hero_image_url', result.url, { shouldDirty: true })
     } else {
-      setUploadError('Upload failed. Please try again.')
+      setUploadError(result.error)
     }
   }
 
@@ -118,10 +118,10 @@ function HeroEditor() {
     setUploadError('')
     const result = await uploadFileFromInput(file, 'hero')
     setUploading(false)
-    if (result) {
+    if (result.ok) {
       setValue('hero_video_url', result.url, { shouldDirty: true })
     } else {
-      setVideoError('Upload failed. Please try again.')
+      setVideoError(result.error)
     }
   }
 

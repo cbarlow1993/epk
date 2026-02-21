@@ -56,10 +56,10 @@ function BioEditor() {
     setUploadError('')
     const result = await uploadFileFromInput(file, 'profile')
     setUploadingPhoto(false)
-    if (result) {
+    if (result.ok) {
       setValue('profile_image_url', result.url, { shouldDirty: true })
     } else {
-      setUploadError('Upload failed. Please try again.')
+      setUploadError(result.error)
     }
   }
 
