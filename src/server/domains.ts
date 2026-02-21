@@ -47,8 +47,14 @@ export const addCustomDomain = createServerFn({ method: 'POST' })
       return { error: err.error?.message || 'Failed to add domain' }
     }
 
+    const responseData = await res.json()
     await supabase.from('profiles').update({ custom_domain: data.domain }).eq('id', user.id)
-    return { success: true, domain: data.domain }
+    return {
+      success: true,
+      domain: data.domain,
+      verified: responseData.verified || false,
+      verification: responseData.verification || [],
+    }
   })
 
 export const removeCustomDomain = createServerFn({ method: 'POST' }).handler(async () => {
@@ -76,23 +82,35 @@ export const checkDomainStatus = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const { supabase, user } = await withAuth()
 
-    // Verify the domain belongs to this user
     const { data: profile } = await supabase
       .from('profiles')
       .select('custom_domain')
       .eq('id', user.id)
       .single()
 
-    if (profile?.custom_domain !== data.domain) return { configured: false }
+    if (profile?.custom_domain !== data.domain) return { configured: false, verified: false, verification: [] }
 
     const teamParam = VERCEL_TEAM_ID ? `?teamId=${VERCEL_TEAM_ID}` : ''
+
+    // Trigger Vercel to re-check domain verification
+    await fetch(`https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/domains/${data.domain}/verify${teamParam}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${VERCEL_TOKEN}` },
+    })
+
+    // Fetch current domain status
     const res = await fetch(`https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/domains/${data.domain}${teamParam}`, {
       headers: { Authorization: `Bearer ${VERCEL_TOKEN}` },
     })
 
-    if (!res.ok) return { configured: false }
+    if (!res.ok) return { configured: false, verified: false, verification: [] }
+
     const domainData = await res.json()
-    return { configured: domainData.verified || false }
+    return {
+      configured: true,
+      verified: domainData.verified || false,
+      verification: domainData.verification || [],
+    }
   })
 
 export const searchDomain = createServerFn({ method: 'POST' })
