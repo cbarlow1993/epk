@@ -56,14 +56,29 @@ function AIDesignerPage() {
     redo,
     canUndo,
     canRedo,
-  } = useTokenHistory(savedTokens as AIDesignTokens)
+  } = useTokenHistory(savedTokens ?? null)
 
   // Lock state
   const [lockState, setLockState] = useState<TokenLockState>({})
 
-  // Chat history
+  // Chat history — synced from ChatPanel via onChatMessage callback
   const [chatHistory, setChatHistory] = useState<AIChatMessage[]>(
     () => (profile?.ai_chat_history as AIChatMessage[]) || [],
+  )
+
+  const handleChatMessage = useCallback(
+    (msg: { role: 'user' | 'assistant'; content: string; tokenChanges?: PartialAIDesignTokens }) => {
+      setChatHistory((prev) => [
+        ...prev,
+        {
+          role: msg.role,
+          content: msg.content,
+          tokenChanges: msg.tokenChanges,
+          timestamp: new Date().toISOString(),
+        },
+      ])
+    },
+    [],
   )
 
   // Wizard visibility — show wizard if no tokens exist yet
@@ -89,7 +104,7 @@ function AIDesignerPage() {
   const sendTokensToPreview = useCallback((t: AIDesignTokens) => {
     iframeRef.current?.contentWindow?.postMessage(
       { type: 'ai-tokens-update', tokens: t },
-      '*',
+      window.location.origin,
     )
   }, [])
 
@@ -164,16 +179,30 @@ function AIDesignerPage() {
   // Publish / Unpublish handlers
   // ---------------------------------------------------------------------------
   const handlePublish = useCallback(async () => {
-    const result = await publishAIDesign()
-    if (result && !('error' in result)) {
-      setRendererMode('ai')
+    setSaveError('')
+    try {
+      const result = await publishAIDesign()
+      if (result && 'error' in result) {
+        setSaveError(String(result.error))
+      } else {
+        setRendererMode('ai')
+      }
+    } catch {
+      setSaveError('Failed to publish. Please try again.')
     }
   }, [])
 
   const handleUnpublish = useCallback(async () => {
-    const result = await unpublishAIDesign()
-    if (result && !('error' in result)) {
-      setRendererMode('template')
+    setSaveError('')
+    try {
+      const result = await unpublishAIDesign()
+      if (result && 'error' in result) {
+        setSaveError(String(result.error))
+      } else {
+        setRendererMode('template')
+      }
+    } catch {
+      setSaveError('Failed to unpublish. Please try again.')
     }
   }, [])
 
@@ -325,6 +354,7 @@ function AIDesignerPage() {
             tokens={tokens}
             lockState={lockState}
             onTokensUpdate={handleTokensUpdate}
+            onChatMessage={handleChatMessage}
             profile={profile as Record<string, unknown>}
             usage={{ used: usageData.used, limit: usageData.limit }}
           />

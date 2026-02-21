@@ -20,7 +20,7 @@ export const getAIDesignData = createServerFn({ method: 'GET' }).handler(async (
   const [profileRes, mixesRes, eventsRes, photosRes, socialRes] = await Promise.all([
     supabase
       .from('profiles')
-      .select('id, display_name, tagline, slug, genres, bio, short_bio, profile_image_url, hero_image_url, accent_color, bg_color, renderer, ai_design_tokens, ai_design_history, ai_chat_history, tier')
+      .select('*')
       .eq('id', user.id)
       .single(),
     supabase.from('mixes').select('*').eq('profile_id', user.id).order('sort_order'),
@@ -144,33 +144,12 @@ export const incrementAIUsage = createServerFn({ method: 'POST' }).handler(async
   const { supabase, user } = await withAuth()
   const month = getCurrentMonth()
 
-  // Check current usage first
-  const { data: existing } = await supabase
-    .from('ai_usage')
-    .select('message_count')
-    .eq('user_id', user.id)
-    .eq('month', month)
-    .maybeSingle()
+  const { data: newCount, error } = await supabase.rpc('increment_ai_usage', {
+    p_user_id: user.id,
+    p_month: month,
+    p_limit: AI_MONTHLY_LIMIT,
+  })
 
-  const currentCount = existing?.message_count ?? 0
-  if (currentCount >= AI_MONTHLY_LIMIT) {
-    return { error: 'Monthly AI limit reached' }
-  }
-
-  // Upsert with increment
-  const { data: usage, error } = await supabase
-    .from('ai_usage')
-    .upsert(
-      {
-        user_id: user.id,
-        month,
-        message_count: currentCount + 1,
-      },
-      { onConflict: 'user_id,month' }
-    )
-    .select('message_count')
-    .single()
-
-  if (error) return { error: error.message }
-  return { data: { used: usage.message_count } }
+  if (error) return { error: 'Monthly AI limit reached' }
+  return { data: { used: newCount as number } }
 })

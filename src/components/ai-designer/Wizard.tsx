@@ -54,12 +54,6 @@ export function Wizard({ onComplete, onCancel, initialStep = 0 }: WizardProps) {
     return true
   }, [step, selectedVibe])
 
-  const handleNext = useCallback(() => {
-    if (step < STEPS.length - 1) {
-      setStep(step + 1)
-    }
-  }, [step])
-
   const handleBack = useCallback(() => {
     if (step > 0) {
       setStep(step - 1)

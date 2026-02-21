@@ -22,6 +22,7 @@ export interface ChatPanelProps {
   tokens: AIDesignTokens
   lockState: TokenLockState
   onTokensUpdate: (newTokens: AIDesignTokens, changes: PartialAIDesignTokens) => void
+  onChatMessage?: (msg: { role: 'user' | 'assistant'; content: string; tokenChanges?: PartialAIDesignTokens }) => void
   profile: Record<string, unknown>
   usage: { used: number; limit: number }
 }
@@ -41,6 +42,7 @@ export function ChatPanel({
   tokens,
   lockState,
   onTokensUpdate,
+  onChatMessage,
   profile,
   usage,
 }: ChatPanelProps) {
@@ -77,6 +79,7 @@ export function ChatPanel({
       }
 
       setMessages((prev) => [...prev, userMessage])
+      onChatMessage?.({ role: 'user', content: text.trim() })
       setInput('')
       setIsStreaming(true)
       setStreamingText('')
@@ -166,6 +169,7 @@ export function ChatPanel({
         }
 
         setMessages((prev) => [...prev, assistantMessage])
+        onChatMessage?.({ role: 'assistant', content: fullText, tokenChanges })
         setLocalUsage((prev) => prev + 1)
       } catch (err: unknown) {
         if (err instanceof DOMException && err.name === 'AbortError') {
@@ -197,7 +201,7 @@ export function ChatPanel({
         abortRef.current = null
       }
     },
-    [isStreaming, limitReached, messages, lockState, profile, onTokensUpdate, streamingText],
+    [isStreaming, limitReached, messages, lockState, profile, onTokensUpdate, onChatMessage, streamingText],
   )
 
   const handleSubmit = (e: React.FormEvent) => {
