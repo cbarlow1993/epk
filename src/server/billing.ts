@@ -51,7 +51,7 @@ export const createCheckoutSession = createServerFn({ method: 'POST' })
       return { url: session.url }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Unknown billing error'
-      console.error('[billing] Checkout error:', message)
+      console.error('[billing] Checkout error:', message, err)
       return { error: 'Unable to start checkout. Please try again later.' }
     }
   })
