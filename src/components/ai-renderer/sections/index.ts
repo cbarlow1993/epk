@@ -1,0 +1,8 @@
+export { AIHero } from './AIHero'
+export { AIBio } from './AIBio'
+export { AIMusic } from './AIMusic'
+export { AIEvents } from './AIEvents'
+export { AIPhotos } from './AIPhotos'
+export { AIContact } from './AIContact'
+export { AINav } from './AINav'
+export { AIFooter } from './AIFooter'
