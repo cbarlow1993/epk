@@ -304,11 +304,15 @@ function PublicEPK() {
 
   // Preview mode: receive live theme updates via postMessage (no iframe reload)
   const [previewOverrides, setPreviewOverrides] = useState<Record<string, string>>({})
+  const [previewAITokens, setPreviewAITokens] = useState<AIDesignTokens | null>(null)
   useEffect(() => {
     if (!search.preview) return
     function handleMessage(e: MessageEvent) {
       if (e.data?.type === 'theme-update' && e.data.values) {
         setPreviewOverrides(e.data.values)
+      }
+      if (e.data?.type === 'ai-tokens-update' && e.data.tokens) {
+        setPreviewAITokens(e.data.tokens as AIDesignTokens)
       }
     }
     window.addEventListener('message', handleMessage)
@@ -323,6 +327,24 @@ function PublicEPK() {
 
   const { profile, socialLinks, mixes, events, technicalRider, bookingContact, pressAssets, photos: rawPhotos } = data
   const photos = (rawPhotos || []) as PhotoRow[]
+
+  // Preview AI tokens: when received via PostMessage from the AI designer, render AIRenderer with those tokens
+  if (previewAITokens && search.preview) {
+    return (
+      <AIRenderer
+        tokens={previewAITokens}
+        content={{
+          profile,
+          profileId: data.profileId,
+          mixes,
+          events,
+          photos,
+          socialLinks,
+          bookingContact,
+        }}
+      />
+    )
+  }
 
   // AI Renderer branch: if profile uses AI renderer with saved tokens, render via AIRenderer
   if (profile?.renderer === 'ai' && profile?.ai_design_tokens) {
