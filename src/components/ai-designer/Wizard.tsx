@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react'
 import { VIBE_PRESETS, type VibePreset } from '~/utils/ai-vibe-presets'
-import { GOOGLE_FONTS } from '~/utils/theme-options'
 import { BTN_PRIMARY, BTN_BASE } from '~/components/forms/styles'
 import type { AIDesignTokens, TokenLockState } from '~/schemas/ai-design-tokens'
 
